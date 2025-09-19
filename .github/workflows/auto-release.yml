@@ -11,26 +11,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: npm test
+        run: pnpm test
 
       - name: Run linter
-        run: npm run lint || echo "No lint script"
+        run: pnpm run lint || echo "No lint script"
 
       - name: Build package
-        run: npm run build
+        run: pnpm run build
 
       - name: Check package
-        run: npm pack --dry-run
+        run: pnpm pack --dry-run
 
   auto-release:
     needs: test
@@ -41,17 +46,23 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build package
-        run: npm run build
+        run: pnpm run build
 
       - name: Configure Git
         run: |
@@ -79,7 +90,7 @@ jobs:
 
       - name: Bump version
         run: |
-          npm version ${{ steps.bump.outputs.bump }} -m "chore: release v%s [skip ci]"
+          pnpm version ${{ steps.bump.outputs.bump }} -m "chore: release v%s [skip ci]"
           echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: Generate changelog
@@ -108,7 +119,7 @@ jobs:
           prerelease: false
 
       - name: Publish to NPM
-        run: npm publish --access public
+        run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
