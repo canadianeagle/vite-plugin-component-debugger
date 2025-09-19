@@ -36,11 +36,13 @@ import componentTagger from 'vite-plugin-component-debugger';
 
 export default defineConfig({
   plugins: [
-    react(),
-    componentTagger() // That's it!
+    componentTagger(), // ⚠️ IMPORTANT: Must be BEFORE react()
+    react()
   ]
 });
 ```
+
+> **⚠️ CRITICAL**: componentTagger() must be placed **BEFORE** react() plugin, otherwise line numbers will be wrong
 
 ## What It Does
 
@@ -181,12 +183,12 @@ const isStaging = process.env.NODE_ENV === 'staging';
 
 export default defineConfig({
   plugins: [
-    react(),
     componentTagger({
       enabled: isDev || isStaging,
       attributePrefix: isStaging ? 'data-staging' : 'data-dev',
       includeProps: isDev, // Props only in development
-    })
+    }),
+    react()
   ]
 });
 ```
@@ -222,7 +224,7 @@ const config: TagOptions = {
 };
 
 export default defineConfig({
-  plugins: [react(), componentTagger(config)]
+  plugins: [componentTagger(config), react()]
 });
 ```
 
@@ -242,10 +244,34 @@ export default defineConfig({
 
 ### Troubleshooting
 
+**⚠️ Line numbers are wrong/offset by ~19?**
+1. **Most common issue**: Plugin order is wrong
+2. **Fix**: Move `componentTagger()` BEFORE `react()` in Vite config
+3. **Cause**: React plugin adds ~19 lines of imports/HMR setup
+
+```typescript
+// ❌ WRONG - Line numbers will be offset
+export default defineConfig({
+  plugins: [
+    react(),           // Transforms code first, adds ~19 lines
+    componentTagger()  // Gets wrong line numbers
+  ]
+});
+
+// ✅ CORRECT - Accurate line numbers
+export default defineConfig({
+  plugins: [
+    componentTagger(), // Processes original source first
+    react()           // Transforms after tagging
+  ]
+});
+```
+
 **Elements not being tagged?**
 1. Check file extension is in `extensions`
 2. Verify element isn't in exclusion lists
 3. Ensure plugin is enabled
+4. Verify plugin order (componentTagger before react)
 
 **Build performance issues?**
 1. Limit `extensions` scope
@@ -256,6 +282,14 @@ export default defineConfig({
 ```typescript
 componentTagger({
   enabled: process.env.NODE_ENV !== 'production'
+})
+```
+
+**Debug line number issues:**
+```typescript
+componentTagger({
+  debug: true, // Shows processed code and line numbers
+  enabled: true
 })
 ```
 

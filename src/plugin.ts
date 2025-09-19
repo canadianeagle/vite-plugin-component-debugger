@@ -11,42 +11,48 @@ export interface TagOptions {
    * @default ['.jsx', '.tsx']
    */
   extensions?: string[];
-  
+
   /**
    * Prefix for data attributes
    * @default 'data-dev'
    */
   attributePrefix?: string;
-  
+
   /**
    * Elements to exclude from tagging
    * @default ['Fragment', 'React.Fragment']
    */
   excludeElements?: string[];
-  
+
   /**
    * Whether to include component props in the data
    * @default true
    */
   includeProps?: boolean;
-  
+
   /**
    * Whether to include text content
    * @default true
    */
   includeContent?: boolean;
-  
+
   /**
    * Custom elements to skip (like Three.js elements)
    * @default Set of Three.js elements
    */
   customExcludes?: Set<string>;
-  
+
   /**
    * Enable/disable the plugin
    * @default true
    */
   enabled?: boolean;
+
+  /**
+   * Enable debug logging for troubleshooting
+   * @default false
+   */
+  debug?: boolean;
 }
 
 interface ComponentInfo {
@@ -136,7 +142,8 @@ export function componentTagger(options: TagOptions = {}): Plugin {
     includeProps = true,
     includeContent = true,
     customExcludes = DEFAULT_THREE_FIBER_ELEMENTS,
-    enabled = true
+    enabled = true,
+    debug = false
   } = options;
 
   const projectRoot = process.cwd();
@@ -166,6 +173,21 @@ export function componentTagger(options: TagOptions = {}): Plugin {
       const filename = path.basename(id);
 
       try {
+        // Debug: Log the actual code being processed
+        if (debug) {
+          console.log(`\n🔍 PROCESSING FILE: ${relativePath}`);
+          console.log(`📄 CODE LENGTH: ${code.length} characters`);
+          console.log(`📄 FIRST 10 LINES:`);
+          code.split('\n').slice(0, 10).forEach((line, i) => {
+            console.log(`  ${i + 1}: ${line}`);
+          });
+          console.log(`📄 LAST 5 LINES:`);
+          const lines = code.split('\n');
+          lines.slice(-5).forEach((line, i) => {
+            console.log(`  ${lines.length - 5 + i + 1}: ${line}`);
+          });
+        }
+
         // Parse the code
         const ast = parse(code, {
           sourceType: 'module',
@@ -230,11 +252,26 @@ export function componentTagger(options: TagOptions = {}): Plugin {
                 return;
               }
 
-              // Collect component information
+              // Collect component information with validation
+              const line = openingElement.loc?.start?.line ?? 1; // Default to line 1, not 0
+              const column = openingElement.loc?.start?.column ?? 0;
+
+              // Warn if location info is missing (indicates potential parser issue)
+              if (!openingElement.loc?.start) {
+                if (debug) {
+                  console.warn(`⚠️  Missing location info for element "${elementName}" in ${relativePath}`);
+                }
+              }
+
+              // Debug logging
+              if (debug) {
+                console.log(`🏷️  Tagging ${elementName} at line ${line}, column ${column} in ${relativePath}`);
+              }
+
               const info: ComponentInfo = {
                 path: relativePath,
-                line: openingElement.loc?.start?.line ?? 0,
-                column: openingElement.loc?.start?.column ?? 0,
+                line,
+                column,
                 file: filename,
                 name: elementName
               };

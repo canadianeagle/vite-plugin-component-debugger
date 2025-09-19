@@ -69,6 +69,33 @@ Version files: `.nvmrc`, `.node-version` specify Node 18.12.0
 - `magic-string` - Code modification
 - `vite` - Peer dependency
 
+## Critical Setup Requirements
+
+### Plugin Order in Vite Config
+**CRITICAL**: The componentTagger plugin MUST be placed BEFORE the React plugin:
+
+```typescript
+// ✅ CORRECT - Plugin processes original source code
+export default defineConfig({
+  plugins: [
+    componentTagger({
+      enabled: process.env.NODE_ENV === 'development'
+    }),
+    react() // React plugin runs after componentTagger
+  ]
+})
+
+// ❌ WRONG - Plugin gets transformed code with wrong line numbers
+export default defineConfig({
+  plugins: [
+    react(),           // Adds ~19 lines of imports/HMR setup
+    componentTagger()  // Gets wrong line numbers (+19 offset)
+  ]
+})
+```
+
+**Why this matters**: React plugin injects ~19 lines of imports and HMR code. If componentTagger runs after React, line numbers will be offset by ~19 lines, causing `data-dev-line` attributes to be incorrect.
+
 ## Configuration Options
 
 Main `TagOptions` interface:
@@ -79,6 +106,7 @@ Main `TagOptions` interface:
 - `includeProps` - Capture component props
 - `includeContent` - Include text content
 - `customExcludes` - Custom element exclusions
+- `debug` - Enable debug logging for troubleshooting
 
 ## Development Workflow
 
@@ -92,3 +120,35 @@ Main `TagOptions` interface:
 - TypeScript declarations included
 - Source maps for debugging
 - Output: `dist/`
+
+## Troubleshooting
+
+### Line Numbers Are Wrong/Offset
+**Symptoms**: `data-dev-line` attributes show line numbers ~19 higher than expected
+**Cause**: Plugin is running after React plugin
+**Solution**: Move `componentTagger()` BEFORE `react()` in Vite config
+
+### Plugin Not Working
+**Check**:
+1. Plugin order (componentTagger before react)
+2. File extensions match (default: `.jsx`, `.tsx`)
+3. Plugin is enabled (`enabled: true`)
+4. File is not in `node_modules`
+
+### Debug Line Number Issues
+Enable debug logging:
+```typescript
+componentTagger({
+  debug: true, // Shows processed code and line numbers
+  enabled: true
+})
+```
+
+### Testing Line Number Accuracy
+Use Playwright or similar to verify DOM `data-dev-line` attributes match source:
+```typescript
+// Test that div on source line 9 has data-dev-line="9"
+const element = page.getByTestId('my-div');
+const lineNumber = await element.getAttribute('data-dev-line');
+expect(lineNumber).toBe('9');
+```
