@@ -7,9 +7,9 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -20,8 +20,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "prepublishOnly": "npm run build",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
+    "test": "vitest --run",
+    "test:coverage": "vitest --coverage --run",
     "lint": "eslint src/**/*.ts",
     "pre-publish": "node scripts/pre-publish.js",
     "check": "npm run lint && npm run test && npm run build",
@@ -38,16 +38,16 @@
     "development-tools",
     "devtools"
   ],
-  "author": "Your Name",
+  "author": "Tonye Brown <hello@tonyebrown.com> (https://www.tonyebrown.com)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/vite-plugin-component-debugger.git"
+    "url": "https://github.com/canadianeagle/vite-plugin-component-debugger.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/vite-plugin-component-debugger/issues"
+    "url": "https://github.com/canadianeagle/vite-plugin-component-debugger/issues"
   },
-  "homepage": "https://github.com/yourusername/vite-plugin-component-debugger#readme",
+  "homepage": "https://www.tonyebrown.com/apps/vite-plugin-component-debugger",
   "peerDependencies": {
     "vite": "^4.0.0 || ^5.0.0"
   },

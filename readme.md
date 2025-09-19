@@ -304,18 +304,83 @@ componentTagger({
 })
 ```
 
-## License
+## Inspiration
 
-MIT
+This plugin was inspired by [lovable-tagger](https://www.npmjs.com/package/lovable-tagger), bringing similar functionality to the Vite ecosystem with enhanced features for React development.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Here's how you can help:
+
+### 🐛 Bug Reports
+- Use the issue tracker to report bugs
+- Include a minimal reproduction case
+- Specify your Vite, React, and plugin versions
+
+### 💡 Feature Requests
+- Open an issue describing the feature
+- Explain the use case and expected behavior
+- Consider implementing it yourself via PR!
+
+### 🤝 Pull Requests
+1. Fork the repository
+2. Create a feature branch: `git checkout -b my-feature`
+3. Make your changes and add tests
+4. Run the full test suite: `pnpm run check`
+5. Commit with a clear message
+6. Push and open a pull request
+
+### 🔧 Development Setup
+```bash
+# Clone and install
+git clone https://github.com/yourusername/vite-plugin-component-debugger.git
+cd vite-plugin-component-debugger
+pnpm install
+
+# Run tests
+pnpm run test
+
+# Build and test
+pnpm run build
+pnpm run check
+```
+
+### 📝 Code Guidelines
+- Follow existing code style
+- Add tests for new features
+- Update documentation as needed
+- Ensure TypeScript types are correct
+
+## Author
+
+**Tonye Brown** is a seasoned front-end developer and designer, crafting immersive web experiences of various scales and complexities. Guided by 5 principles for excellence and a deep-rooted passion for creativity and innovation, he blends coding expertise with an unerring eye for design.
+
+His mission is to help brands forge meaningful & memorable connections with their customers through highly performant and beautifully designed web & digital experiences. Beyond code, he's also a Music Producer and Artist.
+
+**Connect with Tonye:**
+- 🌐 Website: [www.tonyebrown.com](https://www.tonyebrown.com)
+- 📖 Plugin Documentation: [www.tonyebrown.com/apps/vite-plugin-component-debugger](https://www.tonyebrown.com/apps/vite-plugin-component-debugger)
+- 🐦 Twitter: [@truevined](https://www.twitter.com/truevined)
+- 💼 LinkedIn: [/in/tonyeb](https://www.linkedin.com/in/tonyeb/)
+
+**Support This Project:**
+If this plugin helps improve your development workflow, consider supporting its development:
+
+- ⭐ Star this repository
+- ☕ [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
+- 💝 [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
+
+Your support helps maintain and improve this plugin! 🙏
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details
 
 ## Support
 
 If you find this plugin helpful, please consider:
 - ⭐ Starring the repository
-- 🐛 Reporting issues
+- 🐛 Reporting issues on GitHub
 - 💡 Suggesting new features
-- 🤝 Contributing code
+- 🤝 Contributing code via pull requests
+- 📢 Sharing with other developers

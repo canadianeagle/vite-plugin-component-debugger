@@ -12,13 +12,8 @@ export default defineConfig({
   minify: false,
   shims: true,
   esbuildOptions(options) {
-    options.footer = {
-      js: `if (module.exports.default) {
-        module.exports = module.exports.default;
-        for (const key in module.exports.default) {
-          module.exports[key] = module.exports.default[key];
-        }
-      }`
-    };
-  }
+    options.format = options.format;
+  },
+  bundle: true,
+  target: 'es2020'
 });
