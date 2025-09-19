@@ -1,0 +1,132 @@
+# .github/workflows/publish.yml
+name: Publish Package
+
+on:
+  # Manual trigger with version input
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version type (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+  
+  # Automatic trigger on release
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Run linter
+        run: npm run lint || echo "No lint script"
+      
+      - name: Build package
+        run: npm run build
+      
+      - name: Check package
+        run: npm pack --dry-run
+
+  publish-npm:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build package
+        run: npm run build
+      
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      
+      # Version bump only for manual trigger
+      - name: Bump version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          npm version ${{ github.event.inputs.version }} -m "Release %s"
+          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      
+      # Get version for release trigger
+      - name: Get version
+        if: github.event_name == 'release'
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      # Push version bump for manual trigger
+      - name: Push changes
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git push
+          git push --tags
+      
+      - name: Create GitHub Release
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
+          body: |
+            ## Changes in this release
+            - See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details
+            
+            ## Installation
+            ```bash
+            npm install --save-dev vite-plugin-component-debugger@${{ env.VERSION }}
+            ```
+          draft: false
+          prerelease: false
+
+  # Notify on success
+  notify-success:
+    needs: publish-npm
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Get package info
+        id: package
+        run: |
+          echo "name=vite-plugin-component-debugger" >> $GITHUB_OUTPUT
+          echo "version=$(npm view vite-plugin-component-debugger version)" >> $GITHUB_OUTPUT
+      
+      - name: Success message
+        run: |
+          echo "🎉 Successfully published ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
+          echo "View on NPM: https://www.npmjs.com/package/${{ steps.package.outputs.name }}"

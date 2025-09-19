@@ -1,0 +1,72 @@
+{
+  "name": "vite-plugin-component-debugger",
+  "version": "1.0.0",
+  "description": "A Vite plugin that adds data attributes to JSX/TSX elements for development tracking and debugging",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "pre-publish": "node scripts/pre-publish.js",
+    "check": "npm run lint && npm run test && npm run build",
+    "clean": "rm -rf dist node_modules"
+  },
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "react",
+    "jsx",
+    "tsx",
+    "component-tagging",
+    "debugging",
+    "development-tools",
+    "devtools"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/vite-plugin-component-debugger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/vite-plugin-component-debugger/issues"
+  },
+  "homepage": "https://github.com/yourusername/vite-plugin-component-debugger#readme",
+  "peerDependencies": {
+    "vite": "^4.0.0 || ^5.0.0"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.24.0",
+    "estree-walker": "^3.0.3",
+    "magic-string": "^0.30.7"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.20.5",
+    "@types/estree": "^1.0.5",
+    "@types/node": "^20.11.0",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=14.18.0"
+  }
+}
