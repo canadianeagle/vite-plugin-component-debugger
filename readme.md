@@ -1,5 +1,22 @@
 # vite-plugin-component-debugger
 
+<div align="center">
+
+[![npm version](https://badge.fury.io/js/vite-plugin-component-debugger.svg)](https://badge.fury.io/js/vite-plugin-component-debugger)
+[![npm downloads](https://img.shields.io/npm/dm/vite-plugin-component-debugger.svg)](https://www.npmjs.com/package/vite-plugin-component-debugger)
+[![GitHub license](https://img.shields.io/github/license/canadianeagle/vite-plugin-component-debugger.svg)](https://github.com/canadianeagle/vite-plugin-component-debugger/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/canadianeagle/vite-plugin-component-debugger.svg?style=social&label=Star)](https://github.com/canadianeagle/vite-plugin-component-debugger)
+
+[![Build Status](https://github.com/canadianeagle/vite-plugin-component-debugger/workflows/CI/badge.svg)](https://github.com/canadianeagle/vite-plugin-component-debugger/actions)
+[![Auto Release](https://github.com/canadianeagle/vite-plugin-component-debugger/workflows/Auto%20Release/badge.svg)](https://github.com/canadianeagle/vite-plugin-component-debugger/actions)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/tonyebrown)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/truevined?style=social)](https://twitter.com/truevined)
+
+</div>
+
 A Vite plugin that automatically adds data attributes to JSX/TSX elements during development, making it easier to track, debug, and understand component rendering in your React applications.
 
 ## Quick Start
@@ -327,4 +344,16 @@ MIT © [Tonye Brown](https://www.tonyebrown.com)
 
 ---
 
+<div align="center">
+
+**Made with ❤️ by [Tonye Brown](https://www.tonyebrown.com)**
+
 *Inspired by [lovable-tagger](https://www.npmjs.com/package/lovable-tagger), enhanced for the Vite ecosystem.*
+
+[![GitHub](https://img.shields.io/badge/GitHub-canadianeagle-181717?style=flat&logo=github)](https://github.com/canadianeagle)
+[![Website](https://img.shields.io/badge/Website-tonyebrown.com-4285F4?style=flat&logo=google-chrome&logoColor=white)](https://www.tonyebrown.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-tonyeb-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/tonyeb/)
+
+**⭐ Star this repo if it helped you!**
+
+</div>
