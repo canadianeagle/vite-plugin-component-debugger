@@ -49,7 +49,7 @@ jobs:
         run: pnpm run build
 
       - name: Check package
-        run: pnpm pack --dry-run
+        run: pnpm pack && rm -f *.tgz
 
   publish-npm:
     needs: test
