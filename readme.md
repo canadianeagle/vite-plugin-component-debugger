@@ -252,13 +252,36 @@ componentTagger({
 - `feat:` or `feature:` or `minor:` → Minor (1.0.0 → 1.1.0)
 - Everything else → Patch (1.0.0 → 1.0.1)
 
+**Example commit messages:**
+```bash
+# Major version (breaking changes)
+git commit -m "BREAKING CHANGE: removed deprecated API"
+git commit -m "major: complete rewrite of plugin interface"
+
+# Minor version (new features)
+git commit -m "feat: add TypeScript 5.0 support"
+git commit -m "feature: new configuration option for props"
+git commit -m "minor: add custom exclude patterns"
+
+# Patch version (bug fixes, docs, chores)
+git commit -m "fix: resolve memory leak in transformer"
+git commit -m "docs: update README examples"
+git commit -m "chore: update dependencies"
+
+# Skip release
+git commit -m "docs: fix typo [skip ci]"
+```
+
 **What happens automatically:**
 1. Tests run, package builds
 2. Version bump based on commit message
 3. GitHub release created with changelog
 4. Package published to npm
 
-**Skip release:** Add `[skip ci]` to commit message
+**Setup auto-publishing:**
+1. Get NPM token: `npm token create --type=automation`
+2. Add to GitHub repo: **Settings** → **Secrets** → `NPM_TOKEN`
+3. Commit to `main` branch to trigger first release
 
 ### Contributing
 1. Fork and clone

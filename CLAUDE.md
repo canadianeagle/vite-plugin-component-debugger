@@ -23,12 +23,24 @@ Vite plugin that automatically adds data attributes to JSX/TSX elements during d
 ### Auto-Release System
 - **Every commit to `main` triggers automatic release**
 - Version bumping based on commit message:
-  - `BREAKING CHANGE:` or `major:` → Major version
-  - `feat:` or `feature:` or `minor:` → Minor version
-  - All other commits → Patch version
+  - `BREAKING CHANGE:` or `major:` → Major version (1.0.0 → 2.0.0)
+  - `feat:` or `feature:` or `minor:` → Minor version (1.0.0 → 1.1.0)
+  - All other commits → Patch version (1.0.0 → 1.0.1)
 - Automatically: runs tests, builds, creates GitHub release, publishes to npm
 - Skip releases: Add `[skip ci]` to commit message
-- See `.github/COMMIT_CONVENTION.md` for details
+
+**Example commit messages:**
+- `feat: add Vue.js support` → Minor version bump
+- `fix: handle JSX fragments better` → Patch version bump
+- `BREAKING CHANGE: drop Node 14` → Major version bump
+- `docs: improve README [skip ci]` → No release
+
+**Setup auto-publishing:**
+1. `npm token create --type=automation`
+2. Add `NPM_TOKEN` secret to GitHub repo settings
+3. Commit to `main` to trigger first release
+
+See `.github/COMMIT_CONVENTION.md` for detailed examples
 
 ## Core Architecture
 

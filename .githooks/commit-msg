@@ -1,0 +1,16 @@
+#!/bin/sh
+# Validate commit message format
+
+commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|BREAKING CHANGE|major|minor)(\(.+\))?: .{1,50}'
+
+error_msg="Invalid commit message format. Use:
+feat: add new feature (minor bump)
+fix: bug fix (patch bump)
+BREAKING CHANGE: breaking change (major bump)
+major: major version bump
+docs: documentation [skip ci]"
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "$error_msg" >&2
+    exit 1
+fi
