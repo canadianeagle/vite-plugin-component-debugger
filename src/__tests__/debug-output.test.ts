@@ -1,11 +1,11 @@
 // src/__tests__/debug-output.test.ts
 import { describe, it, expect } from 'vitest';
-import { componentTagger } from '../plugin';
+import { componentDebugger } from '../plugin';
 
 describe('Debug Output Analysis', () => {
 
   it('should output transformed code for manual inspection', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `// Line 1
 export function DebugComponent() {
   // Line 3
@@ -58,7 +58,7 @@ export function DebugComponent() {
   });
 
   it('should check for edge case with minimal code', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `<div></div>`;
 
     const result = await plugin.transform?.(code, 'minimal.tsx');
@@ -84,7 +84,7 @@ export function DebugComponent() {
   });
 
   it('should test with undefined location info scenario', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     // Create a scenario that might cause undefined loc
     const code = `<><div></div></>`;
 

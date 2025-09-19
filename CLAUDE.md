@@ -72,16 +72,16 @@ Version files: `.nvmrc`, `.node-version` specify Node 18.12.0
 ## Critical Setup Requirements
 
 ### Plugin Order in Vite Config
-**CRITICAL**: The componentTagger plugin MUST be placed BEFORE the React plugin:
+**CRITICAL**: The componentDebugger plugin MUST be placed BEFORE the React plugin:
 
 ```typescript
 // ✅ CORRECT - Plugin processes original source code
 export default defineConfig({
   plugins: [
-    componentTagger({
+    componentDebugger({
       enabled: process.env.NODE_ENV === 'development'
     }),
-    react() // React plugin runs after componentTagger
+    react() // React plugin runs after componentDebugger
   ]
 })
 
@@ -89,12 +89,12 @@ export default defineConfig({
 export default defineConfig({
   plugins: [
     react(),           // Adds ~19 lines of imports/HMR setup
-    componentTagger()  // Gets wrong line numbers (+19 offset)
+    componentDebugger()  // Gets wrong line numbers (+19 offset)
   ]
 })
 ```
 
-**Why this matters**: React plugin injects ~19 lines of imports and HMR code. If componentTagger runs after React, line numbers will be offset by ~19 lines, causing `data-dev-line` attributes to be incorrect.
+**Why this matters**: React plugin injects ~19 lines of imports and HMR code. If componentDebugger runs after React, line numbers will be offset by ~19 lines, causing `data-dev-line` attributes to be incorrect.
 
 ## Configuration Options
 
@@ -126,11 +126,11 @@ Main `TagOptions` interface:
 ### Line Numbers Are Wrong/Offset
 **Symptoms**: `data-dev-line` attributes show line numbers ~19 higher than expected
 **Cause**: Plugin is running after React plugin
-**Solution**: Move `componentTagger()` BEFORE `react()` in Vite config
+**Solution**: Move `componentDebugger()` BEFORE `react()` in Vite config
 
 ### Plugin Not Working
 **Check**:
-1. Plugin order (componentTagger before react)
+1. Plugin order (componentDebugger before react)
 2. File extensions match (default: `.jsx`, `.tsx`)
 3. Plugin is enabled (`enabled: true`)
 4. File is not in `node_modules`
@@ -138,7 +138,7 @@ Main `TagOptions` interface:
 ### Debug Line Number Issues
 Enable debug logging:
 ```typescript
-componentTagger({
+componentDebugger({
   debug: true, // Shows processed code and line numbers
   enabled: true
 })

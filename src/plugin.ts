@@ -134,7 +134,7 @@ const DEFAULT_THREE_FIBER_ELEMENTS = new Set([
   'fog', 'fogExp2', 'shape'
 ]);
 
-export function componentTagger(options: TagOptions = {}): Plugin {
+export function componentDebugger(options: TagOptions = {}): Plugin {
   const {
     extensions = ['.jsx', '.tsx'],
     attributePrefix = 'data-dev',

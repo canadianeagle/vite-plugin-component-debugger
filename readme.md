@@ -17,7 +17,7 @@
 
 </div>
 
-A Vite plugin that automatically adds data attributes to JSX/TSX elements during development, making it easier to track, debug, and understand component rendering in your React applications.
+A Vite plugin that automatically adds data attributes to JSX/TSX elements during development, making it easier to track, debug, and understand component rendering in your React applications. **Perfect for AI-generated code** and debugging "which component rendered this?" 🤔
 
 ## Quick Start
 
@@ -30,23 +30,24 @@ pnpm add -D vite-plugin-component-debugger
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import componentTagger from 'vite-plugin-component-debugger';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import componentDebugger from "vite-plugin-component-debugger";
 
 export default defineConfig({
   plugins: [
-    componentTagger(), // ⚠️ IMPORTANT: Must be BEFORE react()
-    react()
-  ]
+    componentDebugger(), // ⚠️ IMPORTANT: Must be BEFORE react()
+    react(),
+  ],
 });
 ```
 
-> **⚠️ CRITICAL**: componentTagger() must be placed **BEFORE** react() plugin, otherwise line numbers will be wrong
+> **⚠️ CRITICAL**: componentDebugger() must be placed **BEFORE** react() plugin, otherwise line numbers will be wrong
 
 ## What It Does
 
 **Before:**
+
 ```jsx
 // src/components/Button.tsx (line 10)
 <button className="btn-primary" onClick={handleClick}>
@@ -55,6 +56,7 @@ export default defineConfig({
 ```
 
 **After:**
+
 ```jsx
 <button
   data-dev-id="src/components/Button.tsx:10:2"
@@ -82,59 +84,66 @@ export default defineConfig({
 ## Configuration
 
 ### Basic Configuration
+
 ```typescript
-componentTagger({
-  enabled: process.env.NODE_ENV === 'development', // When to run
-  attributePrefix: 'data-dev',                     // Custom prefix
-  extensions: ['.jsx', '.tsx']                     // File types
-})
+componentDebugger({
+  enabled: process.env.NODE_ENV === "development", // When to run
+  attributePrefix: "data-dev", // Custom prefix
+  extensions: [".jsx", ".tsx"], // File types
+});
 ```
 
 ### Advanced Configuration
+
 ```typescript
-componentTagger({
+componentDebugger({
   // Core settings
-  enabled: process.env.NODE_ENV === 'development',
-  attributePrefix: 'data-dev',
-  extensions: ['.jsx', '.tsx'],
+  enabled: process.env.NODE_ENV === "development",
+  attributePrefix: "data-dev",
+  extensions: [".jsx", ".tsx"],
 
   // Content capture
-  includeProps: true,     // Capture component props
-  includeContent: true,   // Capture text content
+  includeProps: true, // Capture component props
+  includeContent: true, // Capture text content
 
   // Element exclusions
-  excludeElements: ['Fragment', 'React.Fragment'],
-  customExcludes: new Set(['mesh', 'group', 'camera']), // Three.js elements
-})
+  excludeElements: ["Fragment", "React.Fragment"],
+  customExcludes: new Set(["mesh", "group", "camera"]), // Three.js elements
+});
 ```
 
 ### All Configuration Options
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `enabled` | `boolean` | `true` | Enable/disable the plugin |
-| `attributePrefix` | `string` | `'data-dev'` | Prefix for data attributes |
-| `extensions` | `string[]` | `['.jsx', '.tsx']` | File extensions to process |
-| `includeProps` | `boolean` | `true` | Include component props in metadata |
-| `includeContent` | `boolean` | `true` | Include text content in metadata |
-| `excludeElements` | `string[]` | `['Fragment', 'React.Fragment']` | Elements to exclude |
-| `customExcludes` | `Set<string>` | Three.js elements | Custom elements to exclude |
+
+| Option            | Type          | Default                          | Description                         |
+| ----------------- | ------------- | -------------------------------- | ----------------------------------- |
+| `enabled`         | `boolean`     | `true`                           | Enable/disable the plugin           |
+| `attributePrefix` | `string`      | `'data-dev'`                     | Prefix for data attributes          |
+| `extensions`      | `string[]`    | `['.jsx', '.tsx']`               | File extensions to process          |
+| `includeProps`    | `boolean`     | `true`                           | Include component props in metadata |
+| `includeContent`  | `boolean`     | `true`                           | Include text content in metadata    |
+| `excludeElements` | `string[]`    | `['Fragment', 'React.Fragment']` | Elements to exclude                 |
+| `customExcludes`  | `Set<string>` | Three.js elements                | Custom elements to exclude          |
 
 ## Use Cases
 
 ### 1. Development Debugging (Simple)
+
 Find components in the DOM:
+
 ```javascript
 // In browser console
-document.querySelectorAll('[data-dev-component="Button"]')
-console.log('Button locations:', [...$$('[data-dev-path*="Button"]')])
+document.querySelectorAll('[data-dev-component="Button"]');
+console.log("Button locations:", [...$$('[data-dev-path*="Button"]')]);
 ```
 
 ### 2. E2E Testing (Intermediate)
+
 Stable selectors for tests:
+
 ```javascript
 // Cypress
 cy.get('[data-dev-component="SubmitButton"]').click();
-cy.get('[data-dev-path*="LoginForm"]').should('be.visible');
+cy.get('[data-dev-path*="LoginForm"]').should("be.visible");
 
 // Playwright
 await page.click('[data-dev-component="SubmitButton"]');
@@ -142,13 +151,15 @@ await expect(page.locator('[data-dev-path*="LoginForm"]')).toBeVisible();
 ```
 
 ### 3. Visual Debugging Tools (Advanced)
+
 Build custom debugging overlays:
+
 ```javascript
 // Show component boundaries on hover
-document.addEventListener('mouseover', (e) => {
+document.addEventListener("mouseover", (e) => {
   const target = e.target;
   if (target.dataset?.devComponent) {
-    target.style.outline = '2px solid red';
+    target.style.outline = "2px solid red";
     console.log(`Component: ${target.dataset.devComponent}`);
     console.log(`Location: ${target.dataset.devPath}:${target.dataset.devLine}`);
   }
@@ -156,11 +167,13 @@ document.addEventListener('mouseover', (e) => {
 ```
 
 ### 4. Performance Monitoring (Expert)
+
 Track component render activity:
+
 ```javascript
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
-    if (mutation.type === 'childList') {
+    if (mutation.type === "childList") {
       mutation.addedNodes.forEach((node) => {
         if (node.dataset?.devId) {
           console.log(`Component rendered: ${node.dataset.devId}`);
@@ -176,59 +189,73 @@ observer.observe(document.body, { childList: true, subtree: true });
 ## Advanced Features
 
 ### Environment-Specific Setup
+
 ```typescript
 // Different configs per environment
-const isDev = process.env.NODE_ENV === 'development';
-const isStaging = process.env.NODE_ENV === 'staging';
+const isDev = process.env.NODE_ENV === "development";
+const isStaging = process.env.NODE_ENV === "staging";
 
 export default defineConfig({
   plugins: [
-    componentTagger({
+    componentDebugger({
       enabled: isDev || isStaging,
-      attributePrefix: isStaging ? 'data-staging' : 'data-dev',
+      attributePrefix: isStaging ? "data-staging" : "data-dev",
       includeProps: isDev, // Props only in development
     }),
-    react()
-  ]
+    react(),
+  ],
 });
 ```
 
 ### React Three Fiber Support
+
 Automatically excludes Three.js elements:
+
 ```typescript
 // Default exclusions
-componentTagger({
+componentDebugger({
   customExcludes: new Set([
-    'mesh', 'group', 'scene', 'camera',
-    'ambientLight', 'directionalLight', 'pointLight',
-    'boxGeometry', 'sphereGeometry', 'planeGeometry',
-    'meshBasicMaterial', 'meshStandardMaterial'
+    "mesh",
+    "group",
+    "scene",
+    "camera",
+    "ambientLight",
+    "directionalLight",
+    "pointLight",
+    "boxGeometry",
+    "sphereGeometry",
+    "planeGeometry",
+    "meshBasicMaterial",
+    "meshStandardMaterial",
     // ... and many more
-  ])
+  ]),
 });
 
 // To include Three.js elements
-componentTagger({
-  customExcludes: new Set() // Empty set = tag everything
+componentDebugger({
+  customExcludes: new Set(), // Empty set = tag everything
 });
 ```
 
 ### TypeScript Support
+
 Full type definitions included:
+
 ```typescript
-import componentTagger, { type TagOptions } from 'vite-plugin-component-debugger';
+import componentDebugger, { type TagOptions } from "vite-plugin-component-debugger";
 
 const config: TagOptions = {
   enabled: true,
-  attributePrefix: 'data-track'
+  attributePrefix: "data-track",
 };
 
 export default defineConfig({
-  plugins: [componentTagger(config), react()]
+  plugins: [componentDebugger(config), react()],
 });
 ```
 
 ### Build Performance & Statistics
+
 ```
 📊 Component Debugger Statistics:
    Total files scanned: 45
@@ -237,6 +264,7 @@ export default defineConfig({
 ```
 
 **Performance optimizations:**
+
 - Efficient AST traversal with caching
 - Minimal HMR impact
 - Automatically skips `node_modules`
@@ -245,65 +273,73 @@ export default defineConfig({
 ### Troubleshooting
 
 **⚠️ Line numbers are wrong/offset by ~19?**
+
 1. **Most common issue**: Plugin order is wrong
-2. **Fix**: Move `componentTagger()` BEFORE `react()` in Vite config
+2. **Fix**: Move `componentDebugger()` BEFORE `react()` in Vite config
 3. **Cause**: React plugin adds ~19 lines of imports/HMR setup
 
 ```typescript
 // ❌ WRONG - Line numbers will be offset
 export default defineConfig({
   plugins: [
-    react(),           // Transforms code first, adds ~19 lines
-    componentTagger()  // Gets wrong line numbers
-  ]
+    react(), // Transforms code first, adds ~19 lines
+    componentDebugger(), // Gets wrong line numbers
+  ],
 });
 
 // ✅ CORRECT - Accurate line numbers
 export default defineConfig({
   plugins: [
-    componentTagger(), // Processes original source first
-    react()           // Transforms after tagging
-  ]
+    componentDebugger(), // Processes original source first
+    react(), // Transforms after tagging
+  ],
 });
 ```
 
 **Elements not being tagged?**
+
 1. Check file extension is in `extensions`
 2. Verify element isn't in exclusion lists
 3. Ensure plugin is enabled
-4. Verify plugin order (componentTagger before react)
+4. Verify plugin order (componentDebugger before react)
 
 **Build performance issues?**
+
 1. Limit `extensions` scope
 2. Add more elements to `excludeElements`
 3. Disable `includeProps`/`includeContent` if unneeded
 
 **Attributes not in production?**
+
 ```typescript
-componentTagger({
-  enabled: process.env.NODE_ENV !== 'production'
-})
+componentDebugger({
+  enabled: process.env.NODE_ENV !== "production",
+});
 ```
 
 **Debug line number issues:**
+
 ```typescript
-componentTagger({
+componentDebugger({
   debug: true, // Shows processed code and line numbers
-  enabled: true
-})
+  enabled: true,
+});
 ```
 
 ## Development & Contributing
 
 ### Auto-Release Workflow
+
 🚀 **Every commit to `main` triggers automatic release:**
 
 **Commit Message → Version Bump:**
+
 - `BREAKING CHANGE:` or `major:` → Major (1.0.0 → 2.0.0)
 - `feat:` or `feature:` or `minor:` → Minor (1.0.0 → 1.1.0)
 - Everything else → Patch (1.0.0 → 1.0.1)
 
 **Example commit messages:**
+
 ```bash
 # Major version (breaking changes)
 git commit -m "BREAKING CHANGE: removed deprecated API"
@@ -324,17 +360,20 @@ git commit -m "docs: fix typo [skip ci]"
 ```
 
 **What happens automatically:**
+
 1. Tests run, package builds
 2. Version bump based on commit message
 3. GitHub release created with changelog
 4. Package published to npm
 
 **Setup auto-publishing:**
+
 1. Get NPM token: `npm token create --type=automation`
 2. Add to GitHub repo: **Settings** → **Secrets** → `NPM_TOKEN`
 3. Commit to `main` branch to trigger first release
 
 ### Contributing
+
 1. Fork and clone
 2. `pnpm install`
 3. Make changes and add tests
@@ -345,6 +384,7 @@ git commit -m "docs: fix typo [skip ci]"
 See [`.github/COMMIT_CONVENTION.md`](.github/COMMIT_CONVENTION.md) for examples.
 
 ### Development Setup
+
 ```bash
 git clone https://github.com/yourusername/vite-plugin-component-debugger.git
 cd vite-plugin-component-debugger
@@ -359,12 +399,14 @@ pnpm run check    # Full validation
 **Tonye Brown** - Builder, Front-end developer, designer, and performance optimization expert crafting immersive web experiences. Also a Music Producer and Artist.
 
 **Connect:**
+
 - 🌐 [Website](https://www.tonyebrown.com)
 - 📖 [Plugin Docs](https://www.tonyebrown.com/apps/vite-plugin-component-debugger)
 - 🐦 [Twitter](https://www.twitter.com/truevined)
 - 💼 [LinkedIn](https://www.linkedin.com/in/tonyeb/)
 
 **Support This Project:**
+
 - ⭐ Star this repository
 - ☕ [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
 - 💝 [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
@@ -382,7 +424,7 @@ MIT © [Tonye Brown](https://www.tonyebrown.com)
 
 **Made with ❤️ by [Tonye Brown](https://www.tonyebrown.com)**
 
-*Inspired by [lovable-tagger](https://www.npmjs.com/package/lovable-tagger), enhanced for the Vite ecosystem.*
+_Inspired by [lovable-tagger](https://www.npmjs.com/package/lovable-tagger), enhanced for the Vite ecosystem._
 
 [![GitHub](https://img.shields.io/badge/GitHub-canadianeagle-181717?style=flat&logo=github)](https://github.com/canadianeagle)
 [![Website](https://img.shields.io/badge/Website-tonyebrown.com-4285F4?style=flat&logo=google-chrome&logoColor=white)](https://www.tonyebrown.com)

@@ -1,13 +1,13 @@
 // src/__tests__/line-number-accuracy.test.ts
 import { describe, it, expect } from 'vitest';
-import { componentTagger } from '../plugin';
+import { componentDebugger } from '../plugin';
 import fs from 'fs';
 import path from 'path';
 
 describe('Line Number Accuracy', () => {
 
   it('should report correct line numbers for simple elements', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `
 export function TestComponent() {
   return (
@@ -39,7 +39,7 @@ export function TestComponent() {
   });
 
   it('should handle multi-line JSX elements correctly', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `
 export function MultiLineComponent() {
   return (
@@ -69,7 +69,7 @@ export function MultiLineComponent() {
   });
 
   it('should report correct line numbers for nested components', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `
 function NestedComponent() {
   return (
@@ -112,7 +112,7 @@ function NestedComponent() {
   });
 
   it('should handle zero line numbers and edge cases', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     // Test with minimal code that might cause loc issues
     const code = `<div></div>`;
 
@@ -127,7 +127,7 @@ function NestedComponent() {
   });
 
   it('should handle files with leading whitespace/comments', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `// This is a comment on line 1
 // Another comment on line 2
 
@@ -154,7 +154,7 @@ export function ComponentWithComments() {
   });
 
   it('should test with actual fixture files', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const fixturePath = path.join(__dirname, 'fixtures', 'SimpleComponent.tsx');
     const code = fs.readFileSync(fixturePath, 'utf-8');
 
@@ -177,7 +177,7 @@ export function ComponentWithComments() {
   });
 
   it('should verify column numbers are reasonable', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `
 export function ColumnTest() {
   return (

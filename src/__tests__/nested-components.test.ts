@@ -1,13 +1,13 @@
 // src/__tests__/nested-components.test.ts
 import { describe, it, expect } from 'vitest';
-import { componentTagger } from '../plugin';
+import { componentDebugger } from '../plugin';
 import fs from 'fs';
 import path from 'path';
 
 describe('Nested Component Line Number Accuracy', () => {
 
   it('should accurately track line numbers in complex nested components', async () => {
-    const plugin = componentTagger({ debug: false });
+    const plugin = componentDebugger({ debug: false });
     const fixturePath = path.join(__dirname, 'fixtures', 'NestedComponents.tsx');
     const code = fs.readFileSync(fixturePath, 'utf-8');
 
@@ -72,7 +72,7 @@ describe('Nested Component Line Number Accuracy', () => {
   });
 
   it('should handle component composition with render props accurately', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `function App() {
   return (
     <div className="app">
@@ -118,7 +118,7 @@ describe('Nested Component Line Number Accuracy', () => {
   });
 
   it('should handle Higher-Order Component patterns correctly', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `function withWrapper(Component) {
   return function WrappedComponent(props) {
     return (
@@ -183,7 +183,7 @@ function App() {
   });
 
   it('should handle conditional rendering with nested components', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `function ConditionalApp({ showModal, showSidebar, user }) {
   return (
     <div className="conditional-app">
@@ -263,7 +263,7 @@ function App() {
   });
 
   it('should verify line numbers remain sequential and logical', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `function SequentialTest() {
   return (
     <div>

@@ -1,11 +1,11 @@
 // src/__tests__/edge-cases.test.ts
 import { describe, it, expect } from 'vitest';
-import { componentTagger } from '../plugin';
+import { componentDebugger } from '../plugin';
 
 describe('Edge Cases That Could Cause Line Number Issues', () => {
 
   it('should handle JSX with complex expressions and embedded newlines', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `export function ComplexExpression() {
   const items = ['a', 'b', 'c'];
   const condition = true;
@@ -57,7 +57,7 @@ describe('Edge Cases That Could Cause Line Number Issues', () => {
   });
 
   it('should handle JSX with template literals spanning multiple lines', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `function TemplateLiterals() {
   return (
     <div className={\`
@@ -92,7 +92,7 @@ describe('Edge Cases That Could Cause Line Number Issues', () => {
   });
 
   it('should handle deeply nested JSX structures', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `function DeeplyNested() {
   return (
     <div>
@@ -135,7 +135,7 @@ describe('Edge Cases That Could Cause Line Number Issues', () => {
   });
 
   it('should handle JSX fragments with various syntaxes', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `import React from 'react';
 
 function FragmentTest() {
@@ -177,7 +177,7 @@ function ShortFragmentTest() {
   });
 
   it('should handle potential Babel parser edge cases', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
 
     // Test with various JSX edge cases that might confuse the parser
     const code = `function EdgeCases() {
@@ -228,7 +228,7 @@ function ShortFragmentTest() {
   });
 
   it('should detect potential line number discrepancies', async () => {
-    const plugin = componentTagger();
+    const plugin = componentDebugger();
     const code = `// Line 1
 // Line 2
 function LineNumberCheck() {
