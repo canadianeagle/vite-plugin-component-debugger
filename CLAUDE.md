@@ -4,86 +4,72 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Vite plugin that automatically adds data attributes to JSX/TSX elements during development for component debugging and tracking. The plugin transforms React components by adding metadata attributes that help developers identify component locations, props, and content.
+Vite plugin that automatically adds data attributes to JSX/TSX elements during development for component debugging and tracking.
 
 ## Build System & Commands
 
 ### Package Manager
-- Use `pnpm` for all package operations (not npm or yarn)
-- Install dependencies: `pnpm install`
+- Use `pnpm` for all operations (not npm or yarn)
 
 ### Development Commands
-- `pnpm run build` - Build the plugin using tsup
-- `pnpm run dev` - Build in watch mode during development
-- `pnpm run test` - Run tests with vitest
-- `pnpm run test:coverage` - Run tests with coverage reporting
-- `pnpm run lint` - Lint TypeScript files with eslint
-- `pnpm run check` - Run full validation (lint + test + build)
-- `pnpm run clean` - Remove dist and node_modules directories
+- `pnpm run build` - Build plugin using tsup
+- `pnpm run dev` - Build in watch mode
+- `pnpm run test` - Run tests with vitest (exits automatically)
+- `pnpm run test:coverage` - Run tests with coverage (exits automatically)
+- `pnpm run lint` - Lint TypeScript files
+- `pnpm run check` - Full validation (lint + test + build)
+- `pnpm run pre-publish` - Pre-publish validation script
 
-### Publishing
-- `pnpm run pre-publish` - Run pre-publish validation script
-- `pnpm run prepublishOnly` - Automatically runs build before publishing
+### Auto-Release System
+- **Every commit to `main` triggers automatic release**
+- Version bumping based on commit message:
+  - `BREAKING CHANGE:` or `major:` → Major version
+  - `feat:` or `feature:` or `minor:` → Minor version
+  - All other commits → Patch version
+- Automatically: runs tests, builds, creates GitHub release, publishes to npm
+- Skip releases: Add `[skip ci]` to commit message
+- See `.github/COMMIT_CONVENTION.md` for details
 
-## Architecture
+## Core Architecture
 
-### Core Files Structure
-- `src/index.ts` - Main entry point, exports the plugin and types
-- `src/plugin.ts` - Core plugin implementation with Vite integration
-- `src/utils/component-debugger.ts` - Utility functions for component analysis
-- `tsup-config.ts` - Build configuration for dual ESM/CJS output
+### Files
+- `src/index.ts` - Main entry point
+- `src/plugin.ts` - Core Vite plugin implementation
+- `src/utils/component-debugger.ts` - Component analysis utilities
+- `tsup.config.ts` - Build configuration
 
-### Plugin Architecture
-The plugin works by:
-1. Intercepting Vite's transform hook for `.jsx`/`.tsx` files
-2. Parsing JSX/TSX using Babel parser
-3. Walking the AST with estree-walker to find JSX elements
-4. Adding data attributes using magic-string for efficient code modification
-5. Preserving source maps and maintaining build performance
+### How It Works
+1. Intercepts Vite's transform hook for `.jsx`/`.tsx` files
+2. Parses with Babel parser → walks AST with estree-walker
+3. Adds data attributes using magic-string
+4. Preserves source maps and build performance
 
 ### Key Dependencies
-- `@babel/parser` - Parse JSX/TSX files into AST
-- `estree-walker` - Traverse AST nodes efficiently
-- `magic-string` - Modify source code while preserving source maps
-- `vite` - Peer dependency for plugin integration
+- `@babel/parser` - JSX/TSX parsing
+- `estree-walker` - AST traversal
+- `magic-string` - Code modification
+- `vite` - Peer dependency
 
 ## Configuration Options
 
-The plugin accepts a `TagOptions` interface with these key options:
-- `enabled` - Enable/disable plugin (typically tied to NODE_ENV)
-- `extensions` - File extensions to process (default: `.jsx`, `.tsx`)
-- `attributePrefix` - Prefix for data attributes (default: `data-dev`)
-- `excludeElements` - Elements to skip tagging (default: Fragment types)
-- `includeProps` - Include component props in metadata
-- `includeContent` - Include text content in metadata
-- `customExcludes` - Set of custom elements to exclude (Three.js elements by default)
-
-## Testing
-
-- Tests are located in `src/__tests__/` (if present)
-- Uses Vitest as the test runner
-- Run tests before making changes: `pnpm run test`
-- Generate coverage reports: `pnpm run test:coverage`
+Main `TagOptions` interface:
+- `enabled` - Enable/disable (tied to NODE_ENV)
+- `extensions` - File types (default: `.jsx`, `.tsx`)
+- `attributePrefix` - Data attribute prefix (default: `data-dev`)
+- `excludeElements` - Elements to skip
+- `includeProps` - Capture component props
+- `includeContent` - Include text content
+- `customExcludes` - Custom element exclusions
 
 ## Development Workflow
 
-1. Make changes to source files in `src/`
-2. Test changes: `pnpm run test`
-3. Lint code: `pnpm run lint`
-4. Build and verify: `pnpm run build`
-5. Run full check: `pnpm run check`
+1. Make changes in `src/`
+2. Run: `pnpm run check` (lint + test + build)
+3. Commit with semantic message for auto-release
 
 ## Build Output
 
-- Generates both CommonJS and ESM builds via tsup
+- Dual ESM/CJS builds via tsup
 - TypeScript declarations included
-- Source maps generated for debugging
-- Output directory: `dist/`
-
-## Important Notes
-
-- Plugin only processes JSX/TSX files by default
-- Automatically excludes Three.js/React Three Fiber elements
-- Designed for development environment usage
-- Minimal performance impact due to efficient AST processing
-- Supports Vite HMR (Hot Module Replacement)
+- Source maps for debugging
+- Output: `dist/`
