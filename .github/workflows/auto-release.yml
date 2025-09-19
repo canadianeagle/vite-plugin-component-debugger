@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -93,13 +97,33 @@ jobs:
           pnpm version ${{ steps.bump.outputs.bump }} -m "chore: release v%s [skip ci]"
           echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
+      - name: Create and push tag
+        run: |
+          git fetch --tags
+          # Check if tag already exists for this commit
+          if [ -z "$(git tag --points-at HEAD)" ]; then
+            git tag v${{ env.VERSION }}
+            git push origin v${{ env.VERSION }}
+            echo "Created and pushed tag v${{ env.VERSION }}"
+          else
+            echo "Tag already exists for this commit"
+          fi
+
       - name: Generate changelog
         run: |
           # Create a simple changelog entry
           echo "## v${{ env.VERSION }} ($(date +'%Y-%m-%d'))" > release-notes.md
           echo "" >> release-notes.md
           echo "### Changes" >> release-notes.md
-          git log --oneline --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD~1)..HEAD >> release-notes.md || echo "- Initial release" >> release-notes.md
+          # Try to get commits since last tag, or get last 10 commits if no tags
+          if git describe --tags --abbrev=0 HEAD^ 2>/dev/null; then
+            LAST_TAG=$(git describe --tags --abbrev=0 HEAD^)
+            git log --oneline --pretty=format:"- %s" ${LAST_TAG}..HEAD >> release-notes.md
+          else
+            echo "- Initial release" >> release-notes.md
+            git log --oneline --pretty=format:"- %s" -10 >> release-notes.md || true
+          fi
+          echo "" >> release-notes.md
           echo "" >> release-notes.md
           echo "### Installation" >> release-notes.md
           echo "\`\`\`bash" >> release-notes.md
@@ -126,7 +150,7 @@ jobs:
       - name: Push version bump
         run: |
           git push origin main
-          git push origin --tags
+          # Tags are already pushed in "Create and push tag" step
 
       - name: Success notification
         run: |
