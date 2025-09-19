@@ -42,6 +42,13 @@ Vite plugin that automatically adds data attributes to JSX/TSX elements during d
 
 See `.github/COMMIT_CONVENTION.md` for detailed examples
 
+## Requirements
+
+**Node.js:** >= 18.12.0 (required for pnpm compatibility)
+**pnpm:** >= 9.x (set in workflows)
+
+Version files: `.nvmrc`, `.node-version` specify Node 18.12.0
+
 ## Core Architecture
 
 ### Files
