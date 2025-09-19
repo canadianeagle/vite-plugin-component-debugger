@@ -102,11 +102,13 @@ Main `TagOptions` interface:
 - `enabled` - Enable/disable (tied to NODE_ENV)
 - `extensions` - File types (default: `.jsx`, `.tsx`)
 - `attributePrefix` - Data attribute prefix (default: `data-dev`)
-- `excludeElements` - Elements to skip
-- `includeProps` - Capture component props
-- `includeContent` - Include text content
-- `customExcludes` - Custom element exclusions
-- `debug` - Enable debug logging for troubleshooting
+- `excludeElements` - Elements to skip (default: Fragment types)
+- `includeProps` - Capture component props in metadata (default: `false`)
+- `includeContent` - Include text content in metadata (default: `false`)
+- `customExcludes` - Custom element exclusions (default: Three.js elements)
+- `debug` - Enable debug logging for troubleshooting (default: `false`)
+
+**Performance Note**: By default, `data-dev-metadata` is disabled (`includeProps: false`, `includeContent: false`) for better build performance. Enable these options only when you need to capture props or content data.
 
 ## Development Workflow
 

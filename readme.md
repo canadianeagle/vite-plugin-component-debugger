@@ -55,9 +55,32 @@ export default defineConfig({
 </button>
 ```
 
-**After:**
+**After (Basic - Default):**
 
 ```jsx
+<button
+  data-dev-id="src/components/Button.tsx:10:2"
+  data-dev-name="button"
+  data-dev-path="src/components/Button.tsx"
+  data-dev-line="10"
+  data-dev-file="Button.tsx"
+  data-dev-component="button"
+  className="btn-primary"
+  onClick={handleClick}
+>
+  Click me
+</button>
+```
+
+**After (With Metadata Enabled):**
+
+```jsx
+componentDebugger({
+  includeProps: true,
+  includeContent: true
+})
+
+// Results in:
 <button
   data-dev-id="src/components/Button.tsx:10:2"
   data-dev-name="button"
@@ -102,9 +125,9 @@ componentDebugger({
   attributePrefix: "data-dev",
   extensions: [".jsx", ".tsx"],
 
-  // Content capture
-  includeProps: true, // Capture component props
-  includeContent: true, // Capture text content
+  // Content capture (disabled by default for performance)
+  includeProps: true, // Enable to capture component props in data-dev-metadata
+  includeContent: true, // Enable to capture text content in data-dev-metadata
 
   // Element exclusions
   excludeElements: ["Fragment", "React.Fragment"],
@@ -119,8 +142,8 @@ componentDebugger({
 | `enabled`         | `boolean`     | `true`                           | Enable/disable the plugin           |
 | `attributePrefix` | `string`      | `'data-dev'`                     | Prefix for data attributes          |
 | `extensions`      | `string[]`    | `['.jsx', '.tsx']`               | File extensions to process          |
-| `includeProps`    | `boolean`     | `true`                           | Include component props in metadata |
-| `includeContent`  | `boolean`     | `true`                           | Include text content in metadata    |
+| `includeProps`    | `boolean`     | `false`                          | Include component props in metadata |
+| `includeContent`  | `boolean`     | `false`                          | Include text content in metadata    |
 | `excludeElements` | `string[]`    | `['Fragment', 'React.Fragment']` | Elements to exclude                 |
 | `customExcludes`  | `Set<string>` | Three.js elements                | Custom elements to exclude          |
 
@@ -200,7 +223,8 @@ export default defineConfig({
     componentDebugger({
       enabled: isDev || isStaging,
       attributePrefix: isStaging ? "data-staging" : "data-dev",
-      includeProps: isDev, // Props only in development
+      includeProps: isDev, // Enable metadata in development
+      includeContent: isDev, // Enable content capture in development
     }),
     react(),
   ],
@@ -307,7 +331,7 @@ export default defineConfig({
 
 1. Limit `extensions` scope
 2. Add more elements to `excludeElements`
-3. Disable `includeProps`/`includeContent` if unneeded
+3. Keep `includeProps`/`includeContent` disabled (default) for better performance and less noise in the DOM
 
 **Attributes not in production?**
 

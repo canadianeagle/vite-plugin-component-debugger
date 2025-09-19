@@ -26,13 +26,13 @@ export interface TagOptions {
 
   /**
    * Whether to include component props in the data
-   * @default true
+   * @default false
    */
   includeProps?: boolean;
 
   /**
    * Whether to include text content
-   * @default true
+   * @default false
    */
   includeContent?: boolean;
 
@@ -139,8 +139,8 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     extensions = ['.jsx', '.tsx'],
     attributePrefix = 'data-dev',
     excludeElements = ['Fragment', 'React.Fragment'],
-    includeProps = true,
-    includeContent = true,
+    includeProps = false,
+    includeContent = false,
     customExcludes = DEFAULT_THREE_FIBER_ELEMENTS,
     enabled = true,
     debug = false
