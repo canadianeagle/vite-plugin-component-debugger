@@ -313,7 +313,9 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
               const attributes = generateAttributes(info, attributePrefix);
               
               // Insert attributes into the code
-              const insertPosition = openingElement.name.end ?? 0;
+              // If the element has TypeScript generic parameters, insert after them
+              // Otherwise, insert after the element name
+              const insertPosition = (openingElement as any).typeParameters?.end ?? openingElement.name.end ?? 0;
               magicString.appendLeft(insertPosition, attributes);
               
               elementCount++;

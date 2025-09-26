@@ -78,30 +78,35 @@ describe('TypeScript Generics Support', () => {
     }
   });
 
-  it('should handle complex generic constraints', async () => {
+  it('should handle nested generic types', async () => {
     const plugin = componentDebugger();
     const code = `
-      export function ComplexGenerics() {
+      export function NestedGenerics() {
         return (
           <div>
-            <ComplexComponent<T extends Record<string, any>, K extends keyof T>
-              data={complexData}
+            <NestedComponent<Array<Record<string, number>>>
+              data={nestedData}
+            />
+            <Map<string, Array<User>>
+              entries={mapEntries}
             />
           </div>
         );
       }
     `;
     
-    const result = await plugin.transform?.(code, 'ComplexGenerics.tsx');
+    const result = await plugin.transform?.(code, 'NestedGenerics.tsx');
     
     if (result && typeof result === 'object' && 'code' in result) {
-      console.log('\n=== COMPLEX GENERICS TEST ===');
+      console.log('\n=== NESTED GENERICS TEST ===');
       console.log('TRANSFORMED CODE:');
       console.log(result.code);
       
-      // Should preserve complex generic syntax
-      expect(result.code).toContain('ComplexComponent<T extends Record<string, any>, K extends keyof T>');
-      expect(result.code).toContain('data-dev-name="ComplexComponent"');
+      // Should preserve nested generic syntax
+      expect(result.code).toContain('NestedComponent<Array<Record<string, number>>>');
+      expect(result.code).toContain('Map<string, Array<User>>');
+      expect(result.code).toContain('data-dev-name="NestedComponent"');
+      expect(result.code).toContain('data-dev-name="Map"');
     }
   });
 });
