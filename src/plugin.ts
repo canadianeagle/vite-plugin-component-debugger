@@ -313,7 +313,19 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
               const attributes = generateAttributes(info, attributePrefix);
               
               // Insert attributes into the code
-              const insertPosition = openingElement.name.end ?? 0;
+              // For self-closing elements: <Component />
+              // For regular elements: <Component>
+              // We need to insert before the '>' or '/>'
+              let insertPosition: number;
+              
+              if (openingElement.selfClosing) {
+                // Self-closing element - insert before the '/>'
+                insertPosition = openingElement.end! - 2;
+              } else {
+                // Regular element - insert before the '>'
+                insertPosition = openingElement.end! - 1;
+              }
+              
               magicString.appendLeft(insertPosition, attributes);
               
               elementCount++;
