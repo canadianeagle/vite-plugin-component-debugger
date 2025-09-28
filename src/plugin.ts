@@ -313,7 +313,39 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
               const attributes = generateAttributes(info, attributePrefix);
               
               // Insert attributes into the code
-              const insertPosition = openingElement.name.end ?? 0;
+              // We need to find the exact position of the closing bracket
+              const elementStart = openingElement.start ?? 0;
+              const elementEnd = openingElement.end ?? code.length;
+              const elementCode = code.substring(elementStart, elementEnd);
+              
+              let insertPosition: number;
+              
+              if (openingElement.selfClosing) {
+                // Self-closing element - find the '/>' position
+                const selfClosingMatch = elementCode.lastIndexOf('/>');
+                if (selfClosingMatch === -1) {
+                  // Fallback: this shouldn't happen with valid JSX
+                  if (debug) {
+                    console.warn(`⚠️  Could not find '/>' in self-closing element "${elementName}" at ${relativePath}:${line}`);
+                  }
+                  insertPosition = elementEnd - 2;
+                } else {
+                  insertPosition = elementStart + selfClosingMatch;
+                }
+              } else {
+                // Regular element - find the '>' position
+                const closingMatch = elementCode.lastIndexOf('>');
+                if (closingMatch === -1) {
+                  // Fallback: this shouldn't happen with valid JSX
+                  if (debug) {
+                    console.warn(`⚠️  Could not find '>' in element "${elementName}" at ${relativePath}:${line}`);
+                  }
+                  insertPosition = elementEnd - 1;
+                } else {
+                  insertPosition = elementStart + closingMatch;
+                }
+              }
+              
               magicString.appendLeft(insertPosition, attributes);
               
               elementCount++;
