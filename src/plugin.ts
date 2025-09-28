@@ -313,17 +313,37 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
               const attributes = generateAttributes(info, attributePrefix);
               
               // Insert attributes into the code
-              // For self-closing elements: <Component />
-              // For regular elements: <Component>
-              // We need to insert before the '>' or '/>'
+              // We need to find the exact position of the closing bracket
+              const elementStart = openingElement.start ?? 0;
+              const elementEnd = openingElement.end ?? code.length;
+              const elementCode = code.substring(elementStart, elementEnd);
+              
               let insertPosition: number;
               
               if (openingElement.selfClosing) {
-                // Self-closing element - insert before the '/>'
-                insertPosition = openingElement.end! - 2;
+                // Self-closing element - find the '/>' position
+                const selfClosingMatch = elementCode.lastIndexOf('/>');
+                if (selfClosingMatch === -1) {
+                  // Fallback: this shouldn't happen with valid JSX
+                  if (debug) {
+                    console.warn(`⚠️  Could not find '/>' in self-closing element "${elementName}" at ${relativePath}:${line}`);
+                  }
+                  insertPosition = elementEnd - 2;
+                } else {
+                  insertPosition = elementStart + selfClosingMatch;
+                }
               } else {
-                // Regular element - insert before the '>'
-                insertPosition = openingElement.end! - 1;
+                // Regular element - find the '>' position
+                const closingMatch = elementCode.lastIndexOf('>');
+                if (closingMatch === -1) {
+                  // Fallback: this shouldn't happen with valid JSX
+                  if (debug) {
+                    console.warn(`⚠️  Could not find '>' in element "${elementName}" at ${relativePath}:${line}`);
+                  }
+                  insertPosition = elementEnd - 1;
+                } else {
+                  insertPosition = elementStart + closingMatch;
+                }
               }
               
               magicString.appendLeft(insertPosition, attributes);

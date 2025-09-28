@@ -201,4 +201,88 @@ describe('Multi-line JSX Element Handling', () => {
       expect(result.code).toMatch(/data-dev-name="div"[^>]*data-dev-line="3"/);
     }
   });
+
+  it('should handle JSX elements with spaces before closing brackets', async () => {
+    const plugin = componentDebugger();
+    const code = `function SpacesExample() {
+  return (
+    <div className="with-space" >
+      <input type="text" disabled />
+      <CustomComponent
+        prop1="value1"
+        prop2="value2"
+        />
+      <AnotherComponent prop="value"   />
+    </div>
+  );
+}`;
+
+    const result = await plugin.transform?.(code, 'Spaces.tsx');
+    
+    if (result && typeof result === 'object' && 'code' in result) {
+      // Verify syntax is valid
+      expect(() => {
+        const babel = require('@babel/parser');
+        babel.parse(result.code, {
+          sourceType: 'module',
+          plugins: ['jsx', 'typescript']
+        });
+      }).not.toThrow();
+      
+      // Verify all elements are tagged
+      expect(result.code).toContain('data-dev-name="div"');
+      expect(result.code).toContain('data-dev-name="input"');
+      expect(result.code).toContain('data-dev-name="CustomComponent"');
+      expect(result.code).toContain('data-dev-name="AnotherComponent"');
+      
+      // Verify the original formatting is preserved (spaces may be adjusted due to attribute insertion)
+      expect(result.code).toContain('className="with-space"');
+      expect(result.code).toContain('disabled');
+      expect(result.code).toContain('prop="value"');
+    }
+  });
+
+  it('should handle JSX elements with newlines before closing brackets', async () => {
+    const plugin = componentDebugger();
+    const code = `function NewlinesExample() {
+  return (
+    <div
+      className="container"
+    >
+      <input
+        type="text"
+        placeholder="Enter text"
+      />
+      <CustomComponent
+        prop1="value1"
+        prop2="value2"
+        
+      />
+    </div>
+  );
+}`;
+
+    const result = await plugin.transform?.(code, 'Newlines.tsx');
+    
+    if (result && typeof result === 'object' && 'code' in result) {
+      // Verify syntax is valid
+      expect(() => {
+        const babel = require('@babel/parser');
+        babel.parse(result.code, {
+          sourceType: 'module',
+          plugins: ['jsx', 'typescript']
+        });
+      }).not.toThrow();
+      
+      // Verify all elements are tagged
+      expect(result.code).toContain('data-dev-name="div"');
+      expect(result.code).toContain('data-dev-name="input"');
+      expect(result.code).toContain('data-dev-name="CustomComponent"');
+      
+      // Verify line numbers are correct
+      expect(result.code).toMatch(/data-dev-name="div"[^>]*data-dev-line="3"/);
+      expect(result.code).toMatch(/data-dev-name="input"[^>]*data-dev-line="6"/);
+      expect(result.code).toMatch(/data-dev-name="CustomComponent"[^>]*data-dev-line="10"/);
+    }
+  });
 });
