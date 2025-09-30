@@ -4,8 +4,44 @@ import { parse } from '@babel/parser';
 import MagicString from 'magic-string';
 import path from 'path';
 import { walk } from 'estree-walker';
+import { minimatch } from 'minimatch';
+import { writeFileSync } from 'fs';
 
 export type AttributeName = 'id' | 'name' | 'path' | 'line' | 'file' | 'component' | 'metadata';
+export type MetadataEncoding = 'json' | 'base64' | 'none';
+export type Preset = 'minimal' | 'testing' | 'debugging' | 'production';
+
+export interface ComponentInfo {
+  elementName: string;
+  filePath: string;
+  line: number;
+  column: number;
+  props?: Record<string, any>;
+  content?: string;
+}
+
+export interface TransformStats {
+  file: string;
+  elementsTagged: number;
+  elementNames: string[];
+}
+
+export interface CompletionStats {
+  totalFiles: number;
+  processedFiles: number;
+  totalElements: number;
+  errors: number;
+  byElementType: Record<string, number>;
+}
+
+export interface AttributeTransformers {
+  path?: (path: string) => string;
+  id?: (id: string) => string;
+  name?: (name: string) => string;
+  line?: (line: number) => string;
+  file?: (file: string) => string;
+  component?: (component: string) => string;
+}
 
 export interface TagOptions {
   /**
@@ -71,9 +107,104 @@ export interface TagOptions {
    * @default undefined (no attributes excluded)
    */
   excludeAttributes?: AttributeName[];
+
+  // ===== V2 Features =====
+
+  /**
+   * Paths to include (allowlist). Supports glob patterns.
+   * Only files matching these patterns will be processed.
+   * @default undefined (all files processed)
+   */
+  includePaths?: string[];
+
+  /**
+   * Paths to exclude (disallowlist). Supports glob patterns.
+   * Files matching these patterns will be skipped.
+   * @default undefined (no files excluded)
+   */
+  excludePaths?: string[];
+
+  /**
+   * Transform attribute values before adding them to elements
+   * @default undefined (no transformation)
+   */
+  transformers?: AttributeTransformers;
+
+  /**
+   * Conditionally determine whether to tag an element
+   * @default undefined (all elements tagged)
+   */
+  shouldTag?: (info: ComponentInfo) => boolean;
+
+  /**
+   * Add custom attributes to elements
+   * @default undefined (no custom attributes)
+   */
+  customAttributes?: (info: ComponentInfo) => Record<string, string>;
+
+  /**
+   * How to encode metadata attribute
+   * @default 'json' (URL-encoded JSON)
+   */
+  metadataEncoding?: MetadataEncoding;
+
+  /**
+   * Maximum nesting depth to tag (0 = unlimited)
+   * @default 0 (unlimited)
+   */
+  maxDepth?: number;
+
+  /**
+   * Minimum nesting depth to start tagging
+   * @default 0 (tag from root)
+   */
+  minDepth?: number;
+
+  /**
+   * Only tag root-level components in each file
+   * @default false
+   */
+  tagOnlyRoots?: boolean;
+
+  /**
+   * Callback fired after transforming each file
+   * @default undefined
+   */
+  onTransform?: (stats: TransformStats) => void;
+
+  /**
+   * Callback fired after all transformations complete
+   * @default undefined
+   */
+  onComplete?: (stats: CompletionStats) => void;
+
+  /**
+   * Export statistics to a JSON file
+   * @default undefined
+   */
+  exportStats?: string;
+
+  /**
+   * Use a preset configuration
+   * Presets: 'minimal', 'testing', 'debugging', 'production'
+   * @default undefined
+   */
+  preset?: Preset;
+
+  /**
+   * Include source map hints for DevTools integration
+   * @default false
+   */
+  includeSourceMapHints?: boolean;
+
+  /**
+   * Group all attributes into a single JSON object
+   * @default false
+   */
+  groupAttributes?: boolean;
 }
 
-interface ComponentInfo {
+interface InternalComponentInfo {
   path: string;
   line: number;
   column: number;
@@ -81,6 +212,7 @@ interface ComponentInfo {
   name: string;
   props?: Record<string, any>;
   content?: string;
+  depth?: number;
 }
 
 // Default Three.js/React Three Fiber elements to exclude
@@ -152,7 +284,72 @@ const DEFAULT_THREE_FIBER_ELEMENTS = new Set([
   'fog', 'fogExp2', 'shape'
 ]);
 
+// Preset configurations
+const PRESETS: Record<Preset, Partial<TagOptions>> = {
+  minimal: {
+    includeAttributes: ['id'],
+    includeProps: false,
+    includeContent: false
+  },
+  testing: {
+    includeAttributes: ['id', 'name', 'component'],
+    includeProps: false,
+    includeContent: false
+  },
+  debugging: {
+    includeProps: true,
+    includeContent: true,
+    debug: true
+  },
+  production: {
+    includeAttributes: ['id', 'line'],
+    transformers: {
+      path: (p) => p.split('/').slice(-2).join('/'), // Only last 2 segments
+      id: (id) => {
+        const parts = id.split(':');
+        return parts.length > 2 ? parts.slice(-2).join(':') : id; // Only line:col
+      }
+    }
+  }
+};
+
+/**
+ * Apply preset configuration
+ */
+function applyPreset(options: TagOptions): TagOptions {
+  if (!options.preset) return options;
+
+  const preset = PRESETS[options.preset];
+  // Preset values as defaults, but explicit options override them
+  return {
+    ...preset,
+    ...options,
+    // Merge transformers if both exist
+    transformers: options.transformers || preset.transformers
+      ? { ...preset.transformers, ...options.transformers }
+      : undefined
+  };
+}
+
+/**
+ * Check if a file path matches any of the patterns
+ */
+function matchesPatterns(filePath: string, patterns: string[] | undefined): boolean {
+  if (!patterns || patterns.length === 0) return false;
+  return patterns.some(pattern => minimatch(filePath, pattern));
+}
+
+/**
+ * Encode string to base64
+ */
+function encodeBase64(str: string): string {
+  return Buffer.from(str).toString('base64');
+}
+
 export function componentDebugger(options: TagOptions = {}): Plugin {
+  // Apply preset configuration first
+  const resolvedOptions = applyPreset(options);
+
   const {
     extensions = ['.jsx', '.tsx'],
     attributePrefix = 'data-dev',
@@ -163,15 +360,31 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     enabled = true,
     debug = false,
     includeAttributes,
-    excludeAttributes
-  } = options;
+    excludeAttributes,
+    // V2 options
+    includePaths,
+    excludePaths,
+    transformers,
+    shouldTag,
+    customAttributes,
+    metadataEncoding = 'json',
+    maxDepth = 0,
+    minDepth = 0,
+    tagOnlyRoots = false,
+    onTransform,
+    onComplete,
+    exportStats,
+    includeSourceMapHints = false,
+    groupAttributes = false
+  } = resolvedOptions;
 
   const projectRoot = process.cwd();
-  const stats = {
+  const stats: CompletionStats = {
     totalFiles: 0,
     processedFiles: 0,
     totalElements: 0,
-    errors: 0
+    errors: 0,
+    byElementType: {}
   };
 
   return {
@@ -191,6 +404,15 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
       stats.totalFiles++;
       const relativePath = path.relative(projectRoot, id);
       const filename = path.basename(id);
+
+      // V2: Path filtering
+      if (includePaths && !matchesPatterns(relativePath, includePaths)) {
+        return null;
+      }
+
+      if (excludePaths && matchesPatterns(relativePath, excludePaths)) {
+        return null;
+      }
 
       try {
         // Debug: Log the actual code being processed
@@ -246,11 +468,16 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
 
         // Second pass: tag JSX elements
         let currentJSXElement: any = null;
+        const depthStack: number[] = []; // Track nesting depth
+        let currentDepth = 0;
+        const elementNames: string[] = []; // Track for statistics
 
         walk(ast as any, {
           enter(node: any) {
             if (node.type === 'JSXElement') {
               currentJSXElement = node;
+              currentDepth++;
+              depthStack.push(currentDepth);
             }
 
             if (node.type === 'JSXOpeningElement') {
@@ -272,6 +499,21 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
                 return;
               }
 
+              // V2: Depth filtering
+              const elementDepth = depthStack.length;
+
+              if (tagOnlyRoots && elementDepth > 1) {
+                return; // Only tag root-level elements
+              }
+
+              if (minDepth > 0 && elementDepth < minDepth) {
+                return; // Too shallow
+              }
+
+              if (maxDepth > 0 && elementDepth > maxDepth) {
+                return; // Too deep
+              }
+
               // Collect component information with validation
               const line = openingElement.loc?.start?.line ?? 1; // Default to line 1, not 0
               const column = openingElement.loc?.start?.column ?? 0;
@@ -288,12 +530,13 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
                 console.log(`🏷️  Tagging ${elementName} at line ${line}, column ${column} in ${relativePath}`);
               }
 
-              const info: ComponentInfo = {
+              const info: InternalComponentInfo = {
                 path: relativePath,
                 line,
                 column,
                 file: filename,
-                name: elementName
+                name: elementName,
+                depth: elementDepth
               };
 
               // Collect props if enabled
@@ -329,8 +572,34 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
                 }
               }
 
+              // V2: Call shouldTag callback
+              if (shouldTag) {
+                const componentInfo: ComponentInfo = {
+                  elementName,
+                  filePath: relativePath,
+                  line,
+                  column,
+                  props: info.props,
+                  content: info.content
+                };
+
+                if (!shouldTag(componentInfo)) {
+                  return; // Skip this element
+                }
+              }
+
               // Generate attributes
-              const attributes = generateAttributes(info, attributePrefix, includeAttributes, excludeAttributes);
+              const attributes = generateAttributes(
+                info,
+                attributePrefix,
+                includeAttributes,
+                excludeAttributes,
+                transformers,
+                customAttributes,
+                metadataEncoding,
+                includeSourceMapHints,
+                groupAttributes
+              );
               
               // Insert attributes into the code
               // We need to find the exact position of the closing bracket
@@ -367,14 +636,34 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
               }
               
               magicString.appendLeft(insertPosition, attributes);
-              
+
               elementCount++;
+              elementNames.push(elementName); // Track for statistics
+
+              // Track by element type
+              stats.byElementType[elementName] = (stats.byElementType[elementName] || 0) + 1;
+            }
+          },
+          leave(node: any) {
+            // Pop depth when leaving JSXElement
+            if (node.type === 'JSXElement') {
+              depthStack.pop();
+              currentDepth--;
             }
           }
         });
 
         stats.processedFiles++;
         stats.totalElements += elementCount;
+
+        // V2: Call onTransform callback
+        if (onTransform && elementCount > 0) {
+          onTransform({
+            file: relativePath,
+            elementsTagged: elementCount,
+            elementNames
+          });
+        }
 
         if (elementCount > 0) {
           return {
@@ -399,6 +688,22 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
         console.log(`   Elements tagged: ${stats.totalElements}`);
         if (stats.errors > 0) {
           console.log(`   ⚠️  Errors: ${stats.errors}`);
+        }
+
+        // V2: Call onComplete callback
+        if (onComplete) {
+          onComplete(stats);
+        }
+
+        // V2: Export stats to file
+        if (exportStats) {
+          try {
+            const statsPath = path.resolve(projectRoot, exportStats);
+            writeFileSync(statsPath, JSON.stringify(stats, null, 2));
+            console.log(`   📄 Stats exported to: ${exportStats}`);
+          } catch (error) {
+            console.error(`   ⚠️  Failed to export stats: ${error}`);
+          }
         }
       }
     }
@@ -465,53 +770,78 @@ function extractTextContent(children: any[]): string {
  * Generate data attributes for an element
  */
 function generateAttributes(
-  info: ComponentInfo,
+  info: InternalComponentInfo,
   prefix: string,
   includeAttributes?: AttributeName[],
-  excludeAttributes?: AttributeName[]
+  excludeAttributes?: AttributeName[],
+  transformers?: AttributeTransformers,
+  customAttributes?: (info: ComponentInfo) => Record<string, string>,
+  metadataEncoding: MetadataEncoding = 'json',
+  includeSourceMapHints: boolean = false,
+  groupAttributes: boolean = false
 ): string {
-  const attrs: string[] = [];
-
   // Determine which attributes should be included
   const shouldInclude = (attrName: AttributeName): boolean => {
-    // If includeAttributes is specified (even if empty), only include those attributes
     if (includeAttributes !== undefined) {
       return includeAttributes.includes(attrName);
     }
-    // If excludeAttributes is specified, exclude those attributes
     if (excludeAttributes !== undefined && excludeAttributes.length > 0) {
       return !excludeAttributes.includes(attrName);
     }
-    // Otherwise, include all attributes (backwards compatible default)
     return true;
   };
 
+  const attributeValues: Record<string, string> = {};
+
   // Unique ID
   if (shouldInclude('id')) {
-    const id = `${info.path}:${info.line}:${info.column}`;
-    attrs.push(`${prefix}-id="${id}"`);
+    let id = `${info.path}:${info.line}:${info.column}`;
+    if (transformers?.id) {
+      id = transformers.id(id);
+    }
+    attributeValues['id'] = id;
   }
 
   // Element name
   if (shouldInclude('name')) {
-    attrs.push(`${prefix}-name="${info.name}"`);
+    let name = info.name;
+    if (transformers?.name) {
+      name = transformers.name(name);
+    }
+    attributeValues['name'] = name;
   }
 
   // Component location info
   if (shouldInclude('path')) {
-    attrs.push(`${prefix}-path="${info.path}"`);
+    let pathValue = info.path;
+    if (transformers?.path) {
+      pathValue = transformers.path(pathValue);
+    }
+    attributeValues['path'] = pathValue;
   }
 
   if (shouldInclude('line')) {
-    attrs.push(`${prefix}-line="${info.line}"`);
+    let line = String(info.line);
+    if (transformers?.line) {
+      line = transformers.line(info.line);
+    }
+    attributeValues['line'] = line;
   }
 
   if (shouldInclude('file')) {
-    attrs.push(`${prefix}-file="${info.file}"`);
+    let file = info.file;
+    if (transformers?.file) {
+      file = transformers.file(file);
+    }
+    attributeValues['file'] = file;
   }
 
   if (shouldInclude('component')) {
-    attrs.push(`${prefix}-component="${info.name}"`);
+    let component = info.name;
+    if (transformers?.component) {
+      component = transformers.component(component);
+    }
+    attributeValues['component'] = component;
   }
 
   // Props and content as JSON
@@ -525,10 +855,59 @@ function generateAttributes(
     }
 
     if (Object.keys(metadata).length > 0) {
-      const encoded = encodeURIComponent(JSON.stringify(metadata));
-      attrs.push(`${prefix}-metadata="${encoded}"`);
+      let encoded: string;
+      if (metadataEncoding === 'base64') {
+        encoded = encodeBase64(JSON.stringify(metadata));
+      } else if (metadataEncoding === 'none') {
+        // Escape quotes for HTML attributes
+        encoded = JSON.stringify(metadata).replace(/"/g, '&quot;');
+      } else {
+        // Default: URL-encoded JSON (backwards compatible)
+        encoded = encodeURIComponent(JSON.stringify(metadata));
+      }
+      attributeValues['metadata'] = encoded;
     }
   }
 
-  return attrs.length > 0 ? ' ' + attrs.join(' ') : '';
+  // V2: Add source map hints
+  if (includeSourceMapHints && shouldInclude('path')) {
+    const sourcemapHint = `webpack://${info.path}`;
+    attributeValues['sourcemap'] = sourcemapHint;
+  }
+
+  // V2: Add custom attributes
+  if (customAttributes) {
+    const componentInfo: ComponentInfo = {
+      elementName: info.name,
+      filePath: info.path,
+      line: info.line,
+      column: info.column,
+      props: info.props,
+      content: info.content
+    };
+
+    const custom = customAttributes(componentInfo);
+    for (const [key, value] of Object.entries(custom)) {
+      // Remove prefix if user included it
+      const cleanKey = key.startsWith(prefix) ? key.slice(prefix.length + 1) : key;
+      attributeValues[cleanKey] = value;
+    }
+  }
+
+  // Format attributes
+  if (groupAttributes) {
+    // Group all attributes into a single JSON object
+    const grouped = JSON.stringify(attributeValues);
+    const encoded = metadataEncoding === 'base64'
+      ? encodeBase64(grouped)
+      : encodeURIComponent(grouped);
+    return ` ${prefix}="${encoded}"`;
+  } else {
+    // Individual attributes (default, backwards compatible)
+    const attrs: string[] = [];
+    for (const [key, value] of Object.entries(attributeValues)) {
+      attrs.push(`${prefix}-${key}="${value}"`);
+    }
+    return attrs.length > 0 ? ' ' + attrs.join(' ') : '';
+  }
 }
