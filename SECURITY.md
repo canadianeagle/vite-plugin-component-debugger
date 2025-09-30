@@ -4,10 +4,11 @@
 
 We actively support the following versions with security updates:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | ✅ Yes             |
-| < 1.0   | ❌ No              |
+| Version | Supported |
+| ------- | --------- |
+| 2.x.x   | ✅ Yes    |
+| 1.x.x   | ✅ Yes    |
+| < 1.0   | ❌ No     |
 
 ## Reporting a Vulnerability
 
@@ -33,6 +34,7 @@ If you discover a security vulnerability in vite-plugin-component-debugger, plea
 ### Security Best Practices
 
 This plugin:
+
 - Only runs during development builds
 - Does not collect or transmit any data
 - Does not expose sensitive information in data attributes
@@ -41,6 +43,7 @@ This plugin:
 ### Scope
 
 This security policy covers:
+
 - The plugin source code
 - Build and release processes
 - Documentation and examples

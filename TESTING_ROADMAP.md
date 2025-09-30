@@ -1,9 +1,10 @@
 # Enterprise-Grade Testing & Security Roadmap
+
 ## Vite Plugin Component Debugger
 
 **Version:** 2.0.0+
 **Created:** 2025-09-30
-**Total Time Estimate:** 45-60 days (2-3 months for one engineer)
+**Total Time Estimate:** 8-12 hours with AI assistance (1-2 days)
 **Status:** Planning Phase
 
 ---
@@ -13,11 +14,13 @@
 This roadmap outlines a comprehensive plan to achieve enterprise-grade security, reliability, and test coverage for the vite-plugin-component-debugger. The plan includes 51 specific tasks across 8 categories.
 
 **Current Status:**
+
 - ✅ 113/113 tests passing
 - ✅ Basic security measures implemented (ReDoS protection, transformer validation, path traversal prevention)
 - ✅ Risk Level: 🟢 LOW
 
 **Target Status:**
+
 - 🎯 100% code coverage
 - 🎯 Comprehensive fuzzing tests
 - 🎯 Memory leak detection
@@ -31,13 +34,16 @@ This roadmap outlines a comprehensive plan to achieve enterprise-grade security,
 
 ## 🎯 Priority Breakdown
 
-### 🔴 HIGH Priority (20-25 days)
+### 🔴 HIGH Priority (4-6 hours)
+
 Critical security and reliability tasks that should be done first.
 
-### 🟡 MEDIUM Priority (20-25 days)
+### 🟡 MEDIUM Priority (3-4 hours)
+
 Important improvements for production readiness.
 
-### 🟢 LOW Priority (5-10 days)
+### 🟢 LOW Priority (1-2 hours)
+
 Nice-to-have enhancements and edge case handling.
 
 ---
@@ -45,8 +51,9 @@ Nice-to-have enhancements and edge case handling.
 ## 1. Fuzzing Tests for All Inputs
 
 ### Task 1.1: AST Parser Fuzzing (Babel Input)
+
 - **Priority**: 🔴 HIGH
-- **Time Estimate**: 3-4 days
+- **Time Estimate**: 45-60 minutes with AI
 - **Dependencies**: None
 - **Tools Needed**:
   - `@jazzer.js/core` (fuzzing framework)
@@ -54,11 +61,13 @@ Nice-to-have enhancements and edge case handling.
   - `jsfuzz` (JavaScript fuzzer)
 
 **Installation:**
+
 ```bash
 pnpm add -D @jazzer.js/core fast-check
 ```
 
 **Steps:**
+
 1. Create `src/__tests__/fuzzing/babel-parser.fuzz.test.ts`
 2. Generate malformed JSX/TSX code samples (unclosed tags, invalid attributes, broken syntax)
 3. Fuzz test with deeply nested JSX (1000+ levels)
@@ -67,60 +76,59 @@ pnpm add -D @jazzer.js/core fast-check
 6. Test binary/null bytes in code strings
 
 **Success Criteria**:
+
 - Plugin gracefully handles all malformed input without crashes
 - No uncaught exceptions in 100,000+ fuzz iterations
 - Maximum memory usage stays below 500MB per test
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/fuzzing/babel-parser.fuzz.test.ts
-import { describe, it, expect } from 'vitest';
-import { componentDebugger } from '../../plugin';
-import fc from 'fast-check';
+import { describe, it, expect } from "vitest";
+import { componentDebugger } from "../../plugin";
+import fc from "fast-check";
 
-describe('Babel Parser Fuzzing', () => {
-  it('should handle malformed JSX without crashing', async () => {
+describe("Babel Parser Fuzzing", () => {
+  it("should handle malformed JSX without crashing", async () => {
     await fc.assert(
-      fc.asyncProperty(
-        fc.string({ minLength: 1, maxLength: 10000 }),
-        async (randomCode) => {
-          const plugin = componentDebugger();
-          try {
-            // Should not throw, should return null or valid result
-            const result = await plugin.transform?.(randomCode, 'fuzz.tsx');
-            expect(result === null || typeof result === 'object').toBe(true);
-          } catch (error) {
-            // Parsing errors are acceptable, crashes are not
-            expect(error).toBeDefined();
-          }
+      fc.asyncProperty(fc.string({ minLength: 1, maxLength: 10000 }), async (randomCode) => {
+        const plugin = componentDebugger();
+        try {
+          // Should not throw, should return null or valid result
+          const result = await plugin.transform?.(randomCode, "fuzz.tsx");
+          expect(result === null || typeof result === "object").toBe(true);
+        } catch (error) {
+          // Parsing errors are acceptable, crashes are not
+          expect(error).toBeDefined();
         }
-      ),
+      }),
       { numRuns: 10000 }
     );
   });
 
-  it('should handle deeply nested JSX', async () => {
+  it("should handle deeply nested JSX", async () => {
     const depths = [10, 50, 100, 500, 1000];
     for (const depth of depths) {
-      const code = '<div>' + '<span>'.repeat(depth) + 'test' + '</span>'.repeat(depth) + '</div>';
+      const code = "<div>" + "<span>".repeat(depth) + "test" + "</span>".repeat(depth) + "</div>";
       const plugin = componentDebugger();
-      const result = await plugin.transform?.(code, 'deep.tsx');
+      const result = await plugin.transform?.(code, "deep.tsx");
       // Should complete within reasonable time
       expect(result).toBeDefined();
     }
   });
 
-  it('should handle Unicode edge cases', async () => {
+  it("should handle Unicode edge cases", async () => {
     const unicodeCases = [
-      '<Component😀 />',  // Emoji in name
-      '<div>مرحبا</div>',  // Arabic RTL
-      '<div>你好</div>',    // Chinese
-      '<div>\u200B\u200C\u200D</div>',  // Zero-width chars
+      "<Component😀 />", // Emoji in name
+      "<div>مرحبا</div>", // Arabic RTL
+      "<div>你好</div>", // Chinese
+      "<div>\u200B\u200C\u200D</div>", // Zero-width chars
     ];
 
     for (const code of unicodeCases) {
       const plugin = componentDebugger();
-      const result = await plugin.transform?.(code, 'unicode.tsx');
+      const result = await plugin.transform?.(code, "unicode.tsx");
       expect(result).toBeDefined();
     }
   });
@@ -130,12 +138,14 @@ describe('Babel Parser Fuzzing', () => {
 ---
 
 ### Task 1.2: Glob Pattern Fuzzing (Path Filtering)
+
 - **Priority**: 🔴 HIGH
-- **Time Estimate**: 2 days
+- **Time Estimate**: 30-45 minutes with AI
 - **Dependencies**: Task 1.1
 - **Tools Needed**: `fast-check`, `minimatch` (already installed)
 
 **Steps:**
+
 1. Create `src/__tests__/fuzzing/glob-patterns.fuzz.test.ts`
 2. Fuzz test with ReDoS attack patterns (catastrophic backtracking)
 3. Test patterns exceeding MAX_PATTERN_LENGTH (200 chars)
@@ -145,65 +155,67 @@ describe('Babel Parser Fuzzing', () => {
 7. Verify performance: no pattern should take >100ms to match
 
 **Success Criteria**:
+
 - All ReDoS patterns timeout gracefully with warnings
 - Path traversal attacks blocked
 - No glob pattern causes >100ms execution time
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/fuzzing/glob-patterns.fuzz.test.ts
-import { describe, it, expect } from 'vitest';
-import { componentDebugger } from '../../plugin';
-import fc from 'fast-check';
+import { describe, it, expect } from "vitest";
+import { componentDebugger } from "../../plugin";
+import fc from "fast-check";
 
-describe('Glob Pattern Fuzzing', () => {
-  it('should reject ReDoS attack patterns', async () => {
+describe("Glob Pattern Fuzzing", () => {
+  it("should reject ReDoS attack patterns", async () => {
     const redosPatterns = [
-      '(a+)+b',
-      '(a*)*b',
-      '([a-zA-Z]+)*',
-      '*'.repeat(50) + 'test',
-      '**/**/**/**/**/**/**/**/**/**/**',
+      "(a+)+b",
+      "(a*)*b",
+      "([a-zA-Z]+)*",
+      "*".repeat(50) + "test",
+      "**/**/**/**/**/**/**/**/**/**/**",
     ];
 
     for (const pattern of redosPatterns) {
       const plugin = componentDebugger({
-        includePaths: [pattern]
+        includePaths: [pattern],
       });
-      const code = '<div>test</div>';
+      const code = "<div>test</div>";
       const startTime = Date.now();
-      await plugin.transform?.(code, 'test.tsx');
+      await plugin.transform?.(code, "test.tsx");
       const duration = Date.now() - startTime;
       // Should complete quickly or skip pattern
       expect(duration).toBeLessThan(1000);
     }
   });
 
-  it('should prevent path traversal in exportStats', async () => {
+  it("should prevent path traversal in exportStats", async () => {
     const traversalPaths = [
-      '../../../etc/passwd',
-      '..\\..\\..\\windows\\system32\\config\\sam',
-      '/etc/shadow',
-      'C:\\Windows\\System32\\config\\SAM',
+      "../../../etc/passwd",
+      "..\\..\\..\\windows\\system32\\config\\sam",
+      "/etc/shadow",
+      "C:\\Windows\\System32\\config\\SAM",
     ];
 
     for (const path of traversalPaths) {
       const plugin = componentDebugger({ exportStats: path });
-      const code = '<div>test</div>';
-      await plugin.transform?.(code, 'test.tsx');
+      const code = "<div>test</div>";
+      await plugin.transform?.(code, "test.tsx");
       // buildEnd should prevent writing outside project
       plugin.buildEnd?.();
       // Verify file wasn't created (manual check or filesystem mock)
     }
   });
 
-  it('should handle extremely long patterns', async () => {
-    const longPattern = 'a/'.repeat(200) + '*.tsx';
+  it("should handle extremely long patterns", async () => {
+    const longPattern = "a/".repeat(200) + "*.tsx";
     const plugin = componentDebugger({ includePaths: [longPattern] });
-    const code = '<div>test</div>';
+    const code = "<div>test</div>";
 
     // Should warn and skip pattern
-    await plugin.transform?.(code, 'test.tsx');
+    await plugin.transform?.(code, "test.tsx");
   });
 });
 ```
@@ -211,12 +223,14 @@ describe('Glob Pattern Fuzzing', () => {
 ---
 
 ### Task 1.3: Transformer Function Fuzzing
+
 - **Priority**: 🟡 MEDIUM
-- **Time Estimate**: 2 days
+- **Time Estimate**: 20-30 minutes with AI
 - **Dependencies**: Task 1.1
 - **Tools Needed**: `fast-check`
 
 **Steps:**
+
 1. Create `src/__tests__/fuzzing/transformers.fuzz.test.ts`
 2. Fuzz transformers with non-string returns (objects, null, undefined, symbols)
 3. Test transformers that throw errors
@@ -225,59 +239,67 @@ describe('Glob Pattern Fuzzing', () => {
 6. Test transformers with prototype pollution attempts
 
 **Success Criteria**:
+
 - Plugin handles invalid transformer returns gracefully
 - Errors in transformers don't crash the build
 - Resource limits enforced (MAX_ATTR_LENGTH)
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/fuzzing/transformers.fuzz.test.ts
-import { describe, it, expect } from 'vitest';
-import { componentDebugger } from '../../plugin';
+import { describe, it, expect } from "vitest";
+import { componentDebugger } from "../../plugin";
 
-describe('Transformer Fuzzing', () => {
-  it('should handle transformers returning non-strings', async () => {
+describe("Transformer Fuzzing", () => {
+  it("should handle transformers returning non-strings", async () => {
     const badTransformers = [
       { id: () => null as any },
       { id: () => undefined as any },
-      { id: () => ({ malicious: 'object' }) as any },
+      { id: () => ({ malicious: "object" } as any) },
       { id: () => 123 as any },
-      { id: () => Symbol('test') as any },
+      { id: () => Symbol("test") as any },
       { id: () => [] as any },
       { id: () => true as any },
     ];
 
     for (const transformers of badTransformers) {
       const plugin = componentDebugger({ transformers });
-      const code = '<div>test</div>';
-      const result = await plugin.transform?.(code, 'test.tsx');
+      const code = "<div>test</div>";
+      const result = await plugin.transform?.(code, "test.tsx");
       // Should not crash, should warn and use original value
       expect(result).toBeDefined();
     }
   });
 
-  it('should handle transformers that throw', async () => {
+  it("should handle transformers that throw", async () => {
     const plugin = componentDebugger({
       transformers: {
-        id: () => { throw new Error('Malicious transformer'); },
-        name: () => { throw new TypeError('Bad type'); },
-        path: () => { throw new ReferenceError('Not defined'); },
-      }
+        id: () => {
+          throw new Error("Malicious transformer");
+        },
+        name: () => {
+          throw new TypeError("Bad type");
+        },
+        path: () => {
+          throw new ReferenceError("Not defined");
+        },
+      },
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
     // Should catch error and continue with original value
     expect(result).toBeDefined();
   });
 
-  it('should handle transformers returning huge strings', async () => {
+  it("should handle transformers returning huge strings", async () => {
     const plugin = componentDebugger({
       transformers: {
-        id: () => 'x'.repeat(10 * 1024 * 1024) // 10MB string
-      }
+        id: () => "x".repeat(10 * 1024 * 1024), // 10MB string
+      },
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
     // Should handle or truncate
     expect(result).toBeDefined();
   });
@@ -287,12 +309,14 @@ describe('Transformer Fuzzing', () => {
 ---
 
 ### Task 1.4: Callback Function Fuzzing
+
 - **Priority**: 🟡 MEDIUM
-- **Time Estimate**: 2 days
+- **Time Estimate**: 20-30 minutes with AI
 - **Dependencies**: Task 1.3
 - **Tools Needed**: `fast-check`
 
 **Steps:**
+
 1. Create `src/__tests__/fuzzing/callbacks.fuzz.test.ts`
 2. Test callbacks that throw errors
 3. Test callbacks with infinite loops
@@ -302,64 +326,68 @@ describe('Transformer Fuzzing', () => {
 7. Test customAttributes returning huge objects (>50 attributes)
 
 **Success Criteria**:
+
 - Callbacks errors logged but don't crash build
 - Prototype pollution attempts blocked
 - Resource limits enforced (MAX_CUSTOM_ATTRS: 50)
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/fuzzing/callbacks.fuzz.test.ts
-import { describe, it, expect } from 'vitest';
-import { componentDebugger } from '../../plugin';
+import { describe, it, expect } from "vitest";
+import { componentDebugger } from "../../plugin";
 
-describe('Callback Fuzzing', () => {
-  it('should handle shouldTag throwing errors', async () => {
+describe("Callback Fuzzing", () => {
+  it("should handle shouldTag throwing errors", async () => {
     const plugin = componentDebugger({
-      shouldTag: () => { throw new Error('Bad callback'); }
+      shouldTag: () => {
+        throw new Error("Bad callback");
+      },
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
     // Should catch error and continue processing
     expect(result).toBeDefined();
   });
 
-  it('should handle shouldTag returning non-boolean', async () => {
+  it("should handle shouldTag returning non-boolean", async () => {
     const badReturns = [
-      () => 'yes' as any,
+      () => "yes" as any,
       () => 1 as any,
       () => null as any,
       () => undefined as any,
-      () => ({}) as any,
+      () => ({} as any),
     ];
 
     for (const shouldTag of badReturns) {
       const plugin = componentDebugger({ shouldTag });
-      const code = '<div>test</div>';
-      const result = await plugin.transform?.(code, 'test.tsx');
+      const code = "<div>test</div>";
+      const result = await plugin.transform?.(code, "test.tsx");
       expect(result).toBeDefined();
     }
   });
 
-  it('should block prototype pollution in customAttributes', async () => {
+  it("should block prototype pollution in customAttributes", async () => {
     const plugin = componentDebugger({
       customAttributes: () => ({
-        '__proto__': 'malicious',
-        'constructor': 'evil',
-        'prototype': 'bad',
-        'safe': 'good'
-      })
+        __proto__: "malicious",
+        constructor: "evil",
+        prototype: "bad",
+        safe: "good",
+      }),
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
-    if (result && typeof result === 'object' && 'code' in result) {
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
+    if (result && typeof result === "object" && "code" in result) {
       // Should only include 'safe' attribute
-      expect(result.code).toContain('safe');
-      expect(result.code).not.toContain('__proto__');
-      expect(result.code).not.toContain('constructor');
+      expect(result.code).toContain("safe");
+      expect(result.code).not.toContain("__proto__");
+      expect(result.code).not.toContain("constructor");
     }
   });
 
-  it('should limit number of custom attributes', async () => {
+  it("should limit number of custom attributes", async () => {
     const plugin = componentDebugger({
       customAttributes: () => {
         const attrs: Record<string, string> = {};
@@ -367,10 +395,10 @@ describe('Callback Fuzzing', () => {
           attrs[`attr-${i}`] = `value-${i}`;
         }
         return attrs;
-      }
+      },
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
     // Should warn and limit to 50
     expect(result).toBeDefined();
   });
@@ -380,12 +408,14 @@ describe('Callback Fuzzing', () => {
 ---
 
 ### Task 1.5: Configuration Options Fuzzing
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 1 day
 - **Dependencies**: None
 - **Tools Needed**: `fast-check`
 
 **Steps:**
+
 1. Create `src/__tests__/fuzzing/config-options.fuzz.test.ts`
 2. Test invalid depth values (negative, >MAX_DEPTH_LIMIT, NaN, Infinity)
 3. Test conflicting options (minDepth > maxDepth)
@@ -394,18 +424,20 @@ describe('Callback Fuzzing', () => {
 6. Test invalid metadataEncoding values
 
 **Success Criteria**:
+
 - All invalid configs handled with warnings
 - Defaults applied when invalid values provided
 - No crashes on bad configuration
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/fuzzing/config-options.fuzz.test.ts
-import { describe, it, expect } from 'vitest';
-import { componentDebugger } from '../../plugin';
+import { describe, it, expect } from "vitest";
+import { componentDebugger } from "../../plugin";
 
-describe('Configuration Fuzzing', () => {
-  it('should handle invalid depth values', () => {
+describe("Configuration Fuzzing", () => {
+  it("should handle invalid depth values", () => {
     const invalidDepths = [
       { maxDepth: -1 },
       { maxDepth: 999 },
@@ -422,11 +454,11 @@ describe('Configuration Fuzzing', () => {
     }
   });
 
-  it('should handle invalid preset names', () => {
+  it("should handle invalid preset names", () => {
     const invalidPresets = [
-      'invalid-preset',
-      'MINIMAL',  // Wrong case
-      '',
+      "invalid-preset",
+      "MINIMAL", // Wrong case
+      "",
       null as any,
       123 as any,
     ];
@@ -436,33 +468,32 @@ describe('Configuration Fuzzing', () => {
     }
   });
 
-  it('should handle invalid metadataEncoding', () => {
+  it("should handle invalid metadataEncoding", () => {
     const invalidEncodings = [
-      'invalid',
-      'JSON',  // Wrong case
+      "invalid",
+      "JSON", // Wrong case
       null as any,
       123 as any,
     ];
 
     for (const encoding of invalidEncodings) {
-      expect(() => componentDebugger({
-        metadataEncoding: encoding as any
-      })).not.toThrow();
+      expect(() =>
+        componentDebugger({
+          metadataEncoding: encoding as any,
+        })
+      ).not.toThrow();
     }
   });
 
-  it('should handle invalid extensions array', () => {
-    const invalidExtensions = [
-      [123, 456] as any,
-      [''],
-      [null] as any,
-      'not-an-array' as any,
-    ];
+  it("should handle invalid extensions array", () => {
+    const invalidExtensions = [[123, 456] as any, [""], [null] as any, "not-an-array" as any];
 
     for (const extensions of invalidExtensions) {
-      expect(() => componentDebugger({
-        extensions: extensions as any
-      })).not.toThrow();
+      expect(() =>
+        componentDebugger({
+          extensions: extensions as any,
+        })
+      ).not.toThrow();
     }
   });
 });
@@ -473,32 +504,35 @@ describe('Configuration Fuzzing', () => {
 ## 2. 100% Code Coverage (Including Error Paths)
 
 ### Task 2.1: Install Coverage Tooling
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 2 hours
 - **Dependencies**: None
 - **Tools Needed**: `@vitest/coverage-v8`, `vitest`
 
 **Installation:**
+
 ```bash
 pnpm add -D @vitest/coverage-v8
 ```
 
 **Steps:**
+
 1. Create `vitest.config.ts`:
 
 ```typescript
 // vitest.config.ts
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
+    environment: "node",
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
-      include: ['src/**/*.ts'],
-      exclude: ['src/__tests__/**', 'src/**/*.test.ts', 'src/**/*.spec.ts'],
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      include: ["src/**/*.ts"],
+      exclude: ["src/__tests__/**", "src/**/*.test.ts", "src/**/*.spec.ts"],
       all: true,
       lines: 100,
       functions: 100,
@@ -508,14 +542,15 @@ export default defineConfig({
         lines: 100,
         functions: 100,
         branches: 100,
-        statements: 100
-      }
-    }
-  }
+        statements: 100,
+      },
+    },
+  },
 });
 ```
 
 2. Add script to `package.json`:
+
 ```json
 {
   "scripts": {
@@ -532,12 +567,14 @@ export default defineConfig({
 ---
 
 ### Task 2.2: Cover Error Paths in plugin.ts
+
 - **Priority**: 🔴 HIGH
-- **Time Estimate**: 3 days
+- **Time Estimate**: 30-45 minutes with AI
 - **Dependencies**: Task 2.1
 - **Tools Needed**: Vitest
 
 **Steps:**
+
 1. Create `src/__tests__/error-paths/plugin-errors.test.ts`
 2. Test Babel parser throwing on invalid syntax
 3. Test magic-string errors (invalid source positions)
@@ -550,71 +587,73 @@ export default defineConfig({
 10. Test edge case: file with only comments
 
 **Success Criteria**:
+
 - All error branches in plugin.ts covered
 - Error handling verified
 - No silent failures
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/error-paths/plugin-errors.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { componentDebugger } from '../../plugin';
+import { describe, it, expect, vi } from "vitest";
+import { componentDebugger } from "../../plugin";
 
-describe('Plugin Error Paths', () => {
-  it('should handle babel parse errors gracefully', async () => {
+describe("Plugin Error Paths", () => {
+  it("should handle babel parse errors gracefully", async () => {
     const plugin = componentDebugger();
-    const invalidCode = '<div unclosed';
-    const result = await plugin.transform?.(invalidCode, 'test.tsx');
+    const invalidCode = "<div unclosed";
+    const result = await plugin.transform?.(invalidCode, "test.tsx");
     // Should return null and log error
     expect(result).toBeNull();
   });
 
-  it('should handle callback errors in onTransform', async () => {
+  it("should handle callback errors in onTransform", async () => {
     const errorCallback = vi.fn(() => {
-      throw new Error('onTransform failed');
+      throw new Error("onTransform failed");
     });
     const plugin = componentDebugger({ onTransform: errorCallback });
-    const code = '<div>test</div>';
-    await plugin.transform?.(code, 'test.tsx');
+    const code = "<div>test</div>";
+    await plugin.transform?.(code, "test.tsx");
     expect(errorCallback).toHaveBeenCalled();
     // Should log error but continue
   });
 
-  it('should handle missing location info in AST nodes', async () => {
+  it("should handle missing location info in AST nodes", async () => {
     const plugin = componentDebugger({ debug: true });
     // Code that might produce nodes without location info
-    const code = '<div />';
-    const result = await plugin.transform?.(code, 'test.tsx');
+    const code = "<div />";
+    const result = await plugin.transform?.(code, "test.tsx");
     expect(result).toBeDefined();
   });
 
-  it('should handle exportStats file write errors', async () => {
+  it("should handle exportStats file write errors", async () => {
     const plugin = componentDebugger({
-      exportStats: '/root/forbidden/path.json' // Permission denied
+      exportStats: "/root/forbidden/path.json", // Permission denied
     });
-    const code = '<div>test</div>';
-    await plugin.transform?.(code, 'test.tsx');
+    const code = "<div>test</div>";
+    await plugin.transform?.(code, "test.tsx");
     // Should log error, not crash
     expect(() => plugin.buildEnd?.()).not.toThrow();
   });
 
-  it('should handle empty file', async () => {
+  it("should handle empty file", async () => {
     const plugin = componentDebugger();
-    const result = await plugin.transform?.('', 'empty.tsx');
+    const result = await plugin.transform?.("", "empty.tsx");
     expect(result).toBeNull();
   });
 
-  it('should handle file with only comments', async () => {
+  it("should handle file with only comments", async () => {
     const plugin = componentDebugger();
-    const code = '// Just a comment\n/* Another comment */';
-    const result = await plugin.transform?.(code, 'comments.tsx');
+    const code = "// Just a comment\n/* Another comment */";
+    const result = await plugin.transform?.(code, "comments.tsx");
     expect(result).toBeNull();
   });
 
-  it('should handle code with no newlines', async () => {
+  it("should handle code with no newlines", async () => {
     const plugin = componentDebugger();
-    const code = '<div><span>test</span></div>';
-    const result = await plugin.transform?.(code, 'single-line.tsx');
+    const code = "<div><span>test</span></div>";
+    const result = await plugin.transform?.(code, "single-line.tsx");
     expect(result).toBeDefined();
   });
 });
@@ -623,12 +662,14 @@ describe('Plugin Error Paths', () => {
 ---
 
 ### Task 2.3: Cover Edge Cases in generateAttributes Function
+
 - **Priority**: 🔴 HIGH
-- **Time Estimate**: 2 days
+- **Time Estimate**: 20-30 minutes with AI
 - **Dependencies**: Task 2.1
 - **Tools Needed**: Vitest
 
 **Steps:**
+
 1. Create `src/__tests__/error-paths/generate-attributes.test.ts`
 2. Test all encoding modes (json, base64, none)
 3. Test metadata exceeding MAX_METADATA_SIZE (10KB)
@@ -643,89 +684,90 @@ describe('Plugin Error Paths', () => {
 **Success Criteria**: All branches in generateAttributes covered
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/error-paths/generate-attributes.test.ts
-import { describe, it, expect } from 'vitest';
-import { componentDebugger } from '../../plugin';
+import { describe, it, expect } from "vitest";
+import { componentDebugger } from "../../plugin";
 
-describe('Generate Attributes Edge Cases', () => {
-  it('should truncate large metadata', async () => {
-    const largeProps = { data: 'x'.repeat(20000) };
+describe("Generate Attributes Edge Cases", () => {
+  it("should truncate large metadata", async () => {
+    const largeProps = { data: "x".repeat(20000) };
     const plugin = componentDebugger({
       includeProps: true,
-      customAttributes: () => largeProps
+      customAttributes: () => largeProps,
     });
     const code = '<div className="test">content</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
-    if (result && typeof result === 'object' && 'code' in result) {
+    const result = await plugin.transform?.(code, "test.tsx");
+    if (result && typeof result === "object" && "code" in result) {
       // Should contain truncation notice
-      expect(result.code).toContain('truncated');
+      expect(result.code).toContain("truncated");
     }
   });
 
-  it('should handle all metadata encoding modes', async () => {
-    const encodings: Array<'json' | 'base64' | 'none'> = ['json', 'base64', 'none'];
+  it("should handle all metadata encoding modes", async () => {
+    const encodings: Array<"json" | "base64" | "none"> = ["json", "base64", "none"];
 
     for (const encoding of encodings) {
       const plugin = componentDebugger({
         includeProps: true,
-        metadataEncoding: encoding
+        metadataEncoding: encoding,
       });
       const code = '<div className="test">content</div>';
-      const result = await plugin.transform?.(code, 'test.tsx');
+      const result = await plugin.transform?.(code, "test.tsx");
       expect(result).toBeDefined();
     }
   });
 
-  it('should properly escape HTML characters', async () => {
+  it("should properly escape HTML characters", async () => {
     const plugin = componentDebugger({
       customAttributes: () => ({
         xss: '<script>alert("XSS")</script>',
-        amp: 'A & B',
+        amp: "A & B",
         quote: 'He said "hello"',
         apostrophe: "It's working",
-        lt: '<div>',
-        gt: 'a > b'
-      })
+        lt: "<div>",
+        gt: "a > b",
+      }),
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
-    if (result && typeof result === 'object' && 'code' in result) {
-      expect(result.code).toContain('&lt;script&gt;');
-      expect(result.code).toContain('&amp;');
-      expect(result.code).toContain('&quot;');
-      expect(result.code).toContain('&#39;');
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
+    if (result && typeof result === "object" && "code" in result) {
+      expect(result.code).toContain("&lt;script&gt;");
+      expect(result.code).toContain("&amp;");
+      expect(result.code).toContain("&quot;");
+      expect(result.code).toContain("&#39;");
     }
   });
 
-  it('should handle groupAttributes mode', async () => {
+  it("should handle groupAttributes mode", async () => {
     const plugin = componentDebugger({
       groupAttributes: true,
-      includeAttributes: ['id', 'name', 'line'],
-      metadataEncoding: 'base64'
+      includeAttributes: ["id", "name", "line"],
+      metadataEncoding: "base64",
     });
-    const code = '<div>test</div>';
-    const result = await plugin.transform?.(code, 'test.tsx');
-    if (result && typeof result === 'object' && 'code' in result) {
+    const code = "<div>test</div>";
+    const result = await plugin.transform?.(code, "test.tsx");
+    if (result && typeof result === "object" && "code" in result) {
       // Should have single data-dev attribute
-      expect(result.code).toContain('data-dev=');
-      expect(result.code).not.toContain('data-dev-id=');
+      expect(result.code).toContain("data-dev=");
+      expect(result.code).not.toContain("data-dev-id=");
     }
   });
 
-  it('should test all inclusion/exclusion combinations', async () => {
+  it("should test all inclusion/exclusion combinations", async () => {
     const configs = [
-      { includeAttributes: ['id'] },
-      { includeAttributes: ['id', 'name'] },
-      { excludeAttributes: ['metadata'] },
-      { excludeAttributes: ['file', 'component'] },
-      { includeAttributes: ['id'], excludeAttributes: ['metadata'] },
+      { includeAttributes: ["id"] },
+      { includeAttributes: ["id", "name"] },
+      { excludeAttributes: ["metadata"] },
+      { excludeAttributes: ["file", "component"] },
+      { includeAttributes: ["id"], excludeAttributes: ["metadata"] },
     ];
 
     for (const config of configs) {
       const plugin = componentDebugger(config);
-      const code = '<div>test</div>';
-      const result = await plugin.transform?.(code, 'test.tsx');
+      const code = "<div>test</div>";
+      const result = await plugin.transform?.(code, "test.tsx");
       expect(result).toBeDefined();
     }
   });
@@ -735,12 +777,14 @@ describe('Generate Attributes Edge Cases', () => {
 ---
 
 ### Task 2.4: Cover Utility Functions
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 2.1
 - **Tools Needed**: Vitest
 
 **Steps:**
+
 1. Create `src/__tests__/utils/utility-functions.test.ts`
 2. Test shouldExcludeElement with all code paths
 3. Test extractTextContent with nested JSX, expressions, empty content
@@ -752,12 +796,14 @@ describe('Generate Attributes Edge Cases', () => {
 ---
 
 ### Task 2.5: Cover component-debugger.ts Utility File
+
 - **Priority**: 🟢 LOW
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 2.1
 - **Tools Needed**: Vitest, jsdom or happy-dom
 
 **Steps:**
+
 1. Install: `pnpm add -D happy-dom`
 2. Create `src/__tests__/utils/component-debugger-utils.test.ts`
 3. Test all exported functions (getComponentInfo, findAllComponents, etc.)
@@ -772,17 +818,20 @@ describe('Generate Attributes Edge Cases', () => {
 ## 3. Comprehensive Integration Tests
 
 ### Task 3.1: Real Vite Build Integration Tests
+
 - **Priority**: 🔴 HIGH
-- **Time Estimate**: 4 days
+- **Time Estimate**: 45-60 minutes with AI
 - **Dependencies**: None
 - **Tools Needed**: `vite`, `tmp`
 
 **Installation:**
+
 ```bash
 pnpm add -D tmp
 ```
 
 **Steps:**
+
 1. Create `src/__tests__/integration/vite-build.test.ts`
 2. Set up temp project with real vite.config.ts
 3. Test full development build
@@ -794,6 +843,7 @@ pnpm add -D tmp
 9. Verify source maps are correct
 
 **Success Criteria**:
+
 - Plugin works in real Vite builds
 - Attributes present in built HTML
 - Source maps accurate
@@ -802,18 +852,21 @@ pnpm add -D tmp
 ---
 
 ### Task 3.2: End-to-End Browser Tests with Playwright
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 3 days
 - **Dependencies**: Task 3.1
 - **Tools Needed**: `@playwright/test`, `playwright`
 
 **Installation:**
+
 ```bash
 pnpm add -D @playwright/test
 pnpm exec playwright install
 ```
 
 **Steps:**
+
 1. Create `src/__tests__/e2e/browser.spec.ts`
 2. Create `playwright.config.ts`
 3. Start dev server with plugin enabled
@@ -824,34 +877,36 @@ pnpm exec playwright install
 8. Test with different browsers (Chromium, Firefox, WebKit)
 
 **Success Criteria**:
+
 - All attributes visible in browser DOM
 - Line numbers accurate
 - Utilities work in browser context
 
 **Configuration:**
+
 ```typescript
 // playwright.config.ts
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './src/__tests__/e2e',
+  testDir: "./src/__tests__/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: "html",
   use: {
-    baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
+    baseURL: "http://localhost:5173",
+    trace: "on-first-retry",
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
   webServer: {
-    command: 'pnpm run dev',
-    url: 'http://localhost:5173',
+    command: "pnpm run dev",
+    url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
   },
 });
@@ -860,12 +915,14 @@ export default defineConfig({
 ---
 
 ### Task 3.3: Multi-Framework Integration
+
 - **Priority**: 🟡 MEDIUM
-- **Time Estimate**: 5 days
+- **Time Estimate**: 60-90 minutes with AI
 - **Dependencies**: Task 3.1
 - **Tools Needed**: Various React versions, Next.js, Remix
 
 **Steps:**
+
 1. Create test projects for each framework
 2. Test React 17 (no automatic JSX runtime)
 3. Test React 18 (automatic JSX runtime)
@@ -877,6 +934,7 @@ export default defineConfig({
 9. Verify client-side hydration works
 
 **Success Criteria**:
+
 - Plugin works across all framework versions
 - No SSR errors
 - Hydration successful
@@ -884,12 +942,14 @@ export default defineConfig({
 ---
 
 ### Task 3.4: Monorepo Integration Tests
+
 - **Priority**: 🟢 LOW
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 3.1
 - **Tools Needed**: pnpm workspaces
 
 **Steps:**
+
 1. Create test monorepo with multiple packages
 2. Test with pnpm workspaces
 3. Test with npm workspaces
@@ -898,18 +958,21 @@ export default defineConfig({
 6. Test symlinked dependencies
 
 **Success Criteria**:
+
 - Plugin resolves paths correctly in monorepos
 - No duplicate processing
 
 ---
 
 ### Task 3.5: CI/CD Pipeline Integration Tests
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 3.1
 - **Tools Needed**: GitHub Actions
 
 **Steps:**
+
 1. Update `.github/workflows/ci.yml` to run integration tests
 2. Test builds in CI environment
 3. Test across different Node versions (18, 20, 22)
@@ -918,10 +981,12 @@ export default defineConfig({
 6. Add integration test coverage reporting
 
 **Success Criteria**:
+
 - Integration tests pass in CI
 - No platform-specific failures
 
 **Implementation:**
+
 ```yaml
 # .github/workflows/integration.yml
 name: Integration Tests
@@ -943,7 +1008,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm install
       - run: pnpm test:integration
 ```
@@ -953,17 +1018,20 @@ jobs:
 ## 4. Memory Leak Detection
 
 ### Task 4.1: Set Up Memory Profiling Tools
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 1 day
 - **Dependencies**: None
 - **Tools Needed**: `memlab`, `@clinicjs/clinic`
 
 **Installation:**
+
 ```bash
 pnpm add -D memlab @clinicjs/clinic
 ```
 
 **Steps:**
+
 1. Create memory profiling scripts
 2. Set up heap snapshot capture
 3. Configure automated leak detection
@@ -971,6 +1039,7 @@ pnpm add -D memlab @clinicjs/clinic
 **Success Criteria**: Tools installed and configured
 
 **Package.json scripts:**
+
 ```json
 {
   "scripts": {
@@ -983,12 +1052,14 @@ pnpm add -D memlab @clinicjs/clinic
 ---
 
 ### Task 4.2: Detect Leaks in Plugin Transform Loop
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 3 days
 - **Dependencies**: Task 4.1
 - **Tools Needed**: memlab, Vitest
 
 **Steps:**
+
 1. Create `scripts/memory-test.js`
 2. Process 10,000 files in a loop
 3. Monitor heap size growth
@@ -998,19 +1069,21 @@ pnpm add -D memlab @clinicjs/clinic
 7. Verify garbage collection occurs
 
 **Success Criteria**:
+
 - Heap size stabilizes after GC
 - No unbounded growth
 - Memory usage < 200MB for 10,000 files
 
 **Implementation:**
+
 ```javascript
 // scripts/memory-test.js
-const { componentDebugger } = require('./dist/index.js');
-const v8 = require('v8');
+const { componentDebugger } = require("./dist/index.js");
+const v8 = require("v8");
 
 async function testMemoryLeak() {
   const plugin = componentDebugger();
-  const testCode = '<div><span>Test</span></div>';
+  const testCode = "<div><span>Test</span></div>";
 
   const initialHeap = v8.getHeapStatistics().used_heap_size;
 
@@ -1033,11 +1106,11 @@ async function testMemoryLeak() {
   console.log(`\nTotal heap growth after 10,000 files: ${totalGrowth}MB`);
 
   if (parseFloat(totalGrowth) > 200) {
-    console.error('❌ Memory leak detected! Heap growth exceeds 200MB');
+    console.error("❌ Memory leak detected! Heap growth exceeds 200MB");
     process.exit(1);
   }
 
-  console.log('✅ No memory leaks detected');
+  console.log("✅ No memory leaks detected");
 }
 
 testMemoryLeak().catch(console.error);
@@ -1046,12 +1119,14 @@ testMemoryLeak().catch(console.error);
 ---
 
 ### Task 4.3: Detect Leaks in Event Listeners
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 4.1
 - **Tools Needed**: memlab, happy-dom
 
 **Steps:**
+
 1. Test component-debugger.ts browser utilities
 2. Test enableComponentHighlighting for listener cleanup
 3. Test observeComponentRenders for observer cleanup
@@ -1059,18 +1134,21 @@ testMemoryLeak().catch(console.error);
 5. Test repeated enable/disable cycles
 
 **Success Criteria**:
+
 - All listeners removed on cleanup
 - No retained event handlers
 
 ---
 
 ### Task 4.4: Detect Leaks in Long-Running Dev Server
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 4.1, Task 3.1
 - **Tools Needed**: memlab, Vite
 
 **Steps:**
+
 1. Start Vite dev server with plugin
 2. Simulate file changes (HMR) for 1 hour
 3. Monitor heap size over time
@@ -1078,18 +1156,21 @@ testMemoryLeak().catch(console.error);
 5. Verify stats object doesn't grow unbounded
 
 **Success Criteria**:
+
 - Heap stable during long-running server
 - No accumulation of transform results
 
 ---
 
 ### Task 4.5: Add Memory Leak Tests to CI
+
 - **Priority**: 🟢 LOW
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 4.2, Task 4.3, Task 4.4
 - **Tools Needed**: GitHub Actions
 
 **Steps:**
+
 1. Update `.github/workflows/ci.yml`
 2. Add memory leak test job
 3. Configure timeout (30 minutes max)
@@ -1102,17 +1183,20 @@ testMemoryLeak().catch(console.error);
 ## 5. Performance Regression Tests
 
 ### Task 5.1: Establish Performance Baselines
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 2 days
 - **Dependencies**: None
 - **Tools Needed**: `tinybench`
 
 **Installation:**
+
 ```bash
 pnpm add -D tinybench
 ```
 
 **Steps:**
+
 1. Create `src/__tests__/benchmarks/baseline.bench.ts`
 2. Benchmark transform performance (small/medium/large files)
 3. Benchmark different file sizes (1KB, 10KB, 100KB, 1MB)
@@ -1121,38 +1205,40 @@ pnpm add -D tinybench
 6. Store baseline results in `benchmarks/baseline.json`
 
 **Success Criteria**:
+
 - Baseline metrics captured
 - Benchmarks reproducible
 
 **Implementation:**
+
 ```typescript
 // src/__tests__/benchmarks/baseline.bench.ts
-import { bench, describe } from 'vitest';
-import { componentDebugger } from '../../plugin';
+import { bench, describe } from "vitest";
+import { componentDebugger } from "../../plugin";
 
-describe('Performance Baselines', () => {
-  const smallCode = '<div>Hello</div>';
-  const mediumCode = '<div>' + '<span>Test</span>'.repeat(100) + '</div>';
-  const largeCode = '<div>' + '<span>Test</span>'.repeat(1000) + '</div>';
+describe("Performance Baselines", () => {
+  const smallCode = "<div>Hello</div>";
+  const mediumCode = "<div>" + "<span>Test</span>".repeat(100) + "</div>";
+  const largeCode = "<div>" + "<span>Test</span>".repeat(1000) + "</div>";
 
-  bench('transform small file (< 1KB)', async () => {
+  bench("transform small file (< 1KB)", async () => {
     const plugin = componentDebugger();
-    await plugin.transform?.(smallCode, 'small.tsx');
+    await plugin.transform?.(smallCode, "small.tsx");
   });
 
-  bench('transform medium file (10KB)', async () => {
+  bench("transform medium file (10KB)", async () => {
     const plugin = componentDebugger();
-    await plugin.transform?.(mediumCode, 'medium.tsx');
+    await plugin.transform?.(mediumCode, "medium.tsx");
   });
 
-  bench('transform large file (100KB)', async () => {
+  bench("transform large file (100KB)", async () => {
     const plugin = componentDebugger();
-    await plugin.transform?.(largeCode, 'large.tsx');
+    await plugin.transform?.(largeCode, "large.tsx");
   });
 
-  bench('disabled plugin (should be near-zero overhead)', async () => {
+  bench("disabled plugin (should be near-zero overhead)", async () => {
     const plugin = componentDebugger({ enabled: false });
-    await plugin.transform?.(mediumCode, 'disabled.tsx');
+    await plugin.transform?.(mediumCode, "disabled.tsx");
   });
 });
 ```
@@ -1160,12 +1246,14 @@ describe('Performance Baselines', () => {
 ---
 
 ### Task 5.2: Automated Regression Detection
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 3 days
 - **Dependencies**: Task 5.1
 - **Tools Needed**: `tinybench`, custom scripts
 
 **Steps:**
+
 1. Create `scripts/performance-regression-check.js`
 2. Run benchmarks on each commit
 3. Compare against baseline (max 10% regression allowed)
@@ -1174,18 +1262,21 @@ describe('Performance Baselines', () => {
 6. Store historical performance data
 
 **Success Criteria**:
+
 - Automated detection of >10% slowdowns
 - Historical tracking enabled
 
 ---
 
 ### Task 5.3: Build Time Impact Measurement
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 5.1, Task 3.1
 - **Tools Needed**: Vite, hyperfine
 
 **Steps:**
+
 1. Create test projects of varying sizes
 2. Measure build time with plugin enabled vs. disabled
 3. Test cold start vs. warm cache
@@ -1193,18 +1284,21 @@ describe('Performance Baselines', () => {
 5. Verify plugin overhead < 5% of total build time
 
 **Success Criteria**:
+
 - Plugin adds <5% to build time
 - HMR not significantly impacted
 
 ---
 
 ### Task 5.4: Large Codebase Stress Test
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 5.1
 - **Tools Needed**: Test codebase generator
 
 **Steps:**
+
 1. Generate synthetic codebase (10,000 components)
 2. Test transform performance at scale
 3. Measure memory usage with large codebase
@@ -1212,18 +1306,21 @@ describe('Performance Baselines', () => {
 5. Verify no exponential slowdowns
 
 **Success Criteria**:
+
 - Linear time complexity maintained
 - Memory usage proportional to file size
 
 ---
 
 ### Task 5.5: Add Performance Tests to CI
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 5.2
 - **Tools Needed**: GitHub Actions
 
 **Steps:**
+
 1. Add benchmark job to `.github/workflows/ci.yml`
 2. Run on every PR
 3. Comment results on PR
@@ -1236,12 +1333,14 @@ describe('Performance Baselines', () => {
 ## 6. Browser Compatibility Tests
 
 ### Task 6.1: Set Up Cross-Browser Testing
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 3.2
 - **Tools Needed**: `@playwright/test`
 
 **Steps:**
+
 1. Configure Playwright for multiple browsers
 2. Set up test matrix (Chrome, Firefox, Safari, Edge)
 3. Configure mobile browsers (iOS Safari, Chrome Android)
@@ -1251,12 +1350,14 @@ describe('Performance Baselines', () => {
 ---
 
 ### Task 6.2: Test Data Attribute Support
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 6.1
 - **Tools Needed**: Playwright
 
 **Steps:**
+
 1. Test `dataset` API across browsers
 2. Test getAttribute/setAttribute
 3. Test querySelector with data attributes
@@ -1265,18 +1366,21 @@ describe('Performance Baselines', () => {
 6. Test non-ASCII characters
 
 **Success Criteria**:
+
 - All browsers support data attributes correctly
 - No encoding issues
 
 ---
 
 ### Task 6.3: Test Browser Utility Functions
+
 - **Priority**: 🟢 LOW
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 6.1
 - **Tools Needed**: Playwright
 
 **Steps:**
+
 1. Test getComponentInfo in all browsers
 2. Test enableComponentHighlighting visual rendering
 3. Test MutationObserver support
@@ -1284,36 +1388,42 @@ describe('Performance Baselines', () => {
 5. Verify tooltip positioning
 
 **Success Criteria**:
+
 - All utilities work across browsers
 - Graceful degradation for unsupported features
 
 ---
 
 ### Task 6.4: Test Legacy Browser Support
+
 - **Priority**: 🟢 LOW
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 6.1
 - **Tools Needed**: BrowserStack (optional)
 
 **Steps:**
+
 1. Test in older Safari versions (12-13)
 2. Identify polyfills needed
 3. Document browser support matrix
 4. Add graceful degradation
 
 **Success Criteria**:
+
 - Clear browser support documented
 - Polyfills identified
 
 ---
 
 ### Task 6.5: Add Browser Tests to CI
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 6.1, Task 6.2
 - **Tools Needed**: GitHub Actions, Playwright
 
 **Steps:**
+
 1. Add Playwright test job to CI
 2. Run on all configured browsers
 3. Upload test results and screenshots
@@ -1325,12 +1435,14 @@ describe('Performance Baselines', () => {
 ## 7. Formal Threat Modeling
 
 ### Task 7.1: Identify Assets and Trust Boundaries
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 1 day
 - **Dependencies**: None
 - **Tools Needed**: Threat modeling framework (STRIDE)
 
 **Steps:**
+
 1. List all plugin assets
 2. Identify trust boundaries
 3. Map data flow
@@ -1338,10 +1450,12 @@ describe('Performance Baselines', () => {
 5. Create data flow diagram
 
 **Success Criteria**:
+
 - Complete asset inventory
 - Trust boundaries documented
 
 **Assets:**
+
 - Source code files
 - User configuration
 - Babel AST
@@ -1350,6 +1464,7 @@ describe('Performance Baselines', () => {
 - NPM package
 
 **Trust Boundaries:**
+
 1. User configuration (untrusted)
 2. Source code files (partially trusted)
 3. File system operations
@@ -1359,12 +1474,14 @@ describe('Performance Baselines', () => {
 ---
 
 ### Task 7.2: Apply STRIDE Threat Analysis
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 7.1
 - **Tools Needed**: STRIDE framework
 
 **Steps:**
+
 1. Analyze Spoofing threats
 2. Analyze Tampering threats
 3. Analyze Repudiation threats
@@ -1375,44 +1492,53 @@ describe('Performance Baselines', () => {
 8. Rate by severity
 
 **Success Criteria**:
+
 - Complete STRIDE analysis
 - Threats prioritized
 
 **STRIDE Categories:**
 
 **Spoofing (S)**
+
 - S1: Fake data-dev attributes in source
 - S2: Package spoofing on npm
 
 **Tampering (T)**
+
 - T1: Malicious transformer modifying output
 - T2: Path traversal in exportStats (✅ mitigated)
 
 **Repudiation (R)**
+
 - R1: No audit trail for callbacks
 
 **Information Disclosure (I)**
+
 - I1: Sensitive props in metadata
 - I2: File paths revealing structure
 
 **Denial of Service (D)**
+
 - D1: ReDoS via glob patterns (✅ mitigated)
 - D2: Memory exhaustion (✅ mitigated)
 - D3: Infinite loop in callbacks
 
 **Elevation of Privilege (E)**
+
 - E1: Arbitrary code via callbacks
 - E2: Prototype pollution (✅ mitigated)
 
 ---
 
 ### Task 7.3: Document Attack Vectors
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 1 day
 - **Dependencies**: Task 7.2
 - **Tools Needed**: Markdown
 
 **Steps:**
+
 1. Create `SECURITY.md` document
 2. List all attack vectors
 3. Document mitigations
@@ -1423,28 +1549,33 @@ describe('Performance Baselines', () => {
 **Success Criteria**: Complete security documentation
 
 **Template:**
+
 ```markdown
 # SECURITY.md
 
 ## Security Policy
 
 ### Supported Versions
+
 - 2.x: Full security support
 - 1.x: Critical fixes only
 
 ### Known Security Considerations
 
 #### 1. User-Provided Callbacks (CRITICAL)
+
 **Risk**: Arbitrary code execution
 **Mitigation**: Callbacks run in build process
 **Best Practice**: Never use untrusted callbacks
 
 #### 2. Metadata Information Disclosure (HIGH)
+
 **Risk**: Props may contain sensitive data
 **Mitigation**: Set `includeProps: false` in production
 **Best Practice**: Review metadata before enabling
 
 ### Reporting Vulnerabilities
+
 Email: security@tonyebrown.com
 Response time: 48 hours
 ```
@@ -1452,12 +1583,14 @@ Response time: 48 hours
 ---
 
 ### Task 7.4: Create Mitigation Plan
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 3 days
 - **Dependencies**: Task 7.2, Task 7.3
 - **Tools Needed**: None
 
 **Steps:**
+
 1. Prioritize unmitigated threats
 2. Design mitigations for top 5 threats
 3. Implement mitigations (if feasible)
@@ -1465,10 +1598,12 @@ Response time: 48 hours
 5. Document trade-offs
 
 **Success Criteria**:
+
 - Mitigations implemented or documented
 - Security hardening options available
 
 **New Security Options:**
+
 ```typescript
 export interface TagOptions {
   /**
@@ -1494,12 +1629,14 @@ export interface TagOptions {
 ---
 
 ### Task 7.5: Dependency Security Audit
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: None
 - **Tools Needed**: `npm audit`, `snyk`
 
 **Steps:**
+
 1. Run `pnpm audit`
 2. Review dependency tree
 3. Check for known CVEs
@@ -1507,10 +1644,12 @@ export interface TagOptions {
 5. Add audit to CI pipeline
 
 **Success Criteria**:
+
 - No high/critical vulnerabilities
 - Automated scanning enabled
 
 **GitHub Actions:**
+
 ```yaml
 # .github/workflows/security.yml
 name: Security Audit
@@ -1519,7 +1658,7 @@ on:
   push:
   pull_request:
   schedule:
-    - cron: '0 0 * * 0' # Weekly
+    - cron: "0 0 * * 0" # Weekly
 
 jobs:
   audit:
@@ -1531,6 +1670,7 @@ jobs:
 ```
 
 **Dependabot:**
+
 ```yaml
 # .github/dependabot.yml
 version: 2
@@ -1547,12 +1687,14 @@ updates:
 ## 8. Penetration Testing
 
 ### Task 8.1: Set Up Penetration Testing Environment
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 1 day
 - **Dependencies**: None
 - **Tools Needed**: Docker
 
 **Steps:**
+
 1. Create isolated Docker container
 2. Set up test application
 3. Create malicious test payloads
@@ -1563,12 +1705,14 @@ updates:
 ---
 
 ### Task 8.2: Code Injection Attack Testing
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 3 days
 - **Dependencies**: Task 8.1
 - **Tools Needed**: Custom scripts
 
 **Steps:**
+
 1. Test XSS via metadata
 2. Test script injection via customAttributes
 3. Test eval() exploitation
@@ -1577,18 +1721,21 @@ updates:
 6. Verify HTML escaping
 
 **Success Criteria**:
+
 - No code injection vulnerabilities
 - All user input properly escaped
 
 ---
 
 ### Task 8.3: Path Traversal Attack Testing
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 8.1
 - **Tools Needed**: File system mocking
 
 **Steps:**
+
 1. Test directory traversal in exportStats
 2. Test symlink attacks
 3. Test absolute path exploits
@@ -1601,12 +1748,14 @@ updates:
 ---
 
 ### Task 8.4: Denial of Service Attack Testing
+
 - **Priority**: 🔴 HIGH
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 8.1
 - **Tools Needed**: Custom scripts
 
 **Steps:**
+
 1. Test ReDoS with catastrophic backtracking
 2. Test billion laughs attack
 3. Test zip bomb (deeply nested JSX)
@@ -1619,12 +1768,14 @@ updates:
 ---
 
 ### Task 8.5: Supply Chain Attack Simulation
+
 - **Priority**: 🟡 MEDIUM
 - **Time Estimate**: 2 days
 - **Dependencies**: Task 8.1
 - **Tools Needed**: Custom malicious packages
 
 **Steps:**
+
 1. Simulate compromised dependency
 2. Test with malicious AST
 3. Test with malicious glob matcher
@@ -1632,6 +1783,7 @@ updates:
 5. Add runtime validation
 
 **Success Criteria**:
+
 - Plugin resilient to compromised dependencies
 - Validation checks in place
 
@@ -1641,16 +1793,16 @@ updates:
 
 ### Recommended 15-Week Schedule
 
-| Week | Focus | Tasks |
-|------|-------|-------|
-| **1-2** | Foundation | Coverage tooling, Babel fuzzing, Glob fuzzing |
-| **3-4** | Robustness | Error path coverage in plugin.ts and utils |
-| **5-6** | Integration | Real Vite builds, E2E browser tests |
-| **7-8** | Performance | Memory leak detection, Performance baselines |
-| **9-10** | Security | Threat modeling, STRIDE analysis |
-| **11-12** | Attacks | Penetration testing (injection, traversal, DoS) |
-| **13-14** | Polish | Medium priority tasks, CI integration |
-| **15** | Finalization | Low priority tasks, documentation |
+| Week      | Focus        | Tasks                                           |
+| --------- | ------------ | ----------------------------------------------- |
+| **1-2**   | Foundation   | Coverage tooling, Babel fuzzing, Glob fuzzing   |
+| **3-4**   | Robustness   | Error path coverage in plugin.ts and utils      |
+| **5-6**   | Integration  | Real Vite builds, E2E browser tests             |
+| **7-8**   | Performance  | Memory leak detection, Performance baselines    |
+| **9-10**  | Security     | Threat modeling, STRIDE analysis                |
+| **11-12** | Attacks      | Penetration testing (injection, traversal, DoS) |
+| **13-14** | Polish       | Medium priority tasks, CI integration           |
+| **15**    | Finalization | Low priority tasks, documentation               |
 
 ---
 
@@ -1670,26 +1822,31 @@ Task 8.1 (Pentest)  ──> Tasks 8.2, 8.3, 8.4, 8.5
 ## Success Metrics
 
 ### Code Coverage
+
 - **Target**: 100% lines, branches, functions, statements
 - **Current**: ~90% (estimate)
 - **Measurement**: `pnpm test:coverage`
 
 ### Security
+
 - **Target**: 🟢 ZERO risk
 - **Current**: 🟢 LOW risk
 - **Measurement**: STRIDE analysis complete, all threats mitigated
 
 ### Performance
+
 - **Target**: <5% build time overhead, <200MB memory for 10K files
 - **Current**: Unknown
 - **Measurement**: Benchmark suite
 
 ### Reliability
+
 - **Target**: No crashes in 100K+ fuzz iterations
 - **Current**: Unknown
 - **Measurement**: Fuzz test suite
 
 ### Browser Compatibility
+
 - **Target**: Works in Chrome, Firefox, Safari, Edge (latest 2 versions)
 - **Current**: Likely works, not tested
 - **Measurement**: Playwright E2E tests
@@ -1701,6 +1858,7 @@ Task 8.1 (Pentest)  ──> Tasks 8.2, 8.3, 8.4, 8.5
 ### First 3 Tasks (Start Here)
 
 **1. Install Coverage Tooling (2 hours)**
+
 ```bash
 pnpm add -D @vitest/coverage-v8
 # Create vitest.config.ts
@@ -1708,12 +1866,14 @@ pnpm test:coverage
 ```
 
 **2. Babel Parser Fuzzing (3 days)**
+
 ```bash
 pnpm add -D fast-check @jazzer.js/core
 # Create src/__tests__/fuzzing/babel-parser.fuzz.test.ts
 ```
 
 **3. Glob Pattern Fuzzing (2 days)**
+
 ```bash
 # Create src/__tests__/fuzzing/glob-patterns.fuzz.test.ts
 # Test ReDoS patterns
@@ -1724,6 +1884,7 @@ pnpm add -D fast-check @jazzer.js/core
 ## Resources
 
 ### Tools & Libraries
+
 - **Fuzzing**: `fast-check`, `@jazzer.js/core`, `jsfuzz`
 - **Coverage**: `@vitest/coverage-v8`
 - **Integration**: `@playwright/test`, `tmp`
@@ -1732,6 +1893,7 @@ pnpm add -D fast-check @jazzer.js/core
 - **Security**: `npm audit`, `snyk`, `socket.dev`
 
 ### Documentation
+
 - [Vitest Docs](https://vitest.dev)
 - [Playwright Docs](https://playwright.dev)
 - [fast-check Guide](https://fast-check.dev)
@@ -1742,11 +1904,52 @@ pnpm add -D fast-check @jazzer.js/core
 ## Maintenance
 
 This roadmap should be reviewed and updated:
+
 - After completing each major category
 - When new security threats are discovered
 - When dependencies are upgraded
 - Quarterly for relevance
 
 **Last Updated**: 2025-09-30
-**Status**: Planning Phase
-**Next Review**: After Task 2.1 completion
+**Status**: Planning Phase - Updated for AI-Assisted Development
+**Next Review**: After first 3 tasks completion (expected within 2-3 hours)
+
+---
+
+## 🚀 Realistic AI-Assisted Timeline Summary
+
+**Total Time with AI Assistance: 8-12 hours (1-2 days)**
+
+### Phase 1: Critical Security & Fuzzing (3-4 hours)
+
+- ✅ Task 1.1: AST Parser Fuzzing - 45-60 minutes
+- ✅ Task 1.2: Glob Pattern Fuzzing - 30-45 minutes
+- ✅ Task 1.3: Transformer Fuzzing - 20-30 minutes
+- ✅ Task 1.4: Callback Fuzzing - 20-30 minutes
+- ✅ Task 1.5: Configuration Fuzzing - 15-20 minutes
+- ✅ Task 2.1: Coverage Setup - 2 hours
+
+### Phase 2: Comprehensive Testing (3-4 hours)
+
+- ✅ Task 2.2: Error Path Coverage - 30-45 minutes
+- ✅ Task 2.3: Edge Case Coverage - 20-30 minutes
+- ✅ Task 3.1: Integration Tests - 45-60 minutes
+- ✅ Task 3.2: Browser Tests - 60-90 minutes
+- ✅ Memory & Performance Profiling - 30-45 minutes
+
+### Phase 3: Advanced Security & Polish (2-4 hours)
+
+- ✅ Remaining integration tests - 60-90 minutes
+- ✅ Security auditing & documentation - 30-60 minutes
+- ✅ CI/CD setup & final validation - 30-45 minutes
+
+**Key AI Advantages:**
+
+- Automated test generation and boilerplate code
+- Instant fuzzing pattern creation
+- Parallel task execution capabilities
+- Real-time error detection and fixes
+- Comprehensive edge case identification
+- Auto-generated documentation and examples
+
+This represents a **90%+ time reduction** from traditional manual development!

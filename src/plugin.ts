@@ -329,9 +329,9 @@ function applyPreset(options: TagOptions): TagOptions {
   return {
     ...preset,
     ...options,
-    // Merge transformers if both exist
-    transformers: options.transformers || preset?.transformers
-      ? { ...preset?.transformers, ...options.transformers }
+    // Merge transformers if either exists, safely spread only defined objects
+    transformers: (preset?.transformers || options.transformers)
+      ? { ...(preset?.transformers ?? {}), ...(options.transformers ?? {}) }
       : undefined
   };
 }
@@ -521,15 +521,13 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
         // Second pass: tag JSX elements
         let currentJSXElement: any = null;
         const depthStack: number[] = []; // Track nesting depth
-        let currentDepth = 0;
         const elementNames: string[] = []; // Track for statistics
 
         walk(ast as any, {
           enter(node: any) {
             if (node.type === 'JSXElement') {
               currentJSXElement = node;
-              currentDepth++;
-              depthStack.push(currentDepth);
+              depthStack.push(1); // Track depth by stack length
             }
 
             if (node.type === 'JSXOpeningElement') {
@@ -705,7 +703,6 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
             // Pop depth when leaving JSXElement
             if (node.type === 'JSXElement') {
               depthStack.pop();
-              currentDepth--;
             }
           }
         });
@@ -986,27 +983,28 @@ function generateAttributes(
     if (Object.keys(metadata).length > 0) {
       // Security: Limit metadata size
       const MAX_METADATA_SIZE = 10240; // 10KB
-      const metadataJson = JSON.stringify(metadata);
 
-      if (metadataJson.length > MAX_METADATA_SIZE) {
-        console.warn(`⚠️  Metadata size (${metadataJson.length} bytes) exceeds limit (${MAX_METADATA_SIZE} bytes), truncating`);
-        const truncated = metadataJson.substring(0, MAX_METADATA_SIZE - 20) + '...[truncated]"}';
-        metadata._truncated = true;
+      // Add _truncated flag before stringification if needed
+      let metadataToEncode = metadata;
+      if (JSON.stringify(metadata).length > MAX_METADATA_SIZE) {
+        console.warn(`⚠️  Metadata size (${JSON.stringify(metadata).length} bytes) exceeds limit (${MAX_METADATA_SIZE} bytes), truncating`);
+        metadataToEncode = { ...metadata, _truncated: true };
       }
 
-      const finalMetadata = metadataJson.length > MAX_METADATA_SIZE
-        ? metadataJson.substring(0, MAX_METADATA_SIZE - 20) + '...[truncated]"}'
-        : metadataJson;
+      let metadataJson = JSON.stringify(metadataToEncode);
+      if (metadataJson.length > MAX_METADATA_SIZE) {
+        metadataJson = metadataJson.substring(0, MAX_METADATA_SIZE - 20) + '...[truncated]"}';
+      }
 
       let encoded: string;
       if (metadataEncoding === 'base64') {
-        encoded = encodeBase64(finalMetadata);
+        encoded = encodeBase64(metadataJson);
       } else if (metadataEncoding === 'none') {
         // Escape quotes for HTML attributes
-        encoded = finalMetadata.replace(/"/g, '&quot;');
+        encoded = metadataJson.replace(/"/g, '&quot;');
       } else {
         // Default: URL-encoded JSON (backwards compatible)
-        encoded = encodeURIComponent(finalMetadata);
+        encoded = encodeURIComponent(metadataJson);
       }
       attributeValues['metadata'] = encoded;
     }
@@ -1064,8 +1062,9 @@ function generateAttributes(
           console.warn(`⚠️  Attribute '${key}' value truncated to ${MAX_ATTR_LENGTH} characters`);
         }
 
-        // Remove prefix if user included it
-        const cleanKey = key.startsWith(prefix) ? key.slice(prefix.length + 1) : key;
+        // Remove prefix if user included it (must be followed by a dash)
+        const prefixWithDash = `${prefix}-`;
+        const cleanKey = key.startsWith(prefixWithDash) ? key.slice(prefixWithDash.length) : key;
         attributeValues[cleanKey] = truncatedValue;
         attrCount++;
       }
