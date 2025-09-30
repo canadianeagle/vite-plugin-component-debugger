@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-component-debugger",
-  "version": "1.4.0",
-  "description": "A Vite plugin that adds data attributes to JSX/TSX elements for development tracking and debugging",
+  "version": "2.0.0",
+  "description": "Highly customizable Vite plugin that adds data attributes to JSX/TSX elements for development tracking, debugging, and testing. Features path filtering, transformers, presets, and more.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -36,7 +36,13 @@
     "component-tagging",
     "debugging",
     "development-tools",
-    "devtools"
+    "devtools",
+    "testing",
+    "e2e",
+    "playwright",
+    "cypress",
+    "component-tracking",
+    "customizable"
   ],
   "author": "Tonye Brown <hello@tonyebrown.com> (https://www.tonyebrown.com)",
   "license": "MIT",
@@ -54,7 +60,8 @@
   "dependencies": {
     "@babel/parser": "^7.24.0",
     "estree-walker": "^3.0.3",
-    "magic-string": "^0.30.7"
+    "magic-string": "^0.30.7",
+    "minimatch": "^10.0.3"
   },
   "devDependencies": {
     "@types/babel__core": "^7.20.5",
