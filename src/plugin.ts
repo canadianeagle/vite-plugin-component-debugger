@@ -5,6 +5,8 @@ import MagicString from 'magic-string';
 import path from 'path';
 import { walk } from 'estree-walker';
 
+export type AttributeName = 'id' | 'name' | 'path' | 'line' | 'file' | 'component' | 'metadata';
+
 export interface TagOptions {
   /**
    * File extensions to process
@@ -53,6 +55,22 @@ export interface TagOptions {
    * @default false
    */
   debug?: boolean;
+
+  /**
+   * Allowlist of attributes to include (if specified, only these attributes will be added)
+   * Valid values: 'id', 'name', 'path', 'line', 'file', 'component', 'metadata'
+   * Takes precedence over excludeAttributes if both are specified
+   * @default undefined (all attributes included)
+   */
+  includeAttributes?: AttributeName[];
+
+  /**
+   * Disallowlist of attributes to exclude (these attributes will not be added)
+   * Valid values: 'id', 'name', 'path', 'line', 'file', 'component', 'metadata'
+   * Ignored if includeAttributes is specified
+   * @default undefined (no attributes excluded)
+   */
+  excludeAttributes?: AttributeName[];
 }
 
 interface ComponentInfo {
@@ -143,7 +161,9 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     includeContent = false,
     customExcludes = DEFAULT_THREE_FIBER_ELEMENTS,
     enabled = true,
-    debug = false
+    debug = false,
+    includeAttributes,
+    excludeAttributes
   } = options;
 
   const projectRoot = process.cwd();
@@ -310,7 +330,7 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
               }
 
               // Generate attributes
-              const attributes = generateAttributes(info, attributePrefix);
+              const attributes = generateAttributes(info, attributePrefix, includeAttributes, excludeAttributes);
               
               // Insert attributes into the code
               // We need to find the exact position of the closing bracket
@@ -444,33 +464,71 @@ function extractTextContent(children: any[]): string {
 /**
  * Generate data attributes for an element
  */
-function generateAttributes(info: ComponentInfo, prefix: string): string {
+function generateAttributes(
+  info: ComponentInfo,
+  prefix: string,
+  includeAttributes?: AttributeName[],
+  excludeAttributes?: AttributeName[]
+): string {
   const attrs: string[] = [];
-  
+
+  // Determine which attributes should be included
+  const shouldInclude = (attrName: AttributeName): boolean => {
+    // If includeAttributes is specified (even if empty), only include those attributes
+    if (includeAttributes !== undefined) {
+      return includeAttributes.includes(attrName);
+    }
+    // If excludeAttributes is specified, exclude those attributes
+    if (excludeAttributes !== undefined && excludeAttributes.length > 0) {
+      return !excludeAttributes.includes(attrName);
+    }
+    // Otherwise, include all attributes (backwards compatible default)
+    return true;
+  };
+
   // Unique ID
-  const id = `${info.path}:${info.line}:${info.column}`;
-  attrs.push(`${prefix}-id="${id}"`);
-  attrs.push(`${prefix}-name="${info.name}"`);
-  
+  if (shouldInclude('id')) {
+    const id = `${info.path}:${info.line}:${info.column}`;
+    attrs.push(`${prefix}-id="${id}"`);
+  }
+
+  // Element name
+  if (shouldInclude('name')) {
+    attrs.push(`${prefix}-name="${info.name}"`);
+  }
+
   // Component location info
-  attrs.push(`${prefix}-path="${info.path}"`);
-  attrs.push(`${prefix}-line="${info.line}"`);
-  attrs.push(`${prefix}-file="${info.file}"`);
-  attrs.push(`${prefix}-component="${info.name}"`);
-  
+  if (shouldInclude('path')) {
+    attrs.push(`${prefix}-path="${info.path}"`);
+  }
+
+  if (shouldInclude('line')) {
+    attrs.push(`${prefix}-line="${info.line}"`);
+  }
+
+  if (shouldInclude('file')) {
+    attrs.push(`${prefix}-file="${info.file}"`);
+  }
+
+  if (shouldInclude('component')) {
+    attrs.push(`${prefix}-component="${info.name}"`);
+  }
+
   // Props and content as JSON
-  const metadata: any = {};
-  if (info.props) {
-    Object.assign(metadata, info.props);
+  if (shouldInclude('metadata')) {
+    const metadata: any = {};
+    if (info.props) {
+      Object.assign(metadata, info.props);
+    }
+    if (info.content) {
+      metadata.text = info.content;
+    }
+
+    if (Object.keys(metadata).length > 0) {
+      const encoded = encodeURIComponent(JSON.stringify(metadata));
+      attrs.push(`${prefix}-metadata="${encoded}"`);
+    }
   }
-  if (info.content) {
-    metadata.text = info.content;
-  }
-  
-  if (Object.keys(metadata).length > 0) {
-    const encoded = encodeURIComponent(JSON.stringify(metadata));
-    attrs.push(`${prefix}-metadata="${encoded}"`);
-  }
-  
-  return ' ' + attrs.join(' ');
+
+  return attrs.length > 0 ? ' ' + attrs.join(' ') : '';
 }
