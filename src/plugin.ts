@@ -387,6 +387,21 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     byElementType: {}
   };
 
+  // Security: Validate depth values
+  const MAX_DEPTH_LIMIT = 50;
+  if (maxDepth && (maxDepth < 0 || maxDepth > MAX_DEPTH_LIMIT)) {
+    console.warn(`⚠️  maxDepth must be between 0 and ${MAX_DEPTH_LIMIT}, using default`);
+    maxDepth = 0;
+  }
+  if (minDepth && minDepth < 0) {
+    console.warn(`⚠️  minDepth cannot be negative, using 0`);
+    minDepth = 0;
+  }
+  if (minDepth && maxDepth && minDepth > maxDepth) {
+    console.warn(`⚠️  minDepth (${minDepth}) cannot be greater than maxDepth (${maxDepth}), swapping values`);
+    [minDepth, maxDepth] = [maxDepth, minDepth];
+  }
+
   return {
     name: 'vite-plugin-component-debugger',
     enforce: 'pre',
@@ -870,9 +885,23 @@ function generateAttributes(
     }
 
     if (Object.keys(metadata).length > 0) {
+      // Security: Limit metadata size
+      const MAX_METADATA_SIZE = 10240; // 10KB
+      const metadataJson = JSON.stringify(metadata);
+
+      if (metadataJson.length > MAX_METADATA_SIZE) {
+        console.warn(`⚠️  Metadata size (${metadataJson.length} bytes) exceeds limit (${MAX_METADATA_SIZE} bytes), truncating`);
+        const truncated = metadataJson.substring(0, MAX_METADATA_SIZE - 20) + '...[truncated]"}';
+        metadata._truncated = true;
+      }
+
+      const finalMetadata = metadataJson.length > MAX_METADATA_SIZE
+        ? metadataJson.substring(0, MAX_METADATA_SIZE - 20) + '...[truncated]"}'
+        : metadataJson;
+
       let encoded: string;
       if (metadataEncoding === 'base64') {
-        encoded = encodeBase64(JSON.stringify(metadata));
+        encoded = encodeBase64(finalMetadata);
       } else if (metadataEncoding === 'none') {
         // Escape quotes for HTML attributes
         encoded = JSON.stringify(metadata).replace(/"/g, '&quot;');
@@ -907,16 +936,39 @@ function generateAttributes(
       // Security: Prevent prototype pollution
       const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
 
-      for (const [key, value] of Object.entries(custom)) {
+      // Security: Resource limits
+      const MAX_CUSTOM_ATTRS = 50;
+      const MAX_ATTR_LENGTH = 1000;
+
+      const customEntries = Object.entries(custom);
+      let attrCount = 0;
+
+      for (const [key, value] of customEntries) {
         // Skip dangerous keys
         if (dangerousKeys.includes(key)) {
           console.warn(`⚠️  Skipping dangerous custom attribute key: ${key}`);
           continue;
         }
 
+        // Limit number of custom attributes
+        if (attrCount >= MAX_CUSTOM_ATTRS) {
+          console.warn(`⚠️  Maximum custom attributes limit (${MAX_CUSTOM_ATTRS}) reached, skipping remaining attributes`);
+          break;
+        }
+
+        // Limit attribute value length
+        const truncatedValue = typeof value === 'string' && value.length > MAX_ATTR_LENGTH
+          ? value.substring(0, MAX_ATTR_LENGTH) + '...'
+          : value;
+
+        if (typeof value === 'string' && value.length > MAX_ATTR_LENGTH) {
+          console.warn(`⚠️  Attribute '${key}' value truncated to ${MAX_ATTR_LENGTH} characters`);
+        }
+
         // Remove prefix if user included it
         const cleanKey = key.startsWith(prefix) ? key.slice(prefix.length + 1) : key;
-        attributeValues[cleanKey] = value;
+        attributeValues[cleanKey] = truncatedValue;
+        attrCount++;
       }
     } catch (error) {
       console.error(`⚠️  Error in customAttributes callback for ${info.name}:`, error);
