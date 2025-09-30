@@ -129,6 +129,11 @@ componentDebugger({
   includeProps: true, // Enable to capture component props in data-dev-metadata
   includeContent: true, // Enable to capture text content in data-dev-metadata
 
+  // Attribute filtering (control which data attributes are generated)
+  includeAttributes: ["id", "name", "line"], // Only include these attributes
+  // OR
+  excludeAttributes: ["metadata", "file"], // Exclude these attributes
+
   // Element exclusions
   excludeElements: ["Fragment", "React.Fragment"],
   customExcludes: new Set(["mesh", "group", "camera"]), // Three.js elements
@@ -137,15 +142,46 @@ componentDebugger({
 
 ### All Configuration Options
 
-| Option            | Type          | Default                          | Description                         |
-| ----------------- | ------------- | -------------------------------- | ----------------------------------- |
-| `enabled`         | `boolean`     | `true`                           | Enable/disable the plugin           |
-| `attributePrefix` | `string`      | `'data-dev'`                     | Prefix for data attributes          |
-| `extensions`      | `string[]`    | `['.jsx', '.tsx']`               | File extensions to process          |
-| `includeProps`    | `boolean`     | `false`                          | Include component props in metadata |
-| `includeContent`  | `boolean`     | `false`                          | Include text content in metadata    |
-| `excludeElements` | `string[]`    | `['Fragment', 'React.Fragment']` | Elements to exclude                 |
-| `customExcludes`  | `Set<string>` | Three.js elements                | Custom elements to exclude          |
+| Option               | Type                | Default                          | Description                                              |
+| -------------------- | ------------------- | -------------------------------- | -------------------------------------------------------- |
+| `enabled`            | `boolean`           | `true`                           | Enable/disable the plugin                                |
+| `attributePrefix`    | `string`            | `'data-dev'`                     | Prefix for data attributes                               |
+| `extensions`         | `string[]`          | `['.jsx', '.tsx']`               | File extensions to process                               |
+| `includeProps`       | `boolean`           | `false`                          | Include component props in metadata                      |
+| `includeContent`     | `boolean`           | `false`                          | Include text content in metadata                         |
+| `includeAttributes`  | `AttributeName[]`   | `undefined`                      | Allowlist: only include these attributes (takes priority)|
+| `excludeAttributes`  | `AttributeName[]`   | `undefined`                      | Disallowlist: exclude these attributes                   |
+| `excludeElements`    | `string[]`          | `['Fragment', 'React.Fragment']` | Elements to exclude                                      |
+| `customExcludes`     | `Set<string>`       | Three.js elements                | Custom elements to exclude                               |
+
+**Available attribute names:** `'id'`, `'name'`, `'path'`, `'line'`, `'file'`, `'component'`, `'metadata'`
+
+### Attribute Filtering Examples
+
+**Minimal setup (only include ID):**
+```typescript
+componentDebugger({
+  includeAttributes: ["id"], // Only generates data-dev-id
+});
+// Result: <button data-dev-id="src/Button.tsx:10:2">Click me</button>
+```
+
+**Exclude clutter (remove verbose attributes):**
+```typescript
+componentDebugger({
+  excludeAttributes: ["metadata", "file", "component"], // Exclude these
+});
+// Result: <button data-dev-id="..." data-dev-name="button" data-dev-path="..." data-dev-line="10">
+```
+
+**Testing setup (only what you need):**
+```typescript
+componentDebugger({
+  includeAttributes: ["id", "name", "component"], // Minimal for testing
+});
+```
+
+> **Note:** When both `includeAttributes` and `excludeAttributes` are specified, `includeAttributes` takes priority.
 
 ## Use Cases
 

@@ -105,10 +105,16 @@ Main `TagOptions` interface:
 - `excludeElements` - Elements to skip (default: Fragment types)
 - `includeProps` - Capture component props in metadata (default: `false`)
 - `includeContent` - Include text content in metadata (default: `false`)
+- `includeAttributes` - Allowlist of attributes to include (default: `undefined`, all included)
+- `excludeAttributes` - Disallowlist of attributes to exclude (default: `undefined`, none excluded)
 - `customExcludes` - Custom element exclusions (default: Three.js elements)
 - `debug` - Enable debug logging for troubleshooting (default: `false`)
 
+**Available attribute names:** `'id'`, `'name'`, `'path'`, `'line'`, `'file'`, `'component'`, `'metadata'`
+
 **Performance Note**: By default, `data-dev-metadata` is disabled (`includeProps: false`, `includeContent: false`) for better build performance. Enable these options only when you need to capture props or content data.
+
+**Attribute Filtering**: Use `includeAttributes` to allowlist specific attributes (e.g., `['id', 'name']`) or `excludeAttributes` to disallowlist attributes (e.g., `['metadata', 'file']`). If both are specified, `includeAttributes` takes priority.
 
 ## Development Workflow
 
