@@ -574,17 +574,22 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
 
               // V2: Call shouldTag callback
               if (shouldTag) {
-                const componentInfo: ComponentInfo = {
-                  elementName,
-                  filePath: relativePath,
-                  line,
-                  column,
-                  props: info.props,
-                  content: info.content
-                };
+                try {
+                  const componentInfo: ComponentInfo = {
+                    elementName,
+                    filePath: relativePath,
+                    line,
+                    column,
+                    props: info.props,
+                    content: info.content
+                  };
 
-                if (!shouldTag(componentInfo)) {
-                  return; // Skip this element
+                  if (!shouldTag(componentInfo)) {
+                    return; // Skip this element
+                  }
+                } catch (error) {
+                  console.error(`⚠️  Error in shouldTag callback for ${elementName} in ${relativePath}:`, error);
+                  // Continue processing - don't skip element on error
                 }
               }
 
@@ -699,8 +704,18 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
         if (exportStats) {
           try {
             const statsPath = path.resolve(projectRoot, exportStats);
-            writeFileSync(statsPath, JSON.stringify(stats, null, 2));
-            console.log(`   📄 Stats exported to: ${exportStats}`);
+            const normalizedStatsPath = path.normalize(statsPath);
+            const normalizedRoot = path.normalize(projectRoot);
+
+            // Security: Prevent path traversal attacks
+            if (!normalizedStatsPath.startsWith(normalizedRoot)) {
+              console.error(`   ⚠️  Security: exportStats path must be within project directory`);
+              console.error(`   📁 Project root: ${normalizedRoot}`);
+              console.error(`   🚫 Attempted path: ${normalizedStatsPath}`);
+            } else {
+              writeFileSync(statsPath, JSON.stringify(stats, null, 2));
+              console.log(`   📄 Stats exported to: ${exportStats}`);
+            }
           } catch (error) {
             console.error(`   ⚠️  Failed to export stats: ${error}`);
           }
@@ -877,20 +892,35 @@ function generateAttributes(
 
   // V2: Add custom attributes
   if (customAttributes) {
-    const componentInfo: ComponentInfo = {
-      elementName: info.name,
-      filePath: info.path,
-      line: info.line,
-      column: info.column,
-      props: info.props,
-      content: info.content
-    };
+    try {
+      const componentInfo: ComponentInfo = {
+        elementName: info.name,
+        filePath: info.path,
+        line: info.line,
+        column: info.column,
+        props: info.props,
+        content: info.content
+      };
 
-    const custom = customAttributes(componentInfo);
-    for (const [key, value] of Object.entries(custom)) {
-      // Remove prefix if user included it
-      const cleanKey = key.startsWith(prefix) ? key.slice(prefix.length + 1) : key;
-      attributeValues[cleanKey] = value;
+      const custom = customAttributes(componentInfo);
+
+      // Security: Prevent prototype pollution
+      const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
+
+      for (const [key, value] of Object.entries(custom)) {
+        // Skip dangerous keys
+        if (dangerousKeys.includes(key)) {
+          console.warn(`⚠️  Skipping dangerous custom attribute key: ${key}`);
+          continue;
+        }
+
+        // Remove prefix if user included it
+        const cleanKey = key.startsWith(prefix) ? key.slice(prefix.length + 1) : key;
+        attributeValues[cleanKey] = value;
+      }
+    } catch (error) {
+      console.error(`⚠️  Error in customAttributes callback for ${info.name}:`, error);
+      // Continue without custom attributes
     }
   }
 
