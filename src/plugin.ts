@@ -912,10 +912,10 @@ function generateAttributes(
         encoded = encodeBase64(finalMetadata);
       } else if (metadataEncoding === 'none') {
         // Escape quotes for HTML attributes
-        encoded = JSON.stringify(metadata).replace(/"/g, '&quot;');
+        encoded = finalMetadata.replace(/"/g, '&quot;');
       } else {
         // Default: URL-encoded JSON (backwards compatible)
-        encoded = encodeURIComponent(JSON.stringify(metadata));
+        encoded = encodeURIComponent(finalMetadata);
       }
       attributeValues['metadata'] = encoded;
     }
@@ -984,6 +984,16 @@ function generateAttributes(
     }
   }
 
+  // Security: HTML escape attribute values
+  const escapeHtml = (str: string): string => {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  };
+
   // Format attributes
   if (groupAttributes) {
     // Group all attributes into a single JSON object
@@ -991,12 +1001,13 @@ function generateAttributes(
     const encoded = metadataEncoding === 'base64'
       ? encodeBase64(grouped)
       : encodeURIComponent(grouped);
-    return ` ${prefix}="${encoded}"`;
+    return ` ${prefix}="${escapeHtml(encoded)}"`;
   } else {
     // Individual attributes (default, backwards compatible)
     const attrs: string[] = [];
     for (const [key, value] of Object.entries(attributeValues)) {
-      attrs.push(`${prefix}-${key}="${value}"`);
+      const escapedValue = escapeHtml(String(value));
+      attrs.push(`${prefix}-${key}="${escapedValue}"`);
     }
     return attrs.length > 0 ? ' ' + attrs.join(' ') : '';
   }
