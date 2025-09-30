@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Vite plugin that automatically adds data attributes to JSX/TSX elements during development for component debugging and tracking.
+**Highly customizable** Vite plugin that automatically adds data attributes to JSX/TSX elements during development for component debugging and tracking. Features path filtering, attribute transformers, presets, conditional tagging, and more.
+
+**Current Version:** v2.0.0 (major feature release)
 
 ## Build System & Commands
 
@@ -67,6 +69,7 @@ Version files: `.nvmrc`, `.node-version` specify Node 18.12.0
 - `@babel/parser` - JSX/TSX parsing
 - `estree-walker` - AST traversal
 - `magic-string` - Code modification
+- `minimatch` - Glob pattern matching for path filtering (v2)
 - `vite` - Peer dependency
 
 ## Critical Setup Requirements
@@ -96,25 +99,146 @@ export default defineConfig({
 
 **Why this matters**: React plugin injects ~19 lines of imports and HMR code. If componentDebugger runs after React, line numbers will be offset by ~19 lines, causing `data-dev-line` attributes to be incorrect.
 
-## Configuration Options
+## Configuration Options (v2.0)
 
-Main `TagOptions` interface:
-- `enabled` - Enable/disable (tied to NODE_ENV)
-- `extensions` - File types (default: `.jsx`, `.tsx`)
-- `attributePrefix` - Data attribute prefix (default: `data-dev`)
-- `excludeElements` - Elements to skip (default: Fragment types)
-- `includeProps` - Capture component props in metadata (default: `false`)
-- `includeContent` - Include text content in metadata (default: `false`)
-- `includeAttributes` - Allowlist of attributes to include (default: `undefined`, all included)
-- `excludeAttributes` - Disallowlist of attributes to exclude (default: `undefined`, none excluded)
-- `customExcludes` - Custom element exclusions (default: Three.js elements)
-- `debug` - Enable debug logging for troubleshooting (default: `false`)
+### Core Options
+- `enabled` - Enable/disable (default: `true`)
+- `extensions` - File types (default: `['.jsx', '.tsx']`)
+- `attributePrefix` - Data attribute prefix (default: `'data-dev'`)
+- `preset` - Quick config: `'minimal'`, `'testing'`, `'debugging'`, `'production'` (default: `undefined`)
+
+### Attribute Control (v2)
+- `includeAttributes` - **RECOMMENDED** Allowlist of attributes (e.g., `['id', 'name']`) - cleaner DOM, better performance
+- `excludeAttributes` - Disallowlist of attributes (e.g., `['metadata', 'file']`)
+- `transformers` - Transform any attribute value for privacy/formatting (see below)
+- `groupAttributes` - Combine all attributes into single JSON attribute (default: `false`)
 
 **Available attribute names:** `'id'`, `'name'`, `'path'`, `'line'`, `'file'`, `'component'`, `'metadata'`
 
-**Performance Note**: By default, `data-dev-metadata` is disabled (`includeProps: false`, `includeContent: false`) for better build performance. Enable these options only when you need to capture props or content data.
+**Priority:** When both `includeAttributes` and `excludeAttributes` are specified, `includeAttributes` takes priority.
 
-**Attribute Filtering**: Use `includeAttributes` to allowlist specific attributes (e.g., `['id', 'name']`) or `excludeAttributes` to disallowlist attributes (e.g., `['metadata', 'file']`). If both are specified, `includeAttributes` takes priority.
+### Path & Element Filtering (v2)
+- `includePaths` - Glob patterns for files to include (e.g., `['src/components/**', 'src/features/**']`)
+- `excludePaths` - Glob patterns for files to exclude (e.g., `['**/*.test.tsx', '**/*.stories.tsx']`)
+- `excludeElements` - Element names to skip (default: `['Fragment', 'React.Fragment']`)
+- `customExcludes` - Custom element exclusions as Set (default: Three.js elements)
+
+### Conditional & Custom (v2)
+- `shouldTag` - Callback to conditionally tag components: `(info: ComponentInfo) => boolean`
+- `customAttributes` - Add custom data attributes: `(info: ComponentInfo) => Record<string, string>`
+
+**ComponentInfo interface:**
+```typescript
+interface ComponentInfo {
+  elementName: string;
+  filePath: string;
+  line: number;
+  column: number;
+  props?: Record<string, any>;
+  content?: string;
+}
+```
+
+### Metadata & Encoding (v2)
+- `metadataEncoding` - Encoding format: `'json'` (default), `'base64'`, or `'none'`
+- `includeProps` - **LEGACY** Capture props in metadata (default: `false`) - use `includeAttributes` instead
+- `includeContent` - **LEGACY** Capture content in metadata (default: `false`) - use `includeAttributes` instead
+
+### Depth Control (v2)
+- `maxDepth` - Maximum nesting depth to tag (e.g., `3` = only tag up to 3 levels deep)
+- `minDepth` - Minimum nesting depth to tag
+- `tagOnlyRoots` - Only tag root-level elements (default: `false`)
+
+### Statistics & Callbacks (v2)
+- `onTransform` - Callback after each file: `(stats: TransformStats) => void`
+- `onComplete` - Callback after all files: `(stats: CompletionStats) => void`
+- `exportStats` - File path to export statistics JSON (e.g., `'build-stats.json'`)
+
+### Advanced (v2)
+- `includeSourceMapHints` - Add source map comments for debugging (default: `false`)
+- `debug` - Enable debug logging (default: `false`)
+
+## V2 Features in Detail
+
+### Presets
+Quick configurations for common use cases:
+- `minimal` - Only ID attribute (smallest footprint)
+- `testing` - ID, name, component (perfect for E2E tests)
+- `debugging` - Everything + props + content (full visibility)
+- `production` - Privacy-focused with shortened paths
+
+### Attribute Transformers
+Customize any attribute value for privacy, formatting, or anonymization:
+```typescript
+transformers: {
+  path: (p) => p.split('/').slice(-2).join('/'),  // Shorten paths
+  id: (id) => id.split(':').slice(-2).join(':'),   // Remove path from ID
+  name: (name) => name.toUpperCase(),               // Custom formatting
+  line: (line) => `L${line}`,                       // Add prefix
+  file: (file) => 'REDACTED',                       // Anonymize
+  component: (comp) => `<${comp}>`                  // Custom format
+}
+```
+
+### Path Filtering
+Use glob patterns with minimatch to include/exclude specific files:
+```typescript
+includePaths: ['src/components/**', 'src/features/**'],
+excludePaths: ['**/*.test.tsx', '**/*.stories.tsx', '**/__tests__/**']
+```
+
+### Conditional Tagging
+Tag only specific components using `shouldTag` callback:
+```typescript
+shouldTag: ({ elementName, filePath, props }) => {
+  // Only tag custom components (uppercase)
+  if (elementName[0] === elementName[0].toUpperCase()) return true;
+
+  // Only tag components with data-testid
+  if (props && 'data-testid' in props) return true;
+
+  // Only tag components in features directory
+  if (filePath.includes('features/')) return true;
+
+  return false;
+}
+```
+
+### Custom Attributes
+Add your own data attributes dynamically:
+```typescript
+customAttributes: ({ elementName, filePath }) => ({
+  'data-dev-env': process.env.NODE_ENV,
+  'data-dev-branch': execSync('git branch --show-current').toString().trim(),
+  'data-dev-category': filePath.includes('features/') ? 'feature' : 'component'
+})
+```
+
+## Architecture Notes (v2)
+
+### Depth Tracking
+- Uses `depthStack` array to track JSX nesting during AST traversal
+- Increments on `enter` for JSX opening elements, decrements on `leave`
+- Enables `maxDepth`, `minDepth`, and `tagOnlyRoots` filtering
+
+### Attribute Generation Pipeline
+1. Collect base attributes (id, name, path, line, file, component)
+2. Apply `includeAttributes`/`excludeAttributes` filtering
+3. Apply `transformers` to selected attributes
+4. Optionally group into single JSON attribute with `groupAttributes`
+5. Add custom attributes from `customAttributes` callback
+6. Serialize and inject into code with magic-string
+
+### Statistics Collection
+- Tracks files processed, elements tagged, and breakdown by element type
+- Callbacks fired at transform (per-file) and buildEnd (completion)
+- Optional JSON export with `exportStats`
+
+### Performance Optimizations
+- All v2 features are opt-in with `undefined` defaults for backwards compatibility
+- Path filtering uses minimatch caching
+- Attribute filtering reduces DOM size
+- `includeAttributes` recommended over legacy `includeProps`/`includeContent`
 
 ## Development Workflow
 
