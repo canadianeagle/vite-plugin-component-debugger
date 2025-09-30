@@ -146,201 +146,169 @@ componentDebugger({
 ### Quick Start with Presets
 
 ```typescript
-// Minimal setup - only ID attribute
+// Minimal - only ID attribute (cleanest DOM)
 componentDebugger({ preset: 'minimal' })
 
-// Testing setup - ID, name, component
+// Testing - ID, name, component (perfect for E2E)
 componentDebugger({ preset: 'testing' })
 
-// Full debugging - all attributes + props + content
+// Debugging - everything + metadata (full visibility)
 componentDebugger({ preset: 'debugging' })
 
-// Production-safe - privacy-focused with shortened paths
+// Production - privacy-focused with shortened paths
 componentDebugger({ preset: 'production' })
 ```
 
-### Advanced Configuration
+**[📚 See all preset details in EXAMPLES.md](./EXAMPLES.md#presets)**
+
+### Common Configurations
+
+<details>
+<summary><strong>🎯 Clean DOM - Minimal Attributes</strong></summary>
 
 ```typescript
 componentDebugger({
-  // Core settings
-  enabled: process.env.NODE_ENV === "development",
-  attributePrefix: "data-dev",
-  extensions: [".jsx", ".tsx"],
-
-  // 🎯 Attribute filtering (RECOMMENDED - cleaner DOM, better performance)
-  includeAttributes: ["id", "name", "line"], // Only include these attributes
-  // OR
-  excludeAttributes: ["metadata", "file"], // Exclude these attributes
-
-  // 🗂️ Path filtering with glob patterns
-  includePaths: ["src/components/**", "src/features/**"],
-  excludePaths: ["**/*.test.tsx", "**/*.stories.tsx"],
-
-  // 🔧 Attribute transformers (customize any value)
-  transformers: {
-    path: (p) => p.split('/').slice(-2).join('/'), // Shorten paths
-    id: (id) => id.split(':').slice(-2).join(':'), // Remove path from ID
-  },
-
-  // ⚡ Conditional tagging
-  shouldTag: ({ elementName }) => {
-    return elementName[0] === elementName[0].toUpperCase(); // Only custom components
-  },
-
-  // 🏷️ Custom attributes
-  customAttributes: () => ({
-    'data-dev-env': process.env.NODE_ENV,
-    'data-dev-version': process.env.npm_package_version,
-  }),
-
-  // 📦 Metadata encoding
-  metadataEncoding: 'base64', // 'json' (default), 'base64', or 'none'
-
-  // 📊 Statistics & callbacks
-  onTransform: ({ file, elementsTagged }) => {
-    console.log(`✓ ${file}: ${elementsTagged} elements`);
-  },
-  exportStats: 'build-stats.json',
-
-  // 🎚️ Depth filtering
-  maxDepth: 3, // Only tag up to 3 levels deep
-  tagOnlyRoots: true, // Only tag root elements
-
-  // 🔐 Attribute grouping
-  groupAttributes: true, // Combine all into single data-dev attribute
-
-  // Element exclusions
-  excludeElements: ["Fragment", "React.Fragment"],
-  customExcludes: new Set(["mesh", "group", "camera"]), // Three.js elements
-
-  // Legacy options (use includeAttributes/excludeAttributes instead)
-  includeProps: false, // Deprecated: use includeAttributes with transformers
-  includeContent: false, // Deprecated: use includeAttributes with transformers
-});
+  includeAttributes: ["id", "name"], // Only these attributes
+})
+// Result: Only data-dev-id and data-dev-name
 ```
 
-> **💡 Tip:** Use `includeAttributes` or `excludeAttributes` for cleaner DOM and better performance instead of the legacy `includeProps`/`includeContent` options.
+**[See more attribute filtering examples →](./EXAMPLES.md#attribute-filtering)**
 
-### All Configuration Options
+</details>
 
-#### Core Options
+<details>
+<summary><strong>🗂️ Path Filtering - Specific Directories</strong></summary>
+
+```typescript
+componentDebugger({
+  includePaths: ["src/components/**", "src/features/**"],
+  excludePaths: ["**/*.test.tsx", "**/*.stories.tsx"]
+})
+```
+
+**[See path filtering patterns →](./EXAMPLES.md#path-filtering)**
+
+</details>
+
+<details>
+<summary><strong>🔧 Privacy - Transform Paths</strong></summary>
+
+```typescript
+componentDebugger({
+  transformers: {
+    path: (p) => p.split('/').slice(-2).join('/'), // Shorten paths
+    id: (id) => id.split(':').slice(-2).join(':')   // Remove path from ID
+  }
+})
+```
+
+**[See transformer examples →](./EXAMPLES.md#attribute-transformers)**
+
+</details>
+
+<details>
+<summary><strong>⚡ Conditional - Tag Specific Components</strong></summary>
+
+```typescript
+componentDebugger({
+  shouldTag: ({ elementName }) => {
+    // Only tag custom components (uppercase)
+    return elementName[0] === elementName[0].toUpperCase();
+  }
+})
+```
+
+**[See conditional tagging patterns →](./EXAMPLES.md#conditional-tagging)**
+
+</details>
+
+> **💡 Pro Tip:** Use `includeAttributes` for cleaner DOM instead of legacy `includeProps`/`includeContent`
+
+> **⚠️ Gotcha:** When both `includeAttributes` and `excludeAttributes` are set, `includeAttributes` takes priority
+
+### Configuration Reference
+
+<details open>
+<summary><strong>Core Options</strong></summary>
+
 | Option            | Type          | Default              | Description                           |
 | ----------------- | ------------- | -------------------- | ------------------------------------- |
 | `enabled`         | `boolean`     | `true`               | Enable/disable the plugin             |
 | `attributePrefix` | `string`      | `'data-dev'`         | Prefix for data attributes            |
 | `extensions`      | `string[]`    | `['.jsx', '.tsx']`   | File extensions to process            |
-| `preset`          | `Preset`      | `undefined`          | Quick config: `'minimal'`, `'testing'`, `'debugging'`, `'production'` |
+| `preset`          | `Preset`      | `undefined`          | Quick config: `'minimal'` \| `'testing'` \| `'debugging'` \| `'production'` |
 
-#### Attribute Control (v2)
+</details>
+
+<details>
+<summary><strong>V2 Features - Attribute Control</strong></summary>
+
 | Option              | Type              | Default      | Description                                      |
 | ------------------- | ----------------- | ------------ | ------------------------------------------------ |
-| `includeAttributes` | `AttributeName[]` | `undefined`  | Allowlist: only include these attributes (recommended) |
-| `excludeAttributes` | `AttributeName[]` | `undefined`  | Disallowlist: exclude these attributes           |
-| `transformers`      | `object`          | `undefined`  | Transform any attribute value (path, id, name, line, file, component) |
-| `groupAttributes`   | `boolean`         | `false`      | Combine all attributes into single JSON attribute |
+| `includeAttributes` | `AttributeName[]` | `undefined`  | **Recommended:** Only include these attributes |
+| `excludeAttributes` | `AttributeName[]` | `undefined`  | Exclude these attributes           |
+| `transformers`      | `object`          | `undefined`  | Transform attribute values (privacy, formatting) |
+| `groupAttributes`   | `boolean`         | `false`      | Combine all into single JSON attribute |
 
-**Available attribute names:** `'id'`, `'name'`, `'path'`, `'line'`, `'file'`, `'component'`, `'metadata'`
+**Available:** `'id'`, `'name'`, `'path'`, `'line'`, `'file'`, `'component'`, `'metadata'`
 
-#### Path & Element Filtering (v2)
+**[→ Full attribute control examples](./EXAMPLES.md#attribute-filtering)**
+
+</details>
+
+<details>
+<summary><strong>V2 Features - Path & Element Filtering</strong></summary>
+
 | Option            | Type          | Default                          | Description                           |
 | ----------------- | ------------- | -------------------------------- | ------------------------------------- |
-| `includePaths`    | `string[]`    | `undefined`                      | Glob patterns for files to include    |
-| `excludePaths`    | `string[]`    | `undefined`                      | Glob patterns for files to exclude    |
-| `excludeElements` | `string[]`    | `['Fragment', 'React.Fragment']` | Element names to exclude              |
-| `customExcludes`  | `Set<string>` | Three.js elements                | Custom element names to exclude       |
+| `includePaths`    | `string[]`    | `undefined`                      | Glob patterns to include    |
+| `excludePaths`    | `string[]`    | `undefined`                      | Glob patterns to exclude    |
+| `excludeElements` | `string[]`    | `['Fragment', 'React.Fragment']` | Element names to skip              |
+| `customExcludes`  | `Set<string>` | Three.js elements                | Custom elements to skip       |
 
-#### Conditional & Custom (v2)
+**[→ Path filtering patterns](./EXAMPLES.md#path-filtering)**
+
+</details>
+
+<details>
+<summary><strong>V2 Features - Conditional & Custom</strong></summary>
+
 | Option             | Type                              | Default      | Description                                   |
 | ------------------ | --------------------------------- | ------------ | --------------------------------------------- |
-| `shouldTag`        | `(info) => boolean`               | `undefined`  | Callback to conditionally tag components      |
-| `customAttributes` | `(info) => Record<string, string>`| `undefined`  | Add custom data attributes dynamically        |
+| `shouldTag`        | `(info) => boolean`               | `undefined`  | Conditionally tag components      |
+| `customAttributes` | `(info) => Record<string, string>`| `undefined`  | Add custom attributes dynamically        |
+| `metadataEncoding` | `MetadataEncoding`                | `'json'`     | Encoding: `'json'` \| `'base64'` \| `'none'`   |
 
-#### Metadata & Encoding (v2)
-| Option              | Type               | Default  | Description                                          |
-| ------------------- | ------------------ | -------- | ---------------------------------------------------- |
-| `metadataEncoding`  | `MetadataEncoding` | `'json'` | Encoding format: `'json'`, `'base64'`, or `'none'`   |
-| `includeProps`      | `boolean`          | `false`  | ⚠️ Legacy: Include props in metadata (use `includeAttributes` instead) |
-| `includeContent`    | `boolean`          | `false`  | ⚠️ Legacy: Include content in metadata (use `includeAttributes` instead) |
+**[→ Conditional tagging](./EXAMPLES.md#conditional-tagging)** • **[→ Custom attributes](./EXAMPLES.md#custom-attributes)**
 
-#### Depth Control (v2)
-| Option         | Type      | Default      | Description                              |
-| -------------- | --------- | ------------ | ---------------------------------------- |
-| `maxDepth`     | `number`  | `undefined`  | Maximum nesting depth to tag             |
-| `minDepth`     | `number`  | `undefined`  | Minimum nesting depth to tag             |
-| `tagOnlyRoots` | `boolean` | `false`      | Only tag root-level elements             |
+</details>
 
-#### Statistics & Callbacks (v2)
-| Option          | Type                    | Default      | Description                              |
-| --------------- | ----------------------- | ------------ | ---------------------------------------- |
-| `onTransform`   | `(stats) => void`       | `undefined`  | Callback after each file transformation  |
-| `onComplete`    | `(stats) => void`       | `undefined`  | Callback after all files processed       |
-| `exportStats`   | `string`                | `undefined`  | File path to export statistics JSON      |
+<details>
+<summary><strong>V2 Features - Depth, Stats & Advanced</strong></summary>
 
-#### Advanced (v2)
-| Option                 | Type      | Default | Description                              |
-| ---------------------- | --------- | ------- | ---------------------------------------- |
-| `includeSourceMapHints`| `boolean` | `false` | Add source map comments for debugging    |
-| `debug`                | `boolean` | `false` | Enable debug logging                     |
+| Option                  | Type              | Default      | Description                              |
+| ----------------------- | ----------------- | ------------ | ---------------------------------------- |
+| `maxDepth`              | `number`          | `undefined`  | Maximum nesting depth             |
+| `minDepth`              | `number`          | `undefined`  | Minimum nesting depth             |
+| `tagOnlyRoots`          | `boolean`         | `false`      | Only tag root elements             |
+| `onTransform`           | `(stats) => void` | `undefined`  | Per-file callback  |
+| `onComplete`            | `(stats) => void` | `undefined`  | Completion callback       |
+| `exportStats`           | `string`          | `undefined`  | Export stats to file      |
+| `includeSourceMapHints` | `boolean`         | `false`      | Add source map comments    |
+| `debug`                 | `boolean`         | `false`      | Enable debug logging                     |
 
-### Feature Examples
+**[→ Depth filtering](./EXAMPLES.md#depth-filtering)** • **[→ Statistics](./EXAMPLES.md#statistics--callbacks)**
 
-#### Attribute Filtering
-```typescript
-// Minimal setup - only ID
-componentDebugger({
-  includeAttributes: ["id"]
-});
-// Result: <button data-dev-id="src/Button.tsx:10:2">Click me</button>
+</details>
 
-// Exclude verbose attributes
-componentDebugger({
-  excludeAttributes: ["metadata", "file", "component"]
-});
-```
+> **💡 All v2 features are opt-in** - Existing configs work unchanged
+>
+> **📖 See complete TypeScript types:** `import { type TagOptions } from 'vite-plugin-component-debugger'`
 
-#### Path Filtering
-```typescript
-// Only process specific directories
-componentDebugger({
-  includePaths: ["src/components/**", "src/features/**"],
-  excludePaths: ["**/*.test.tsx", "**/*.stories.tsx"]
-});
-```
+**📚 [View 50+ Detailed Examples in EXAMPLES.md →](./EXAMPLES.md)**
 
-#### Attribute Transformers
-```typescript
-// Shorten paths for privacy
-componentDebugger({
-  transformers: {
-    path: (p) => p.split('/').slice(-2).join('/'), // "auth/LoginForm.tsx"
-    id: (id) => id.split(':').slice(-2).join(':')   // "10:2"
-  }
-});
-```
-
-#### Conditional Tagging
-```typescript
-// Only tag custom components
-componentDebugger({
-  shouldTag: ({ elementName }) => {
-    return elementName[0] === elementName[0].toUpperCase();
-  }
-});
-```
-
-#### Custom Attributes
-```typescript
-// Add git and environment info
-componentDebugger({
-  customAttributes: () => ({
-    'data-dev-env': process.env.NODE_ENV,
-    'data-dev-branch': execSync('git branch --show-current').toString().trim()
-  })
-});
-```
-
-**📚 [View 50+ More Examples in EXAMPLES.md](./EXAMPLES.md)** - Including E2E testing, debug overlays, monorepo setups, feature flags, and more!
+Examples include: E2E testing setups, debug overlays, monorepo configs, feature flags, performance monitoring, and more!
 
 ## Use Cases
 
@@ -489,13 +457,16 @@ export default defineConfig({
 - Automatically skips `node_modules`
 - Only runs during development
 
-### Troubleshooting
+### Troubleshooting & Common Gotchas
 
-**⚠️ Line numbers are wrong/offset by ~19?**
+<details>
+<summary><strong>⚠️ Line numbers are wrong/offset by ~19?</strong> (Most common issue)</summary>
 
-1. **Most common issue**: Plugin order is wrong
-2. **Fix**: Move `componentDebugger()` BEFORE `react()` in Vite config
-3. **Cause**: React plugin adds ~19 lines of imports/HMR setup
+**Problem:** `data-dev-line` shows numbers ~19 higher than expected
+
+**Cause:** Plugin order is wrong - React plugin adds ~19 lines of imports/HMR setup
+
+**Fix:** Move `componentDebugger()` BEFORE `react()` in Vite config
 
 ```typescript
 // ❌ WRONG - Line numbers will be offset
@@ -515,35 +486,101 @@ export default defineConfig({
 });
 ```
 
-**Elements not being tagged?**
+</details>
 
-1. Check file extension is in `extensions`
-2. Verify element isn't in exclusion lists
-3. Ensure plugin is enabled
-4. Verify plugin order (componentDebugger before react)
+<details>
+<summary><strong>Elements not being tagged?</strong></summary>
 
-**Build performance issues?**
+1. **Check file extension:** File must match `extensions` (default: `.jsx`, `.tsx`)
+2. **Check exclusions:** Element not in `excludeElements` or `customExcludes`
+3. **Check paths:** File not excluded by `excludePaths` pattern
+4. **Check plugin order:** `componentDebugger()` before `react()`
+5. **Check enabled:** Plugin is enabled (`enabled: true`)
+6. **Check shouldTag:** If using `shouldTag`, callback must return `true`
 
-1. Limit `extensions` scope
-2. Add more elements to `excludeElements`
-3. Keep `includeProps`/`includeContent` disabled (default) for better performance and less noise in the DOM
-
-**Attributes not in production?**
-
+**Debug with:**
 ```typescript
 componentDebugger({
-  enabled: process.env.NODE_ENV !== "production",
-});
-```
-
-**Debug line number issues:**
-
-```typescript
-componentDebugger({
-  debug: true, // Shows processed code and line numbers
+  debug: true, // Shows what's being processed
   enabled: true,
 });
 ```
+
+</details>
+
+<details>
+<summary><strong>Build performance issues?</strong></summary>
+
+**Quick fixes:**
+1. Use `includeAttributes` to reduce DOM size:
+   ```typescript
+   includeAttributes: ['id', 'name'] // Only essential attributes
+   ```
+2. Filter paths to only process needed directories:
+   ```typescript
+   includePaths: ['src/components/**'],
+   excludePaths: ['**/*.test.tsx', '**/*.stories.tsx']
+   ```
+3. Use `maxDepth` to limit deep nesting:
+   ```typescript
+   maxDepth: 5 // Only tag up to 5 levels deep
+   ```
+4. Skip test files with `excludePaths`
+
+**[→ See performance optimization examples](./EXAMPLES.md#performance-monitoring)**
+
+</details>
+
+<details>
+<summary><strong>Attributes appearing in production?</strong></summary>
+
+```typescript
+componentDebugger({
+  enabled: process.env.NODE_ENV !== 'production',
+});
+```
+
+Or use environment-specific configs:
+```typescript
+enabled: isDev || isStaging, // Not in production
+```
+
+</details>
+
+<details>
+<summary><strong>includeAttributes vs excludeAttributes priority?</strong></summary>
+
+**Gotcha:** When both are set, `includeAttributes` takes priority
+
+```typescript
+componentDebugger({
+  includeAttributes: ['id', 'name', 'line'],
+  excludeAttributes: ['name'], // ⚠️ This is IGNORED
+});
+// Result: Only id, name, line are included
+```
+
+**Best practice:** Use one or the other, not both
+
+</details>
+
+<details>
+<summary><strong>TypeScript type errors?</strong></summary>
+
+Import types for full IntelliSense:
+```typescript
+import componentDebugger, {
+  type TagOptions,
+  type ComponentInfo,
+  type AttributeName
+} from 'vite-plugin-component-debugger';
+
+const config: TagOptions = {
+  // Full type checking
+};
+```
+
+</details>
 
 ## Development & Contributing
 
