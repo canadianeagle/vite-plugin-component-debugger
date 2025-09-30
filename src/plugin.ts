@@ -341,7 +341,36 @@ function applyPreset(options: TagOptions): TagOptions {
  */
 function matchesPatterns(filePath: string, patterns: string[] | undefined): boolean {
   if (!patterns || patterns.length === 0) return false;
-  return patterns.some(pattern => minimatch(filePath, pattern));
+
+  // Security: Prevent ReDoS attacks via malicious glob patterns
+  const MAX_PATTERN_LENGTH = 200;
+  const MAX_WILDCARD_COUNT = 10;
+
+  for (const pattern of patterns) {
+    // Validate pattern length
+    if (pattern.length > MAX_PATTERN_LENGTH) {
+      console.warn(`⚠️  Glob pattern exceeds maximum length (${MAX_PATTERN_LENGTH}), skipping: ${pattern.substring(0, 50)}...`);
+      continue;
+    }
+
+    // Validate wildcard count
+    const wildcardCount = (pattern.match(/\*/g) || []).length;
+    if (wildcardCount > MAX_WILDCARD_COUNT) {
+      console.warn(`⚠️  Glob pattern contains too many wildcards (${wildcardCount}), skipping: ${pattern}`);
+      continue;
+    }
+
+    try {
+      if (minimatch(filePath, pattern, { dot: true })) {
+        return true;
+      }
+    } catch (error) {
+      console.error(`⚠️  Error matching glob pattern "${pattern}":`, error);
+      continue;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -844,7 +873,12 @@ function generateAttributes(
     let id = `${info.path}:${info.line}:${info.column}`;
     if (transformers?.id) {
       try {
-        id = transformers.id(id);
+        const transformed = transformers.id(id);
+        if (typeof transformed !== 'string') {
+          console.warn(`⚠️  id transformer must return string, got ${typeof transformed}, using original value`);
+        } else {
+          id = transformed;
+        }
       } catch (error) {
         console.error(`⚠️  Error in id transformer:`, error);
       }
@@ -857,7 +891,12 @@ function generateAttributes(
     let name = info.name;
     if (transformers?.name) {
       try {
-        name = transformers.name(name);
+        const transformed = transformers.name(name);
+        if (typeof transformed !== 'string') {
+          console.warn(`⚠️  name transformer must return string, got ${typeof transformed}, using original value`);
+        } else {
+          name = transformed;
+        }
       } catch (error) {
         console.error(`⚠️  Error in name transformer:`, error);
       }
@@ -870,7 +909,12 @@ function generateAttributes(
     let pathValue = info.path;
     if (transformers?.path) {
       try {
-        pathValue = transformers.path(pathValue);
+        const transformed = transformers.path(pathValue);
+        if (typeof transformed !== 'string') {
+          console.warn(`⚠️  path transformer must return string, got ${typeof transformed}, using original value`);
+        } else {
+          pathValue = transformed;
+        }
       } catch (error) {
         console.error(`⚠️  Error in path transformer:`, error);
       }
@@ -882,7 +926,12 @@ function generateAttributes(
     let line = String(info.line);
     if (transformers?.line) {
       try {
-        line = transformers.line(info.line);
+        const transformed = transformers.line(info.line);
+        if (typeof transformed !== 'string') {
+          console.warn(`⚠️  line transformer must return string, got ${typeof transformed}, using original value`);
+        } else {
+          line = transformed;
+        }
       } catch (error) {
         console.error(`⚠️  Error in line transformer:`, error);
       }
@@ -894,7 +943,12 @@ function generateAttributes(
     let file = info.file;
     if (transformers?.file) {
       try {
-        file = transformers.file(file);
+        const transformed = transformers.file(file);
+        if (typeof transformed !== 'string') {
+          console.warn(`⚠️  file transformer must return string, got ${typeof transformed}, using original value`);
+        } else {
+          file = transformed;
+        }
       } catch (error) {
         console.error(`⚠️  Error in file transformer:`, error);
       }
@@ -906,7 +960,12 @@ function generateAttributes(
     let component = info.name;
     if (transformers?.component) {
       try {
-        component = transformers.component(component);
+        const transformed = transformers.component(component);
+        if (typeof transformed !== 'string') {
+          console.warn(`⚠️  component transformer must return string, got ${typeof transformed}, using original value`);
+        } else {
+          component = transformed;
+        }
       } catch (error) {
         console.error(`⚠️  Error in component transformer:`, error);
       }
