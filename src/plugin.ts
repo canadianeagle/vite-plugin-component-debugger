@@ -320,13 +320,18 @@ function applyPreset(options: TagOptions): TagOptions {
   if (!options.preset) return options;
 
   const preset = PRESETS[options.preset];
+  if (!preset) {
+    console.warn(`⚠️  Unknown preset: ${options.preset}, using default configuration`);
+    return options;
+  }
+
   // Preset values as defaults, but explicit options override them
   return {
     ...preset,
     ...options,
     // Merge transformers if both exist
-    transformers: options.transformers || preset.transformers
-      ? { ...preset.transformers, ...options.transformers }
+    transformers: options.transformers || preset?.transformers
+      ? { ...preset?.transformers, ...options.transformers }
       : undefined
   };
 }
@@ -368,8 +373,8 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     shouldTag,
     customAttributes,
     metadataEncoding = 'json',
-    maxDepth = 0,
-    minDepth = 0,
+    maxDepth: initialMaxDepth = 0,
+    minDepth: initialMinDepth = 0,
     tagOnlyRoots = false,
     onTransform,
     onComplete,
@@ -387,8 +392,11 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     byElementType: {}
   };
 
-  // Security: Validate depth values
+  // Security: Validate depth values (mutable copies)
+  let maxDepth = initialMaxDepth;
+  let minDepth = initialMinDepth;
   const MAX_DEPTH_LIMIT = 50;
+
   if (maxDepth && (maxDepth < 0 || maxDepth > MAX_DEPTH_LIMIT)) {
     console.warn(`⚠️  maxDepth must be between 0 and ${MAX_DEPTH_LIMIT}, using default`);
     maxDepth = 0;
