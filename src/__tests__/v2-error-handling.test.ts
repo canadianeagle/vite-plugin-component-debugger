@@ -97,17 +97,29 @@ describe('V2 Error Handling', () => {
 
   describe('transformer errors', () => {
     it('should handle transformer throwing an error', async () => {
+      let errorWasThrown = false;
+
       const plugin = componentDebugger({
         transformers: {
           path: () => {
+            errorWasThrown = true;
             throw new Error('Transformer error');
           }
         }
       });
 
-      // Should not crash, might fail silently or log
+      // Should not crash - error should be caught internally
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
+
+      // Verify transformer was called and threw error
+      expect(errorWasThrown).toBe(true);
+
+      // Verify plugin continued processing despite error
       expect(result).toBeDefined();
+      if (result && typeof result === 'object' && 'code' in result) {
+        // Should still have tagged the element
+        expect(result.code).toContain('data-dev-id');
+      }
     });
   });
 
