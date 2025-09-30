@@ -686,11 +686,15 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
 
         // V2: Call onTransform callback
         if (onTransform && elementCount > 0) {
-          onTransform({
-            file: relativePath,
-            elementsTagged: elementCount,
-            elementNames
-          });
+          try {
+            onTransform({
+              file: relativePath,
+              elementsTagged: elementCount,
+              elementNames
+            });
+          } catch (error) {
+            console.error(`⚠️  Error in onTransform callback for ${relativePath}:`, error);
+          }
         }
 
         if (elementCount > 0) {
@@ -720,7 +724,11 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
 
         // V2: Call onComplete callback
         if (onComplete) {
-          onComplete(stats);
+          try {
+            onComplete(stats);
+          } catch (error) {
+            console.error(`⚠️  Error in onComplete callback:`, error);
+          }
         }
 
         // V2: Export stats to file
@@ -835,7 +843,11 @@ function generateAttributes(
   if (shouldInclude('id')) {
     let id = `${info.path}:${info.line}:${info.column}`;
     if (transformers?.id) {
-      id = transformers.id(id);
+      try {
+        id = transformers.id(id);
+      } catch (error) {
+        console.error(`⚠️  Error in id transformer:`, error);
+      }
     }
     attributeValues['id'] = id;
   }
@@ -844,7 +856,11 @@ function generateAttributes(
   if (shouldInclude('name')) {
     let name = info.name;
     if (transformers?.name) {
-      name = transformers.name(name);
+      try {
+        name = transformers.name(name);
+      } catch (error) {
+        console.error(`⚠️  Error in name transformer:`, error);
+      }
     }
     attributeValues['name'] = name;
   }
@@ -853,7 +869,11 @@ function generateAttributes(
   if (shouldInclude('path')) {
     let pathValue = info.path;
     if (transformers?.path) {
-      pathValue = transformers.path(pathValue);
+      try {
+        pathValue = transformers.path(pathValue);
+      } catch (error) {
+        console.error(`⚠️  Error in path transformer:`, error);
+      }
     }
     attributeValues['path'] = pathValue;
   }
@@ -861,7 +881,11 @@ function generateAttributes(
   if (shouldInclude('line')) {
     let line = String(info.line);
     if (transformers?.line) {
-      line = transformers.line(info.line);
+      try {
+        line = transformers.line(info.line);
+      } catch (error) {
+        console.error(`⚠️  Error in line transformer:`, error);
+      }
     }
     attributeValues['line'] = line;
   }
@@ -869,7 +893,11 @@ function generateAttributes(
   if (shouldInclude('file')) {
     let file = info.file;
     if (transformers?.file) {
-      file = transformers.file(file);
+      try {
+        file = transformers.file(file);
+      } catch (error) {
+        console.error(`⚠️  Error in file transformer:`, error);
+      }
     }
     attributeValues['file'] = file;
   }
@@ -877,7 +905,11 @@ function generateAttributes(
   if (shouldInclude('component')) {
     let component = info.name;
     if (transformers?.component) {
-      component = transformers.component(component);
+      try {
+        component = transformers.component(component);
+      } catch (error) {
+        console.error(`⚠️  Error in component transformer:`, error);
+      }
     }
     attributeValues['component'] = component;
   }
