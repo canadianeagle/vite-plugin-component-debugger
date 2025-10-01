@@ -97,21 +97,37 @@ jobs:
           git push origin v${{ env.VERSION }}
           echo "Created and pushed tag v${{ env.VERSION }}"
 
-      - name: Generate changelog
+      - name: Generate changelog and update file
         if: steps.check_release.outputs.skip == 'false'
         run: |
-          # Create a simple changelog entry
-          echo "## v${{ env.VERSION }} ($(date +'%Y-%m-%d'))" > release-notes.md
-          echo "" >> release-notes.md
-          echo "### Changes" >> release-notes.md
-          # Get commits since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          git log --oneline --pretty=format:"- %s" ${LAST_TAG}..HEAD >> release-notes.md
-          echo "" >> release-notes.md
-          echo "### Installation" >> release-notes.md
-          echo "\`\`\`bash" >> release-notes.md
-          echo "npm install --save-dev vite-plugin-component-debugger@${{ env.VERSION }}" >> release-notes.md
-          echo "\`\`\`" >> release-notes.md
+          # Install changelog generator
+          npm install -g auto-changelog
+
+          # Generate changelog content using the custom template
+          auto-changelog --stdout --commit-limit false -u --template ".github/changelog-template.hbs" --starting-version ${{ env.VERSION }} --issue-url "https://github.com/canadianeagle/vite-plugin-component-debugger/issues/{id}" > new-changelog-entry.md
+
+          # Prepare the new changelog entry
+          # The output from auto-changelog includes the version header, so we can use it directly
+
+          # Read the existing changelog
+          EXISTING_CHANGELOG=$(cat changelog.md)
+
+          # Create the new changelog content
+          # The header is already in new-changelog-entry.md
+          # We need to remove the old header from the existing changelog
+          # This is a simple way to do it, might need adjustment based on your changelog format
+          UPDATED_CHANGELOG=$(echo -e "$(cat new-changelog-entry.md)\n\n$(echo "$EXISTING_CHANGELOG" | sed '1,7d')")
+
+          # Write the updated changelog
+          echo "$UPDATED_CHANGELOG" > changelog.md
+
+          # Also create release notes for the GitHub Release
+          cp changelog.md release-notes.md
+
+          # Commit the updated changelog
+          git add changelog.md
+          git commit -m "chore: update changelog for v${{ env.VERSION }} [skip ci]"
+          git push origin main
 
       - name: Create GitHub Release
         if: steps.check_release.outputs.skip == 'false'

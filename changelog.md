@@ -1,83 +1,76 @@
 # Changelog
 
-All notable changes to vite-plugin-component-debugger will be documented in this file.
+All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.0.0...HEAD) - 2025-09-30
 
-### Added
-- Initial release of vite-plugin-component-debugger
-- Automatic JSX/TSX element tagging with data attributes
-- Configurable options for customization
-- Support for excluding specific elements
-- Three.js/React Three Fiber element exclusion by default
-- Debug utilities for component inspection
-- TypeScript support with full type definitions
-- Comprehensive test suite
-- Documentation and examples
 
-### Changed
-- N/A
+- refactor: streamline auto-release workflow and improve version checking logic ([`83e4e47`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/83e4e470a0d57f1785b0476e0b6049d8745b1ca4)) by 
 
-### Deprecated
-- N/A
 
-### Removed
-- N/A
+## [v2.0.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v1.4.0...v2.0.0) - 2025-09-30
 
-### Fixed
-- N/A
 
-### Security
-- N/A
+### Pull Requests
+- v2.0.0: Major Feature Release with 10+ New Capabilities ([#6](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/6))
 
-## [1.0.0] - 2024-XX-XX
+- chore: release v1.4.0 [skip ci] ([`68427f3`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/68427f316498bfff45a076a3199427c03dcd04e6)) by 
 
-### Added
-- Initial public release
-- Core plugin functionality
-- Basic configuration options
-- Debug utilities
-- Documentation
 
----
+## [v1.4.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v1.3.1...v1.4.0) - 2025-09-30
 
-## Version History Guide
 
-### [1.0.1] - Patch Release Example
-- Fixed: Issue with TypeScript definitions
-- Fixed: Edge case in JSX parsing
+### Pull Requests
+- feat: add includeAttributes and excludeAttributes options for filtering data attributes ([#5](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/5))
 
-### [1.1.0] - Minor Release Example
-- Added: New configuration option for custom prefixes
-- Added: Support for MDX files
-- Improved: Performance optimizations
+- chore: release v1.3.1 [skip ci] ([`51afdd7`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/51afdd789b85d7353dcadc4cc9d6e2b6842d253f)) by 
 
-### [2.0.0] - Major Release Example
-- Breaking: Changed default attribute prefix
-- Breaking: Removed deprecated options
-- Added: New plugin architecture
+- feat: add includeAttributes and excludeAttributes options for filtering data attributes (#5) ([`2be7403`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/2be7403eff885afda17c7da562581c43f1f44477))
 
----
+## [v1.3.1](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v1.3.0...v1.3.1) - 2025-09-27
 
-## How to Update This File
 
-When releasing a new version:
+### Pull Requests
+- fix: handle multi-line JSX elements correctly when inserting attributes ([#3](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/3))
 
-1. Move items from [Unreleased] to a new version section
-2. Add the version number and date
-3. Add new [Unreleased] section for future changes
-4. Commit with message: "chore: update CHANGELOG for vX.X.X"
+- chore: release v1.3.0 [skip ci] ([`8929854`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/892985402187551742fe0a1c234046641a808a39)) by 
 
-Categories to use:
-- **Added** for new features
-- **Changed** for changes in existing functionality
-- **Deprecated** for soon-to-be removed features
-- **Removed** for now removed features
-- **Fixed** for any bug fixes
-- **Security** in case of vulnerabilities
 
-[Unreleased]: https://github.com/yourusername/vite-plugin-component-debugger/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/yourusername/vite-plugin-component-debugger/releases/tag/v1.0.0
+## [v1.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v1.2.0...v1.3.0) - 2025-09-19
+
+
+- feat: update default values for includeProps and includeContent to false for improved performance and less noise in the DOM ([`c40d02e`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/c40d02e566901ba83381c8b69aada8d3a1c295f8)) by 
+- chore: release v1.2.0 [skip ci] ([`f6ac6bb`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/f6ac6bbf34bcca4f54391438e7675af99e5ce7ff)) by 
+
+
+## [v1.2.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v1.1.0...v1.2.0) - 2025-09-19
+
+
+- feat: use componentDebugger for consistency and update related documentation and tests ([`94febd9`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/94febd9c308635c37fbdfe0e3895dab1bdef7f02)) by 
+- chore: release v1.1.0 [skip ci] ([`aaecba6`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/aaecba6eb6c925e0e23120644f5a8648e170de4f)) by 
+
+
+## [v1.1.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v1.0.1...v1.1.0) - 2025-09-19
+
+
+- feat: Add complex and nested components for testing line number accuracy ([`45881e3`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/45881e3dc47bea1af9cb31e19271c79791629cfe)) by 
+- chore: release v1.0.1 [skip ci] ([`7ca8475`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/7ca84752c3c6a667c7a8ea1d898032fcf9727d9d)) by 
+
+
+## v1.0.1 - 2025-09-19
+
+
+- chore: update code structure and remove redundant changes ([`81dd38b`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/81dd38b09dd1722db908f8277b2d06146b740471)) by 
+- first commit ([`4ac7b57`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/4ac7b579eed78e4d0f5c0f40c640997fb1d53441)) by 
+- chore: organize and clean up code structure for better maintainability ([`c17ffa7`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/c17ffa70e2c0fc2954bb144f71cfd1f42dbc864f)) by 
+- feat: migrate workflows to pnpm for dependency management and build processes ([`06c9437`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/06c9437d7b41888f042ca3f4e04f35ec448d749a)) by 
+- major:  v1 release + add security policy and enhance README with additional badges and acknowledgments ([`f646374`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/f646374b6f0d458d78396dd793a12dee15e5499f)) by 
+- chore: add commit message validation script and update documentation with examples ([`4d7cb34`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/4d7cb34dceed825bfc3bf2e0acad9bb3b0e6075d)) by 
+- chore: add permissions for contents and packages in workflows ([`9b07043`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/9b07043ee419ab72d31bf53f6ac6715427bc87e6)) by 
+- chore: update Node.js and pnpm versions in workflows and documentation ([`b9d96ef`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/b9d96efbc5c9027e2a6a810a8685c1c5f64cc9a5)) by 
+- fix: update package check command to remove temporary files after packing ([`f76f05d`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/f76f05d7366729a7b53e3594c8ca123653d995ae)) by 
+
+
