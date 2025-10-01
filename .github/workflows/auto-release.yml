@@ -73,32 +73,61 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Check if release is needed
-        id: check_release
+      - name: Determine version bump type
+        id: bump_type
         run: |
-          # Get the version from the merged package.json
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Version in package.json is $CURRENT_VERSION"
+          # Get the last commit message
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
 
-          # Check if a git tag for this version already exists
-          if git rev-parse "v$CURRENT_VERSION" >/dev/null 2>&1; then
-            echo "Tag v$CURRENT_VERSION already exists. Skipping release."
-            echo "skip=true" >> $GITHUB_OUTPUT
+          # Determine bump type based on commit message
+          if echo "$COMMIT_MSG" | grep -iq "BREAKING CHANGE\|major:"; then
+            echo "type=major" >> $GITHUB_OUTPUT
+            echo "Detected MAJOR version bump"
+          elif echo "$COMMIT_MSG" | grep -iq "feat:\|feature:\|minor:"; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+            echo "Detected MINOR version bump"
           else
-            echo "Tag v$CURRENT_VERSION does not exist. Proceeding with release."
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Detected PATCH version bump"
+          fi
+
+      - name: Check if version already bumped
+        id: check_version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          # Check if tag already exists
+          if git rev-parse "v$CURRENT_VERSION" >/dev/null 2>&1; then
+            echo "Tag v$CURRENT_VERSION already exists"
+            echo "needs_bump=true" >> $GITHUB_OUTPUT
+          else
+            echo "Tag v$CURRENT_VERSION does not exist"
+            echo "needs_bump=false" >> $GITHUB_OUTPUT
             echo "VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
           fi
 
+      - name: Bump version in package.json
+        if: steps.check_version.outputs.needs_bump == 'true'
+        run: |
+          pnpm version ${{ steps.bump_type.outputs.type }} -m "chore: release v%s [skip ci]"
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "Bumped to version $NEW_VERSION"
+
+      - name: Push version bump commit
+        if: steps.check_version.outputs.needs_bump == 'true'
+        run: |
+          git push origin main
+
       - name: Create and push tag
-        if: steps.check_release.outputs.skip == 'false'
         run: |
           git tag v${{ env.VERSION }}
           git push origin v${{ env.VERSION }}
           echo "Created and pushed tag v${{ env.VERSION }}"
 
       - name: Generate changelog and update file
-        if: steps.check_release.outputs.skip == 'false'
         run: |
           # Install changelog generator
           npm install -g auto-changelog
@@ -130,7 +159,6 @@ jobs:
           git push origin main
 
       - name: Create GitHub Release
-        if: steps.check_release.outputs.skip == 'false'
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -143,13 +171,11 @@ jobs:
           prerelease: false
 
       - name: Publish to NPM
-        if: steps.check_release.outputs.skip == 'false'
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Success notification
-        if: steps.check_release.outputs.skip == 'false'
         run: |
           echo "🎉 Successfully released v${{ env.VERSION }}"
           echo "📦 NPM: https://www.npmjs.com/package/vite-plugin-component-debugger"
