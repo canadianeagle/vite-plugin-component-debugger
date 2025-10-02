@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.1.0...HEAD) - 2025-10-02
+
+## [v2.1.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.0.0...v2.1.0) - 2025-10-01
+
+### Pull Requests
+- fix: use PAT token to allow workflows to trigger on PR merges ([#8](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/8))
+- feat: modularize plugin architecture and implement performance optimizations ([#7](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/7))
+
+- chore: add changelog template and update changelog generation in auto-release workflow ([`d187976`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d187976caad88d74c64cf6605ac44fb233a499ea)) by 
+- refactor: streamline auto-release workflow and improve version checking logic ([`83e4e47`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/83e4e470a0d57f1785b0476e0b6049d8745b1ca4)) by 
+- feat: restore automatic version bumping and enhance changelog generation ([`2b3170f`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/2b3170f983565f063639164b57364287174b9840)) by 
+- chore: release v2.1.0 [skip ci] ([`c190580`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/c190580c907ac76acc4a474fcfe087cd15dcdc93)) by 
+
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.0.0...HEAD) - 2025-09-30
 
 
@@ -72,5 +85,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: add permissions for contents and packages in workflows ([`9b07043`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/9b07043ee419ab72d31bf53f6ac6715427bc87e6)) by 
 - chore: update Node.js and pnpm versions in workflows and documentation ([`b9d96ef`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/b9d96efbc5c9027e2a6a810a8685c1c5f64cc9a5)) by 
 - fix: update package check command to remove temporary files after packing ([`f76f05d`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/f76f05d7366729a7b53e3594c8ca123653d995ae)) by 
-
-
