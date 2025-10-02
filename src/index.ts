@@ -9,5 +9,5 @@ export type {
   TransformStats,
   CompletionStats,
   AttributeTransformers
-} from './plugin';
+} from './types';
 

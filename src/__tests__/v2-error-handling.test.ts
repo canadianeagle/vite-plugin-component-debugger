@@ -136,7 +136,7 @@ describe('V2 Error Handling', () => {
 
       // Should log security warning
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Security: exportStats path must be within project directory')
+        expect.stringContaining('exportStats path cannot contain ".."')
       );
 
       consoleErrorSpy.mockRestore();
@@ -153,7 +153,7 @@ describe('V2 Error Handling', () => {
       plugin.buildEnd?.();
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Security: exportStats path must be within project directory')
+        expect.stringContaining('exportStats path must be relative or within project root')
       );
 
       consoleErrorSpy.mockRestore();
