@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-component-debugger",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Highly customizable Vite plugin that adds data attributes to JSX/TSX elements for development tracking, debugging, and testing. Features path filtering, transformers, presets, and more.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
