@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.0...HEAD) - 2025-10-07
+
+## [v2.2.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.1.0...v2.2.0) - 2025-10-07
+
+### Pull Requests
+- feat: Add support for Vite 6 and 7 in peer dependencies ([#10](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/10))
+
+- feat: Add project image and update documentation ([`8a71c6a`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8a71c6a414288e80b5866885b1a6ebad148a1110)) by 
+- chore: update changelog for v2.1.0 [skip ci] ([`4af86c7`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/4af86c703f0b84942beaf7d7cd09f1fdc28af9cd)) by 
+- chore: release v2.2.0 [skip ci] ([`e561182`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/e5611824e96b155eeafd7276fad88c2163d406af)) by 
+
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.1.0...HEAD) - 2025-10-02
 
 ## [v2.1.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.0.0...v2.1.0) - 2025-10-01
