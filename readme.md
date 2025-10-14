@@ -62,7 +62,11 @@ import componentDebugger from "vite-plugin-component-debugger";
 
 export default defineConfig({
   plugins: [
-    componentDebugger(), // ⚠️ IMPORTANT: Must be BEFORE react()
+    componentDebugger({ // ⚠️ IMPORTANT: Must be BEFORE react()
+      enabled: process.env.NODE_ENV === "development", // When to run
+      attributePrefix: "data-dev", // Custom prefix
+      extensions: [".jsx", ".tsx"], // File types
+    }),
     react(),
   ],
 });
@@ -707,3 +711,4 @@ _Inspired by [lovable-tagger](https://www.npmjs.com/package/lovable-tagger), enh
 **⭐ Star this repo if it helped you!**
 
 </div>
+
