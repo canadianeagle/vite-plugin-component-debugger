@@ -6,7 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Highly customizable** Vite plugin that automatically adds data attributes to JSX/TSX elements during development for component debugging and tracking. Features path filtering, attribute transformers, presets, conditional tagging, and more.
 
-**Current Version:** v2.0.0 (major feature release)
+**Current Version:** see `package.json` and `changelog.md`. Versions are bumped automatically on
+merge to `main`, so do not hand-edit the version field.
 
 ## Build System & Commands
 
@@ -46,10 +47,27 @@ See `.github/COMMIT_CONVENTION.md` for detailed examples
 
 ## Requirements
 
-**Node.js:** >= 18.12.0 (required for pnpm compatibility)
+**Node.js:** >= 18.12.0 (the package's own `engines` field)
 **pnpm:** >= 9.x (set in workflows)
 
-Version files: `.nvmrc`, `.node-version` specify Node 18.12.0
+Version files: `.nvmrc`, `.node-version` specify Node 18.20.8. That is higher than the
+published `engines` floor because the TypeScript-ESLint toolchain requires `^18.18.0`.
+Do not lower it without checking `pnpm run lint` still installs.
+
+**Vite:** 2.x through 8.x. The peer range is verified, not assumed: `pnpm run vite-compat`
+packs the plugin, installs it into a throwaway app against every major in
+`peerDependencies.vite`, runs a real `vite build`, and asserts the injected attributes and
+line numbers. CI runs this as the `vite-compat` job.
+
+When a new Vite major ships:
+1. Add `|| ^N.0.0` to `peerDependencies.vite` in `package.json`
+2. Run `pnpm run vite-compat` (it reads the majors straight out of the peer range)
+3. Update the compatibility table in `readme.md`
+
+Note that Vite 7+ requires Node `^20.19.0 || >=22.12.0`, so the CI compat job runs on Node 22
+even though the package itself still supports Node 18. Vite 8 builds with Rolldown/oxc rather
+than esbuild+Rollup; the plugin works on both because it only uses the standard
+`configResolved`/`buildStart`/`transform`/`buildEnd` hooks.
 
 ## Core Architecture
 
@@ -63,6 +81,11 @@ Version files: `.nvmrc`, `.node-version` specify Node 18.12.0
 - `src/helpers/attribute-generator.ts` - Attribute generation pipeline
 - `src/helpers/ast-walker.ts` - AST traversal and element tagging
 - `tsup.config.ts` - Build configuration
+- `.eslintrc.json` - ESLint config (`pnpm run lint` fails without it)
+
+**Dead code:** `src/utils/component-debugger.ts` is a browser-side helper module that
+nothing imports, exports, bundles, or tests (0% coverage). It is not part of the published
+package. Delete it or publish it as an explicit browser subpath entry.
 
 ### How It Works
 1. Intercepts Vite's transform hook for `.jsx`/`.tsx` files
@@ -104,6 +127,13 @@ export default defineConfig({
 ```
 
 **Why this matters**: React plugin injects ~19 lines of imports and HMR code. If componentDebugger runs after React, line numbers will be offset by ~19 lines, causing `data-dev-line` attributes to be incorrect.
+
+**Why `enforce: 'pre'` does not save you**: `@vitejs/plugin-react`'s `vite:react-babel` also
+declares `enforce: 'pre'`. Vite preserves the plugins-array order within the `pre` group, so
+array position is what actually decides which transform runs first.
+
+**Production builds**: `enabled` defaults to `true` and the plugin sets no `apply`, so a bare
+`componentDebugger()` tags production builds too. Gate it on `NODE_ENV` explicitly.
 
 ## Configuration Options (v2.0)
 
@@ -171,7 +201,7 @@ Quick configurations for common use cases:
 - `minimal` - Only ID attribute (smallest footprint)
 - `testing` - ID, name, component (perfect for E2E tests)
 - `debugging` - Everything + props + content (full visibility)
-- `production` - Privacy-focused with shortened paths
+- `production` - Privacy-focused: `id`, `path`, `line` only, with paths shortened to their last two segments (it does **not** disable the plugin - use `enabled` for that)
 
 ### Attribute Transformers
 Customize any attribute value for privacy, formatting, or anonymization:
