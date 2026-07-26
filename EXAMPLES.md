@@ -412,8 +412,12 @@ componentDebugger({ preset: 'debugging' })
 ### Production
 ```typescript
 componentDebugger({ preset: 'production' })
-// Privacy-focused: ID and line only, with shortened paths
+// Privacy-focused: id, path and line only.
+// Paths are shortened to their last two segments, and the id keeps only line:column.
 ```
+
+> Note: `preset: 'production'` only controls which attributes are emitted. It does not
+> disable the plugin. Use `enabled` to keep attributes out of a production build.
 
 ### Override Preset Options
 ```typescript
