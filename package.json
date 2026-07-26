@@ -14,7 +14,7 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "readme.md"
   ],
   "scripts": {
     "build": "tsup",
@@ -22,7 +22,9 @@
     "prepublishOnly": "npm run build",
     "test": "vitest --run",
     "test:coverage": "vitest --coverage --run",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "vite-compat": "node scripts/vite-compat.mjs",
     "pre-publish": "node scripts/pre-publish.js",
     "check": "npm run lint && npm run test && npm run build",
     "clean": "rm -rf dist node_modules"
@@ -55,18 +57,21 @@
   },
   "homepage": "https://www.tonyebrown.com/apps/vite-plugin-component-debugger",
   "peerDependencies": {
-    "vite": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+    "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
   },
   "dependencies": {
     "@babel/parser": "^7.24.0",
     "estree-walker": "^3.0.3",
     "magic-string": "^0.30.7",
-    "minimatch": "^10.0.3"
+    "minimatch": "^10.2.5"
   },
   "devDependencies": {
     "@types/babel__core": "^7.20.5",
     "@types/estree": "^1.0.5",
     "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitest/coverage-v8": "^1.6.1",
     "eslint": "^8.56.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
