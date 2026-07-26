@@ -47,7 +47,7 @@ jobs:
         run: pnpm test
 
       - name: Run linter
-        run: pnpm run lint || echo "No lint script"
+        run: pnpm run lint
 
       - name: Build package
         run: pnpm run build

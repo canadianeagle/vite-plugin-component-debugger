@@ -39,13 +39,45 @@ jobs:
         run: pnpm run build
 
       - name: Check types
-        run: pnpm exec tsc --noEmit || echo "No TypeScript check"
+        run: pnpm exec tsc --noEmit
 
       - name: Lint
-        run: pnpm run lint || echo "No lint script"
+        run: pnpm run lint
+
+      # The published CJS entry has broken before (ESM-only transitive dep).
+      # Import both build outputs so a packaging regression fails CI.
+      - name: Smoke test build outputs
+        run: |
+          node -e "const p=require('./dist/index.js'); if (typeof (p.default||p) !== 'function') process.exit(1); console.log('CJS entry OK')"
+          node --input-type=module -e "import p from './dist/index.mjs'; if (typeof p !== 'function') process.exit(1); console.log('ESM entry OK')"
 
       - name: Test pack
         run: pnpm pack && rm -f *.tgz
+
+  # Proves the declared peerDependencies.vite range is real: builds a fixture app
+  # against every Vite major in the range and checks the injected attributes.
+  vite-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Vite 7 and 8 require Node ^20.19 || >=22.12
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Vite compatibility
+        run: pnpm run vite-compat
 
   coverage:
     runs-on: ubuntu-latest
@@ -68,7 +100,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests with coverage
-        run: pnpm run test:coverage || pnpm test
+        run: pnpm run test:coverage
       
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
