@@ -43,9 +43,10 @@ export function compilePatterns(patterns: string[] | undefined): CompiledPattern
     }
 
     try {
-      // Convert glob to regex (makeRe returns null on error)
+      // Convert glob to regex. makeRe() returns `false` (not null) for a
+      // pattern it cannot compile, so normalize it to null here.
       const regex = minimatch.makeRe(pattern, { dot: true });
-      return { regex, pattern };
+      return { regex: regex === false ? null : regex, pattern };
     } catch (error) {
       console.error(`⚠️  Error compiling glob pattern "${pattern}":`, error);
       return { regex: null, pattern };
@@ -64,8 +65,11 @@ export function compilePatterns(patterns: string[] | undefined): CompiledPattern
 export function matchesCompiledPatterns(filePath: string, compiledPatterns: CompiledPattern[]): boolean {
   if (compiledPatterns.length === 0) return false;
 
+  // Glob patterns always use '/', so normalize Windows separators before testing.
+  const normalized = filePath.replace(/\\/g, '/');
+
   for (const { regex } of compiledPatterns) {
-    if (regex && regex.test(filePath)) {
+    if (regex && regex.test(normalized)) {
       return true;
     }
   }
@@ -97,7 +101,7 @@ export function matchesPatterns(filePath: string, patterns: string[] | undefined
     }
 
     try {
-      if (minimatch(filePath, pattern, { dot: true })) {
+      if (minimatch(filePath.replace(/\\/g, '/'), pattern, { dot: true })) {
         return true;
       }
     } catch (error) {

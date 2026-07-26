@@ -62,13 +62,28 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     groupAttributes = false
   } = resolvedOptions;
 
-  const projectRoot = process.cwd();
+  // Falls back to cwd, but Vite's resolved `root` wins once it is known -
+  // otherwise path globs, ids and export containment are wrong whenever
+  // `root` differs from cwd (monorepos, nested Vite roots).
+  let projectRoot = process.cwd();
   const stats: CompletionStats = {
     totalFiles: 0,
     processedFiles: 0,
     totalElements: 0,
     errors: 0,
-    byElementType: {}
+    // Null-prototype: element names are valid JSX identifiers like `constructor`
+    // or `toString`, which on a normal object collide with inherited members and
+    // corrupt the counts.
+    byElementType: Object.create(null)
+  };
+
+  /** Reset accumulated stats so watch-mode rebuilds don't report cumulative totals */
+  const resetStats = () => {
+    stats.totalFiles = 0;
+    stats.processedFiles = 0;
+    stats.totalElements = 0;
+    stats.errors = 0;
+    stats.byElementType = Object.create(null);
   };
 
   // Security: Validate depth values (mutable copies)
@@ -99,19 +114,34 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
     name: 'vite-plugin-component-debugger',
     enforce: 'pre',
 
+    configResolved(config) {
+      if (config?.root) {
+        projectRoot = config.root;
+      }
+    },
+
+    buildStart() {
+      resetStats();
+    },
+
     async transform(code: string, id: string) {
       // Skip if disabled
       if (!enabled) return null;
 
+      // Vite ids frequently carry a query suffix (?v=hash, ?t=timestamp, ?import).
+      // path.extname() would then see '.tsx?v=hash' and the extension check would fail.
+      const filePath = id.split('?')[0];
+
       // Check if file should be processed
-      const ext = path.extname(id);
-      if (!extensions.includes(ext) || id.includes('node_modules')) {
+      const ext = path.extname(filePath);
+      if (!extensions.includes(ext) || filePath.includes('node_modules')) {
         return null;
       }
 
       stats.totalFiles++;
-      const relativePath = path.relative(projectRoot, id);
-      const filename = path.basename(id);
+      // Glob patterns are written with '/', so normalize Windows separators before matching.
+      const relativePath = path.relative(projectRoot, filePath).split(path.sep).join('/');
+      const filename = path.basename(filePath);
 
       // 🚀 OPTIMIZATION #2: Use pre-compiled patterns (5-10x faster)
       if (compiledIncludes.length > 0 && !matchesCompiledPatterns(relativePath, compiledIncludes)) {
@@ -140,7 +170,7 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
         const { importedFromDrei, namespaceImports } = collectImports(ast);
 
         // Second pass: tag JSX elements
-        const elementCount = tagElements({
+        const { elementCount, elementNames } = tagElements({
           ast,
           code,
           magicString,
@@ -177,7 +207,7 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
             const transformStats: TransformStats = {
               file: relativePath,
               elementsTagged: elementCount,
-              elementNames: Object.keys(stats.byElementType)
+              elementNames
             };
             onTransform(transformStats);
           } catch (error) {
@@ -191,7 +221,13 @@ export function componentDebugger(options: TagOptions = {}): Plugin {
 
         return {
           code: magicString.toString(),
-          map: magicString.generateMap({ hires: true })
+          // Without an explicit `source` the map carries sources: [""], which
+          // Vite papers over but Rollup and chained pre-transforms do not.
+          map: magicString.generateMap({
+            hires: true,
+            source: filePath,
+            includeContent: true
+          })
         };
       } catch (error) {
         stats.errors++;
