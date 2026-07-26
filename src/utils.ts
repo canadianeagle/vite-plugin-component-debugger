@@ -1,7 +1,8 @@
 // src/utils.ts
 // Utility functions for vite-plugin-component-debugger
 
-import type { Preset, TagOptions } from './types';
+import path from 'path';
+import type { TagOptions } from './types';
 import { PRESETS } from './constants';
 
 /**
@@ -38,26 +39,28 @@ export function encodeBase64(str: string): string {
  * Validate and sanitize exportStats path to prevent path traversal attacks
  */
 export function sanitizeExportPath(statsPath: string, projectRoot: string): string | null {
-  const path = require('path');
-
   // Security: Prevent path traversal
-  if (statsPath.includes('..')) {
+  if (statsPath.split(/[\\/]/).includes('..')) {
     console.error('⚠️  exportStats path cannot contain ".." (path traversal attempt)');
     return null;
   }
 
-  // Security: Prevent absolute paths outside project
-  if (path.isAbsolute(statsPath) && !statsPath.startsWith(projectRoot)) {
-    console.error('⚠️  exportStats path must be relative or within project root');
-    return null;
-  }
-
   // Convert to absolute path relative to project root
-  const absolutePath = path.isAbsolute(statsPath) ? statsPath : path.resolve(projectRoot, statsPath);
+  const absolutePath = path.resolve(projectRoot, statsPath);
+  const resolvedRoot = path.resolve(projectRoot);
 
-  // Double-check it's within project root
-  if (!absolutePath.startsWith(projectRoot)) {
-    console.error('⚠️  exportStats path resolved outside project root');
+  // Containment check must be separator-aware: a plain startsWith() would let
+  // '/home/u/project-evil/x.json' pass when the root is '/home/u/project'.
+  const relative = path.relative(resolvedRoot, absolutePath);
+  const isInsideRoot =
+    relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
+
+  if (!isInsideRoot) {
+    console.error(
+      path.isAbsolute(statsPath)
+        ? '⚠️  exportStats path must be relative or within project root'
+        : '⚠️  exportStats path resolved outside project root'
+    );
     return null;
   }
 

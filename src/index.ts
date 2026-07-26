@@ -1,5 +1,6 @@
 // src/index.ts
-export { componentDebugger as default } from './plugin';
+// The plugin is available both as the default export and as a named export.
+export { componentDebugger, componentDebugger as default } from './plugin';
 export type {
   TagOptions,
   AttributeName,

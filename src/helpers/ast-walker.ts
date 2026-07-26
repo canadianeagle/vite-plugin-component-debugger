@@ -28,6 +28,17 @@ function extractTextContent(children: any[]): string | null {
 }
 
 /**
+ * Fragments are transparent to depth tracking: `<>...</>`, `<Fragment>...</Fragment>`
+ * and `<React.Fragment>...</React.Fragment>` must all report the same child depth.
+ * Only the shorthand form used to be transparent, so `tagOnlyRoots` tagged the child
+ * of `<>` but not the child of `<Fragment>`.
+ */
+function isFragmentName(elementName: string | null): boolean {
+  if (elementName === null) return false;
+  return elementName === 'Fragment' || elementName.endsWith('.Fragment');
+}
+
+/**
  * Check if element should be excluded from tagging
  */
 function shouldExcludeElement(
@@ -85,6 +96,16 @@ export function logDebugInfo(code: string, relativePath: string): void {
 }
 
 /**
+ * Match three.js / React Three Fiber module sources without catching unrelated
+ * packages that merely contain the substring "three" (e.g. 'three-column-layout').
+ */
+function isThreeRelatedSource(source: string): boolean {
+  if (source.startsWith('@react-three/')) return true;
+  // 'three', 'three/examples/...', 'three-stdlib', 'three-stdlib/...'
+  return /^three(-stdlib)?(\/|$)/.test(source);
+}
+
+/**
  * Collect imports from specific libraries (drei, three.js)
  */
 export function collectImports(ast: any): {
@@ -99,12 +120,10 @@ export function collectImports(ast: any): {
       if (node.type === 'ImportDeclaration') {
         const source = node.source?.value;
         if (typeof source === 'string') {
-          // Track React Three Drei imports
-          if (
-            source.includes('@react-three/drei') ||
-            source.includes('@react-three/fiber') ||
-            source.includes('three')
-          ) {
+          // Track React Three / three.js imports.
+          // A substring test on 'three' also matched unrelated packages such as
+          // 'three-column-layout', silently skipping their components.
+          if (isThreeRelatedSource(source)) {
             node.specifiers.forEach((spec: any) => {
               if (spec.type === 'ImportSpecifier') {
                 importedFromDrei.add(spec.local.name);
@@ -153,10 +172,43 @@ export interface TagElementsOptions {
 }
 
 /**
+ * Result of tagging a single file
+ */
+export interface TagElementsResult {
+  /** Number of elements tagged in this file */
+  elementCount: number;
+  /** Distinct element names tagged in this file, in first-seen order */
+  elementNames: string[];
+}
+
+/**
+ * Resolve a JSX element name to a string.
+ * Handles plain identifiers and arbitrarily nested member expressions (A.B.C).
+ * Returns null for names we do not tag (e.g. namespaced names like svg:circle).
+ */
+function resolveElementName(nameNode: any): string | null {
+  if (!nameNode) return null;
+
+  if (nameNode.type === 'JSXIdentifier') {
+    return nameNode.name;
+  }
+
+  if (nameNode.type === 'JSXMemberExpression') {
+    // `object` may itself be a JSXMemberExpression, so recurse instead of
+    // reading `.name` (which is undefined for nested members like A.B.C).
+    const objectName = resolveElementName(nameNode.object);
+    if (objectName === null) return null;
+    return `${objectName}.${nameNode.property.name}`;
+  }
+
+  return null;
+}
+
+/**
  * Tag JSX elements in the AST
  * Main logic for traversing AST and adding data attributes
  */
-export function tagElements(options: TagElementsOptions): number {
+export function tagElements(options: TagElementsOptions): TagElementsResult {
   const {
     ast,
     code,
@@ -187,27 +239,29 @@ export function tagElements(options: TagElementsOptions): number {
 
   let currentJSXElement: any = null;
   const depthStack: number[] = []; // Track nesting depth
-  const elementNames: string[] = []; // Track for statistics
+  const elementNames = new Set<string>(); // Distinct names tagged in THIS file
   let elementCount = 0;
+
+  // Nodes that actually pushed onto depthStack, so `leave` pops symmetrically
+  const pushedNodes = new WeakSet<object>();
 
   walk(ast as any, {
     enter(node: any) {
       if (node.type === 'JSXElement') {
         currentJSXElement = node;
-        depthStack.push(1); // Track depth by stack length
+        // Fragments do not add a nesting level (JSXFragment never did either)
+        if (!isFragmentName(resolveElementName(node.openingElement?.name))) {
+          depthStack.push(1); // Track depth by stack length
+          pushedNodes.add(node);
+        }
       }
 
       if (node.type === 'JSXOpeningElement') {
         const openingElement = node;
-        let elementName: string;
 
-        // Get element name
-        if (openingElement.name.type === 'JSXIdentifier') {
-          elementName = openingElement.name.name;
-        } else if (openingElement.name.type === 'JSXMemberExpression') {
-          const memberExpr = openingElement.name;
-          elementName = `${memberExpr.object.name}.${memberExpr.property.name}`;
-        } else {
+        // Get element name (handles nested member expressions like A.B.C)
+        const elementName = resolveElementName(openingElement.name);
+        if (elementName === null) {
           return;
         }
 
@@ -381,19 +435,19 @@ export function tagElements(options: TagElementsOptions): number {
         magicString.appendLeft(insertPosition, attributes);
 
         elementCount++;
-        elementNames.push(elementName); // Track for statistics
+        elementNames.add(elementName); // Track for this file's TransformStats
 
         // Track by element type
         stats.byElementType[elementName] = (stats.byElementType[elementName] || 0) + 1;
       }
     },
     leave(node: any) {
-      // Pop depth when leaving JSXElement
-      if (node.type === 'JSXElement') {
+      // Pop depth when leaving a JSXElement that pushed one
+      if (node.type === 'JSXElement' && pushedNodes.has(node)) {
         depthStack.pop();
       }
     }
   });
 
-  return elementCount;
+  return { elementCount, elementNames: Array.from(elementNames) };
 }

@@ -12,6 +12,17 @@ import type {
 import { encodeBase64 } from '../utils';
 
 /**
+ * JSX attribute-name grammar (JSXIdentifier, optionally with `-` or `:` parts).
+ * Attribute names are emitted verbatim into source, so anything outside this
+ * grammar must be rejected rather than injected.
+ */
+const VALID_ATTRIBUTE_NAME = /^[A-Za-z_][A-Za-z0-9_.:-]*$/;
+
+function isValidAttributeName(name: string): boolean {
+  return VALID_ATTRIBUTE_NAME.test(name);
+}
+
+/**
  * Generate data attributes string for a JSX element
  * 🚀 PERFORMANCE: Optimized to call JSON.stringify only once or twice (not 3 times)
  *
@@ -179,9 +190,16 @@ export function generateAttributes(
         // Re-stringify with _truncated flag (2nd call only if needed)
         metadataJson = JSON.stringify({ ...metadata, _truncated: true });
 
-        // Truncate if still too large
+        // Still too large: drop to a bounded, always-valid summary object.
+        // Slicing the serialized JSON (the old approach) could cut a `\uXXXX`
+        // escape or a surrogate pair in half and emit unparseable JSON.
         if (metadataJson.length > MAX_METADATA_SIZE) {
-          metadataJson = metadataJson.substring(0, MAX_METADATA_SIZE - 20) + '...[truncated]"}';
+          metadataJson = JSON.stringify({
+            _truncated: true,
+            _note: '...[truncated]',
+            _originalSize: metadataJson.length,
+            _keys: Object.keys(metadata).slice(0, 50)
+          });
         }
       }
 
@@ -189,8 +207,9 @@ export function generateAttributes(
       if (metadataEncoding === 'base64') {
         encoded = encodeBase64(metadataJson);
       } else if (metadataEncoding === 'none') {
-        // Escape quotes for HTML attributes
-        encoded = metadataJson.replace(/"/g, '&quot;');
+        // Emit raw JSON. Quote/entity escaping is applied once, below, by
+        // escapeHtml() - escaping here too produced '&amp;quot;'.
+        encoded = metadataJson;
       } else {
         // Default: URL-encoded JSON (backwards compatible)
         encoded = encodeURIComponent(metadataJson);
@@ -230,8 +249,14 @@ export function generateAttributes(
       let attrCount = 0;
 
       for (const [key, value] of customEntries) {
-        // Skip dangerous keys
-        if (dangerousKeys.includes(key)) {
+        // Remove prefix if user included it (must be followed by a dash).
+        // Done BEFORE the dangerous-key check so 'data-dev-__proto__' cannot
+        // slip through as '__proto__'.
+        const prefixWithDash = `${prefix}-`;
+        const cleanKey = key.startsWith(prefixWithDash) ? key.slice(prefixWithDash.length) : key;
+
+        // Skip dangerous keys (check both the raw and the de-prefixed form)
+        if (dangerousKeys.includes(key) || dangerousKeys.includes(cleanKey)) {
           console.warn(`⚠️  Skipping dangerous custom attribute key: ${key}`);
           continue;
         }
@@ -251,9 +276,6 @@ export function generateAttributes(
           console.warn(`⚠️  Attribute '${key}' value truncated to ${MAX_ATTR_LENGTH} characters`);
         }
 
-        // Remove prefix if user included it (must be followed by a dash)
-        const prefixWithDash = `${prefix}-`;
-        const cleanKey = key.startsWith(prefixWithDash) ? key.slice(prefixWithDash.length) : key;
         attributeValues[cleanKey] = truncatedValue;
         attrCount++;
       }
@@ -277,16 +299,34 @@ export function generateAttributes(
   if (groupAttributes) {
     // Group all attributes into a single JSON object
     const grouped = JSON.stringify(attributeValues);
-    const encoded = metadataEncoding === 'base64'
-      ? encodeBase64(grouped)
-      : encodeURIComponent(grouped);
+    let encoded: string;
+    if (metadataEncoding === 'base64') {
+      encoded = encodeBase64(grouped);
+    } else if (metadataEncoding === 'none') {
+      // Honour 'none' here too - this branch used to URL-encode regardless.
+      encoded = grouped;
+    } else {
+      encoded = encodeURIComponent(grouped);
+    }
+    if (!isValidAttributeName(prefix)) {
+      console.warn(`⚠️  Skipping attributes: invalid attributePrefix "${prefix}"`);
+      return '';
+    }
     return ` ${prefix}="${escapeHtml(encoded)}"`;
   } else {
     // Individual attributes (default, backwards compatible)
     const attrs: string[] = [];
     for (const [key, value] of Object.entries(attributeValues)) {
+      const attrName = `${prefix}-${key}`;
+      // Attribute NAMES are injected verbatim into JSX source. An invalid name
+      // (from attributePrefix or a customAttributes key) would inject arbitrary
+      // JSX or make the module unparseable, so reject it.
+      if (!isValidAttributeName(attrName)) {
+        console.warn(`⚠️  Skipping attribute with invalid name: ${attrName}`);
+        continue;
+      }
       const escapedValue = escapeHtml(String(value));
-      attrs.push(`${prefix}-${key}="${escapedValue}"`);
+      attrs.push(`${attrName}="${escapedValue}"`);
     }
     return attrs.length > 0 ? ` ${attrs.join(' ')}` : '';
   }
