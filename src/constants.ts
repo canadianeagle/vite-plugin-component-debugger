@@ -94,7 +94,9 @@ export const PRESETS: Record<Preset, Partial<TagOptions>> = {
     debug: true
   },
   production: {
-    includeAttributes: ['id', 'line'],
+    // 'path' must be in the allowlist for the path transformer below to have
+    // any effect - without it the shortened path was computed and discarded.
+    includeAttributes: ['id', 'path', 'line'],
     transformers: {
       path: (p) => p.split('/').slice(-2).join('/'), // Only last 2 segments
       id: (id) => {

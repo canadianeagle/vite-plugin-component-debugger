@@ -186,7 +186,9 @@ export interface TagOptions {
   preset?: Preset;
 
   /**
-   * Include source map hints for DevTools integration
+   * Emit an extra `<prefix>-sourcemap` attribute pointing back at the source file.
+   * This does not write source map comments; it only adds a data attribute, and
+   * only when the `path` attribute is itself included.
    * @default false
    */
   includeSourceMapHints?: boolean;
