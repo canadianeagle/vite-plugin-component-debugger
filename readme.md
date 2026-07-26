@@ -21,7 +21,20 @@
 
 A **highly customizable** Vite plugin that automatically adds data attributes to JSX/TSX elements during development. Track, debug, and understand component rendering with powerful features like path filtering, attribute transformers, presets, and more. **Perfect for AI-generated code** and debugging "which component rendered this?" 🤔
 
-## ✨ What's New in v2.2
+## ✨ What's New
+
+**v2.2.2 (fixes):**
+
+- 🐛 **The CommonJS entry now works.** `require('vite-plugin-component-debugger')` previously
+  threw `ERR_PACKAGE_PATH_NOT_EXPORTED`
+- 🧩 **Vite 2 through 8 supported and verified** by a real build in CI
+- 🔒 Attribute names from `attributePrefix` and `customAttributes` are validated before being
+  written into your source
+- 📐 Correct nested component names (`<A.B.C />` used to become `undefined.C`)
+- 🧵 Consistent nesting depth across `<>`, `<Fragment>` and `<React.Fragment>`
+- 🪟 Path globs now work on Windows
+
+See [changelog.md](./changelog.md) for the full list.
 
 **Performance Optimizations (v2.2.0):**
 
@@ -41,9 +54,27 @@ A **highly customizable** Vite plugin that automatically adds data attributes to
 - 📊 **Statistics & Callbacks** - Track processing stats and export metrics
 - 🎚️ **Depth Filtering** - Control tagging by component nesting level
 - 🔐 **Attribute Grouping** - Combine all attributes into single JSON attribute
-- 🗺️ **Source Map Hints** - Better debugging with source map comments
+- 🗺️ **Source Map Hints** - Emit a `data-dev-sourcemap` attribute pointing back at the source file
 
 **📚 [View Detailed Examples & Use Cases](./EXAMPLES.md)**
+
+## Compatibility
+
+| Vite | Status | Notes |
+| ---- | ------ | ----- |
+| 8.x  | ✅ Supported | Builds with Rolldown/oxc |
+| 7.x  | ✅ Supported | Requires Node `^20.19.0 \|\| >=22.12.0` |
+| 6.x  | ✅ Supported | |
+| 5.x  | ✅ Supported | |
+| 4.x  | ✅ Supported | |
+| 3.x  | ✅ Supported | |
+| 2.x  | ✅ Supported | |
+
+**Node.js:** >= 18.12.0 for the plugin itself. Vite 7 and 8 require Node 20.19+/22.12+, so
+your Vite version sets the real floor.
+
+Every version in that table is verified by a real `vite build` in CI, not just declared in
+`peerDependencies`. Run it yourself with `pnpm run vite-compat`.
 
 ## Quick Start
 
@@ -59,6 +90,8 @@ pnpm add -D vite-plugin-component-debugger
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import componentDebugger from "vite-plugin-component-debugger";
+// A named import works too:
+// import { componentDebugger } from "vite-plugin-component-debugger";
 
 export default defineConfig({
   plugins: [
@@ -72,7 +105,15 @@ export default defineConfig({
 });
 ```
 
-> **⚠️ CRITICAL**: componentDebugger() must be placed **BEFORE** react() plugin, otherwise line numbers will be wrong
+> **⚠️ CRITICAL**: componentDebugger() must be placed **BEFORE** react() in the `plugins` array, otherwise line numbers will be wrong.
+>
+> Both this plugin and `@vitejs/plugin-react`'s `vite:react-babel` declare `enforce: 'pre'`. Vite keeps the array order *within* the `pre` group, so listing componentDebugger first is what actually decides which transform runs first. The React plugin injects roughly 19 lines of imports and HMR setup, so running after it shifts every `data-dev-line` by that amount.
+
+> **⚠️ `enabled` defaults to `true`, including production builds.** This plugin has no `apply` restriction, so a bare `componentDebugger()` also tags your production bundle, embedding source paths and line numbers in the shipped DOM. Gate it explicitly:
+>
+> ```typescript
+> componentDebugger({ enabled: process.env.NODE_ENV === "development" });
+> ```
 
 ## What It Does
 
@@ -89,18 +130,20 @@ export default defineConfig({
 
 ```jsx
 <button
+  className="btn-primary"
+  onClick={handleClick}
   data-dev-id="src/components/Button.tsx:10:2"
   data-dev-name="button"
   data-dev-path="src/components/Button.tsx"
   data-dev-line="10"
   data-dev-file="Button.tsx"
   data-dev-component="button"
-  className="btn-primary"
-  onClick={handleClick}
 >
   Click me
 </button>
 ```
+
+> Attributes are appended after your existing props, immediately before the closing `>`.
 
 **After (Minimal Preset - Clean):**
 
@@ -109,9 +152,9 @@ componentDebugger({ preset: 'minimal' })
 
 // Results in:
 <button
-  data-dev-id="src/components/Button.tsx:10:2"
   className="btn-primary"
   onClick={handleClick}
+  data-dev-id="src/components/Button.tsx:10:2"
 >
   Click me
 </button>
@@ -308,7 +351,7 @@ componentDebugger({
 | `onTransform`           | `(stats) => void` | `undefined` | Per-file callback       |
 | `onComplete`            | `(stats) => void` | `undefined` | Completion callback     |
 | `exportStats`           | `string`          | `undefined` | Export stats to file    |
-| `includeSourceMapHints` | `boolean`         | `false`     | Add source map comments |
+| `includeSourceMapHints` | `boolean`         | `false`     | Add a `data-dev-sourcemap` attribute (requires `path`) |
 | `debug`                 | `boolean`         | `false`     | Enable debug logging    |
 
 **[→ Depth filtering](./EXAMPLES.md#depth-filtering)** • **[→ Statistics](./EXAMPLES.md#statistics--callbacks)**
