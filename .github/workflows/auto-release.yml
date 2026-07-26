@@ -96,14 +96,23 @@ jobs:
         id: check_version
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
+          PKG_NAME=$(node -p "require('./package.json').name")
           echo "Current version: $CURRENT_VERSION"
 
-          # Check if tag already exists
-          if git rev-parse "v$CURRENT_VERSION" >/dev/null 2>&1; then
-            echo "Tag v$CURRENT_VERSION already exists"
+          # Bump if this version is already ON NPM. The registry is the source of
+          # truth for "has this shipped".
+          #
+          # This used to test for a local git tag instead, which silently skipped
+          # the bump whenever a version had no tag: the workflow would detect a
+          # minor bump, ignore it, and then try to republish the current version.
+          if npm view "$PKG_NAME@$CURRENT_VERSION" version >/dev/null 2>&1; then
+            echo "$CURRENT_VERSION is already published, bumping"
+            echo "needs_bump=true" >> $GITHUB_OUTPUT
+          elif git rev-parse "v$CURRENT_VERSION" >/dev/null 2>&1; then
+            echo "Tag v$CURRENT_VERSION already exists, bumping"
             echo "needs_bump=true" >> $GITHUB_OUTPUT
           else
-            echo "Tag v$CURRENT_VERSION does not exist"
+            echo "$CURRENT_VERSION is unpublished and untagged, releasing as-is"
             echo "needs_bump=false" >> $GITHUB_OUTPUT
             echo "VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
           fi
