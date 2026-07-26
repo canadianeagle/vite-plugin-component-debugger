@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...HEAD) - 2026-07-26
+
+## [v2.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...v2.3.0) - 2026-07-26
+
+- fix: release v2.3.0 and repair the auto-release version check ([`8159c00`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8159c0016a6640a09b4b9e0a073051755a02aa6e)) by 
+- chore: update changelog for v2.2.1 [skip ci] ([`a952958`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/a9529588a005f12f521c965a3be1466302f99820)) by 
+
 > Note: v2.2.1 was tagged but never reached npm; its release run failed to authenticate
 > with the registry. The last published version before this one is v2.2.0.
 
