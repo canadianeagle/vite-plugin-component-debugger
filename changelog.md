@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...HEAD) - 2026-07-26
+
+## [v2.2.1](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.0...v2.2.1) - 2026-07-26
+
+- feat: support Vite 2 through 8 ([`4b63c39`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/4b63c39c1301256866db8222b0aa17c00e354ef0)) by 
+- test: add regression and adversarial suites ([`da1d87a`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/da1d87aa68efa56a21d802bf18ed96367fd15b10)) by 
+- docs: correct inaccurate claims and document Vite support ([`e068962`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/e0689626d795988921773bd2e1587dca6b4f73a0)) by 
+- fix: correct 15 defects in attribute generation and file handling ([`cd8f521`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/cd8f5212b993a41f7cbe0d1063ee0c339877991c)) by 
+- ci: make lint and typecheck real gates, add vite-compat job ([`3e52858`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/3e528586a4c4cdf9096c59f08af9a39a8a737962)) by 
+- chore: update changelog for v2.2.0 [skip ci] ([`cc73317`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/cc73317d8d89bd37edec6d2e6d152981de0e5bcb)) by 
+- Update readme.md ([`d0c8fd5`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d0c8fd56cc23d2aa80b3691341bb660f2694d5f3)) by 
+- chore: release v2.2.1 [skip ci] ([`edad9a9`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/edad9a94db2a9620279411936e59aa55a26a4de5)) by 
+- fix: bundle estree-walker so the CommonJS entry works ([`6a3c8fc`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/6a3c8fcc377b719b212a2f08275cae4c86cdbc3c)) by 
+
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...HEAD)
 
 ### Fixed
