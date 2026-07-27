@@ -19,44 +19,31 @@
 
 </div>
 
-A **highly customizable** Vite plugin that automatically adds data attributes to JSX/TSX elements during development. Track, debug, and understand component rendering with powerful features like path filtering, attribute transformers, presets, and more. **Perfect for AI-generated code** and debugging "which component rendered this?" 🤔
+A Vite plugin that adds data attributes to your JSX and TSX elements so you can tell which
+component rendered which piece of the DOM. Useful when you are debugging someone else's code,
+or code you generated and have not read yet.
 
-## ✨ What's New
+## What's new
 
-**v2.2.2 (fixes):**
+**v2.3.0** repairs a CommonJS entry that threw on `require()`, widens Vite support to
+2 through 8, and fixes 19 defects found in an audit of v2.2.1. Full list in
+[changelog.md](./changelog.md).
 
-- 🐛 **The CommonJS entry now works.** `require('vite-plugin-component-debugger')` previously
-  threw `ERR_PACKAGE_PATH_NOT_EXPORTED`
-- 🧩 **Vite 2 through 8 supported and verified** by a real build in CI
-- 🔒 Attribute names from `attributePrefix` and `customAttributes` are validated before being
-  written into your source
-- 📐 Correct nested component names (`<A.B.C />` used to become `undefined.C`)
-- 🧵 Consistent nesting depth across `<>`, `<Fragment>` and `<React.Fragment>`
-- 🪟 Path globs now work on Windows
+## Features
 
-See [changelog.md](./changelog.md) for the full list.
+- **Path filtering** with glob patterns, to include or exclude specific files
+- **Attribute transformers** to rewrite any attribute value, for privacy or formatting
+- **Presets** for common setups: minimal, testing, debugging, production
+- **Conditional tagging** through a `shouldTag` callback
+- **Custom attributes** of your own, such as git branch or environment
+- **Metadata encoding** as JSON, Base64, or plain text
+- **Statistics and callbacks** for tracking what was processed, with optional JSON export
+- **Depth filtering** to tag only certain nesting levels
+- **Attribute grouping** to collapse everything into one JSON attribute
 
-**Performance Optimizations (v2.2.0):**
+Every option is opt-in. An existing config keeps working untouched.
 
-- 🚀 **15-30% faster** build times with 3 micro-optimizations
-- ⚡ **5-10x faster path matching** with pre-compiled glob patterns
-- 📦 **2-3x faster metadata encoding** with optimized JSON serialization
-- 🔧 **Modular architecture** - Clean, maintainable 7-file structure
-
-**V2 Features - Complete control over component debugging:**
-
-- 🎯 **Path Filtering** - Include/exclude files with glob patterns
-- 🔧 **Attribute Transformers** - Customize any attribute value (privacy, formatting)
-- 🎨 **Presets** - Quick configs for common use cases (minimal, testing, debugging, production)
-- ⚡ **Conditional Tagging** - Tag only specific components with `shouldTag` callback
-- 🏷️ **Custom Attributes** - Add your own data attributes (git info, environment, etc.)
-- 📦 **Metadata Encoding** - Choose JSON, Base64, or plain text encoding
-- 📊 **Statistics & Callbacks** - Track processing stats and export metrics
-- 🎚️ **Depth Filtering** - Control tagging by component nesting level
-- 🔐 **Attribute Grouping** - Combine all attributes into single JSON attribute
-- 🗺️ **Source Map Hints** - Emit a `data-dev-sourcemap` attribute pointing back at the source file
-
-**📚 [View Detailed Examples & Use Cases](./EXAMPLES.md)**
+[Detailed examples and use cases](./EXAMPLES.md)
 
 ## Compatibility
 
@@ -179,13 +166,15 @@ componentDebugger({
 </button>
 ```
 
-## Key Benefits
+## Why use it
 
-- 🐛 **Debug Faster**: Find which component renders any DOM element
-- 📍 **Jump to Source**: Go directly from DevTools to your code
-- 🎯 **Stable Testing**: Use data attributes for reliable E2E tests
-- ⚡ **Zero Runtime Cost**: Only runs during development
-- 🔧 **Smart Exclusions**: Automatically skips Fragment and Three.js elements
+- Find which component rendered any DOM element, without guessing
+- Jump straight from DevTools to the source line
+- Select elements in E2E tests by a stable attribute instead of a brittle CSS path
+- Fragments and Three.js elements are skipped automatically, so your scene graph stays clean
+
+The transform runs at build time and adds no runtime code. It does add attributes to your
+markup, though, so gate it with `enabled` if you do not want them in a production bundle.
 
 ## Configuration
 
@@ -215,12 +204,12 @@ componentDebugger({ preset: "debugging" });
 componentDebugger({ preset: "production" });
 ```
 
-**[📚 See all preset details in EXAMPLES.md](./EXAMPLES.md#presets)**
+[See all preset details in EXAMPLES.md](./EXAMPLES.md#presets)
 
 ### Common Configurations
 
 <details>
-<summary><strong>🎯 Clean DOM - Minimal Attributes</strong></summary>
+<summary><strong>Clean DOM, minimal attributes</strong></summary>
 
 ```typescript
 componentDebugger({
@@ -234,7 +223,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>🗂️ Path Filtering - Specific Directories</strong></summary>
+<summary><strong>Path filtering for specific directories</strong></summary>
 
 ```typescript
 componentDebugger({
@@ -248,7 +237,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>🔧 Privacy - Transform Paths</strong></summary>
+<summary><strong>Privacy: transform paths</strong></summary>
 
 ```typescript
 componentDebugger({
@@ -264,7 +253,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>⚡ Conditional - Tag Specific Components</strong></summary>
+<summary><strong>Conditional: tag specific components</strong></summary>
 
 ```typescript
 componentDebugger({
@@ -279,7 +268,7 @@ componentDebugger({
 
 </details>
 
-> **💡 Pro Tip:** Use `includeAttributes` for cleaner DOM instead of legacy `includeProps`/`includeContent`
+> Prefer `includeAttributes` over the legacy `includeProps` and `includeContent`. It produces a smaller DOM.
 
 > **⚠️ Gotcha:** When both `includeAttributes` and `excludeAttributes` are set, `includeAttributes` takes priority
 
@@ -298,7 +287,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>V2 Features - Attribute Control</strong></summary>
+<summary><strong>Attribute control</strong></summary>
 
 | Option              | Type              | Default     | Description                                      |
 | ------------------- | ----------------- | ----------- | ------------------------------------------------ |
@@ -314,7 +303,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>V2 Features - Path & Element Filtering</strong></summary>
+<summary><strong>Path and element filtering</strong></summary>
 
 | Option            | Type          | Default                          | Description              |
 | ----------------- | ------------- | -------------------------------- | ------------------------ |
@@ -328,7 +317,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>V2 Features - Conditional & Custom</strong></summary>
+<summary><strong>Conditional and custom</strong></summary>
 
 | Option             | Type                               | Default     | Description                                  |
 | ------------------ | ---------------------------------- | ----------- | -------------------------------------------- |
@@ -341,7 +330,7 @@ componentDebugger({
 </details>
 
 <details>
-<summary><strong>V2 Features - Depth, Stats & Advanced</strong></summary>
+<summary><strong>Depth, stats and advanced</strong></summary>
 
 | Option                  | Type              | Default     | Description             |
 | ----------------------- | ----------------- | ----------- | ----------------------- |
@@ -358,11 +347,9 @@ componentDebugger({
 
 </details>
 
-> **💡 All v2 features are opt-in** - Existing configs work unchanged
->
 > **📖 See complete TypeScript types:** `import { type TagOptions } from 'vite-plugin-component-debugger'`
 
-**📚 [View 50+ Detailed Examples in EXAMPLES.md →](./EXAMPLES.md)**
+[More examples in EXAMPLES.md](./EXAMPLES.md)
 
 Examples include: E2E testing setups, debug overlays, monorepo configs, feature flags, performance monitoring, and more!
 
@@ -506,17 +493,16 @@ export default defineConfig({
    Elements tagged: 287
 ```
 
-**Performance optimizations (v2.2.0):**
+**How it keeps out of the way:**
 
-- 🚀 **15-30% faster** than v2.1 with 3 micro-optimizations
-- ⚡ **Pre-compiled glob patterns** - 5-10x faster path matching
-- 📦 **Optimized JSON serialization** - 2-3x faster metadata encoding
-- 🔧 **Smart string operations** - 2x faster debug logging
-- **Time savings**: 200-500ms on 100-file projects, 2-5s on 1000-file projects
-- Efficient AST traversal with caching
-- Minimal HMR impact
-- Automatically skips `node_modules`
-- Only runs during development
+- Glob patterns are compiled once at startup rather than on every file
+- Metadata is serialized once per element instead of repeatedly
+- `node_modules` is skipped before any parsing happens
+- Files outside `includePaths` are rejected before the parser runs
+
+v2.2.0 introduced these as optimizations over v2.1. The original release notes quoted specific
+speedups; those numbers are not reproduced here because there is no benchmark in the repo to
+back them up. If build time matters to you, measure it with `onTransform` on your own project.
 
 ### Troubleshooting & Common Gotchas
 
@@ -651,7 +637,7 @@ const config: TagOptions = {
 
 ### Auto-Release Workflow
 
-🚀 **Every commit to `main` triggers automatic release:**
+**Every commit to `main` triggers an automatic release:**
 
 **Commit Message → Version Bump:**
 
@@ -731,7 +717,7 @@ pnpm run check    # Full validation
 - ⭐ Star this repository
 - ☕ [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
 - 💝 [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
-- 🐛 Report issues or suggest features
+- Report issues or suggest features
 - 🤝 Contribute code via pull requests
 - 📢 Share with other developers
 

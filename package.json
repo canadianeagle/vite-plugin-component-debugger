@@ -26,7 +26,7 @@
     "typecheck": "tsc --noEmit",
     "vite-compat": "node scripts/vite-compat.mjs",
     "pre-publish": "node scripts/pre-publish.js",
-    "check": "npm run lint && npm run test && npm run build",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "clean": "rm -rf dist node_modules"
   },
   "keywords": [
