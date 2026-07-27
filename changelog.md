@@ -9,30 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v2.3.1](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...v2.3.1) - 2026-07-27
 
-- chore: clear the outstanding cleanup items ([`869ea2c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/869ea2c0233fcd01e4d786a1a96f95de068245f4)) by 
-- fix: stop the release failing when pnpm version already created the tag ([`bade493`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/bade493192b8cfbf335c4a0b3616512a5110a260)) by 
-- chore: update changelog for v2.3.0 [skip ci] ([`2607035`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/260703574651c9e08b73ca9ce489cf55e8862217)) by 
-- chore: release v2.3.1 [skip ci] ([`1007663`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/1007663fd170c9d56e372b8a40ac8c18e1178824)) by 
+- chore: clear the outstanding cleanup items ([`8c08892`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8c088926d8d22e0ca99da1d66f8b8d408118bf7d)) by 
+- fix: stop the release failing when pnpm version already created the tag ([`36c8795`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/36c8795ba7022cf2f06da432962e47ef0a7d56f1)) by 
+- chore: update changelog for v2.3.0 [skip ci] ([`d21df89`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d21df892b577ee1adb07818a35f309b8b8b5139f)) by 
+- chore: release v2.3.1 [skip ci] ([`cacc9cc`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/cacc9cc1dd042fce18532feffcfe5685a3cc7268)) by 
 
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...HEAD) - 2026-07-27
 
 ## [v2.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...v2.3.0) - 2026-07-27
 
-- docs: correct false claims in readme, drop stale release notes, cut emoji ([`e62ab2c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/e62ab2c1ccb3047b7be559c6f79eddf2be57f286)) by 
-- docs: strip decorative emoji across the repo ([`7be7eda`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/7be7eda5ac86df4f7286739ae4926ebeee327f32)) by 
-- fix: release v2.3.0 and repair the auto-release version check ([`8159c00`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8159c0016a6640a09b4b9e0a073051755a02aa6e)) by 
-- ci: fail the release before tagging when npm auth is broken ([`c0bb0b0`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/c0bb0b0305842aa4722ca9f20e6479eaa6732e42)) by 
-- ci: publish via npm trusted publishing (OIDC) with token fallback ([`d134f62`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d134f626f791e18843bff4c0886baaca65ab8c43)) by 
-- chore: update changelog for v2.2.1 [skip ci] ([`a952958`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/a9529588a005f12f521c965a3be1466302f99820)) by 
-- fix: run the release job on Node 22 so npm can be upgraded for OIDC ([`cb42b19`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/cb42b19247ffa7c52b67f37d533de7e6a825d7c0)) by 
-- chore: update changelog for v2.3.0 [skip ci] ([`79dc0ca`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/79dc0ca76e8004075b1b26a258395a0402e25ad4)) by 
+- docs: correct false claims in readme, drop stale release notes, cut emoji ([`414db1c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/414db1c3eb8685a4c6e89a1dc85c3a4c7ee39580)) by 
+- docs: strip decorative emoji across the repo ([`a7f4636`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/a7f46360db03939792484227bce9eb912512e3b2)) by 
+- fix: release v2.3.0 and repair the auto-release version check ([`9afa0d4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/9afa0d4458eea42f23eeb567f8f56b1722f54954)) by 
+- ci: fail the release before tagging when npm auth is broken ([`44bea48`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/44bea4854c08a089c0d5a61f8fd8c832082fefe7)) by 
+- ci: publish via npm trusted publishing (OIDC) with token fallback ([`8d1bf86`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8d1bf86dacfffbf170ba934d099cfb6f6092ff17)) by 
+- chore: update changelog for v2.2.1 [skip ci] ([`8daa3f2`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8daa3f21bb70b72d7232356256a5b04f55336734)) by 
+- fix: run the release job on Node 22 so npm can be upgraded for OIDC ([`d86c4d4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d86c4d47dc74263d596d8d83211a242be29ad808)) by 
+- chore: update changelog for v2.3.0 [skip ci] ([`04c8d22`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/04c8d22edca1eff8840cbbbc28d91ccb27b70305)) by 
 
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...HEAD) - 2026-07-26
 
 ## [v2.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...v2.3.0) - 2026-07-26
 
-- fix: release v2.3.0 and repair the auto-release version check ([`8159c00`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8159c0016a6640a09b4b9e0a073051755a02aa6e)) by 
-- chore: update changelog for v2.2.1 [skip ci] ([`a952958`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/a9529588a005f12f521c965a3be1466302f99820)) by 
+- fix: release v2.3.0 and repair the auto-release version check ([`9afa0d4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/9afa0d4458eea42f23eeb567f8f56b1722f54954)) by 
+- chore: update changelog for v2.2.1 [skip ci] ([`8daa3f2`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8daa3f21bb70b72d7232356256a5b04f55336734)) by 
 
 > Note: v2.2.1 was tagged but never reached npm; its release run failed to authenticate
 > with the registry. The last published version before this one is v2.2.0.
