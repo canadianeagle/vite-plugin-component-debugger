@@ -75,7 +75,7 @@ export function DebugComponent() {
         console.log('Line number reported:', lineNumber);
 
         if (lineNumber === 0) {
-          console.log('🐛 BUG FOUND: Line number is 0!');
+          console.log('BUG FOUND: Line number is 0!');
         }
       }
     }
@@ -97,7 +97,7 @@ export function DebugComponent() {
 
       // Check for zero line numbers
       if (result.code.includes('data-dev-line="0"')) {
-        console.log('🐛 BUG FOUND: Zero line number detected!');
+        console.log('BUG FOUND: Zero line number detected!');
       }
     }
 

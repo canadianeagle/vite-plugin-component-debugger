@@ -191,7 +191,7 @@ export function enableComponentHighlighting(options?: {
   });
 
   // Log to console
-  console.log('🔍 Component highlighting enabled. Hover over elements to see their info.');
+  console.log('Component highlighting enabled. Hover over elements to see their info.');
   
   return () => {
     // Cleanup function
@@ -214,9 +214,9 @@ export function logComponentStats(prefix = 'data-dev'): void {
     fileStats[comp.file] = (fileStats[comp.file] || 0) + 1;
   });
 
-  console.group('📊 Component Statistics');
+  console.group('Component Statistics');
   console.table(stats);
-  console.group('📁 File Statistics');
+  console.group('File Statistics');
   console.table(fileStats);
   console.groupEnd();
   console.groupEnd();
@@ -233,7 +233,7 @@ export function observeComponentRenders(callback?: (info: ComponentInfo) => void
           if (node instanceof HTMLElement) {
             const info = getComponentInfo(node);
             if (info) {
-              console.log(`✨ Component rendered: ${info.name} at ${info.path}:${info.line}`);
+              console.log(`Component rendered: ${info.name} at ${info.path}:${info.line}`);
               callback?.(info);
             }
           }
@@ -278,12 +278,12 @@ export function jumpToSource(element: HTMLElement): void {
   }
 
   // This creates a clickable link in Chrome DevTools
-  console.log(`📍 Component source: ${info.path}:${info.line}:0`);
+  console.log(`Component source: ${info.path}:${info.line}:0`);
   
   // Alternative: Copy path to clipboard
   if (navigator.clipboard) {
     navigator.clipboard.writeText(`${info.path}:${info.line}`);
-    console.log('✅ Path copied to clipboard');
+    console.log('Path copied to clipboard');
   }
 }
 
@@ -303,7 +303,7 @@ if (process.env.NODE_ENV === 'development') {
     jumpToSource
   };
 
-  console.log('🚀 Component Debugger initialized. Access via window.__componentDebugger');
+  console.log('Component Debugger initialized. Access via window.__componentDebugger');
   console.log('Try: __componentDebugger.enableComponentHighlighting()');
 }
 

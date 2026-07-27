@@ -5,7 +5,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Running pre-publish checks...\n');
+console.log('Running pre-publish checks...\n');
 
 const checks = {
   'NPM Login': () => {
@@ -97,7 +97,7 @@ const checks = {
 let allPassed = true;
 
 Object.entries(checks).forEach(([name, check]) => {
-  process.stdout.write(`✓ ${name}... `);
+  process.stdout.write(`${name}... `);
   const result = check();
   
   if (result.success) {
@@ -122,7 +122,7 @@ if (allPassed) {
 }
 
 // Show what will be published
-console.log('\n📦 Files to be published:');
+console.log('\nFiles to be published:');
 try {
   const output = execSync('npm pack --dry-run 2>&1', { encoding: 'utf-8' });
   const filesMatch = output.match(/npm notice === Tarball Contents ===([\s\S]*?)npm notice ===/);
