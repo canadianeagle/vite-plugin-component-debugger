@@ -62,7 +62,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          # Node 22 for the release job specifically: npm >= 11.5.1 is required
+          # for OIDC trusted publishing and it will not install on Node 18.
+          # This does not change the package's own Node 18 support, which is
+          # declared in engines and exercised by the test matrix above.
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
@@ -80,7 +84,8 @@ jobs:
       # ships npm 10, so upgrade before we rely on it.
       - name: Upgrade npm for trusted publishing
         run: |
-          npm install -g npm@latest
+          # Pinned to 11.x: npm@latest is 12.x, which requires Node >= 22.22.
+          npm install -g npm@^11
           echo "npm $(npm --version)"
 
       - name: Preflight - verify a publish route exists
