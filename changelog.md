@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...HEAD) - 2026-07-27
+
+## [v2.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...v2.3.0) - 2026-07-27
+
+- docs: correct false claims in readme, drop stale release notes, cut emoji ([`e62ab2c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/e62ab2c1ccb3047b7be559c6f79eddf2be57f286)) by 
+- docs: strip decorative emoji across the repo ([`7be7eda`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/7be7eda5ac86df4f7286739ae4926ebeee327f32)) by 
+- fix: release v2.3.0 and repair the auto-release version check ([`8159c00`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8159c0016a6640a09b4b9e0a073051755a02aa6e)) by 
+- ci: fail the release before tagging when npm auth is broken ([`c0bb0b0`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/c0bb0b0305842aa4722ca9f20e6479eaa6732e42)) by 
+- ci: publish via npm trusted publishing (OIDC) with token fallback ([`d134f62`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d134f626f791e18843bff4c0886baaca65ab8c43)) by 
+- chore: update changelog for v2.2.1 [skip ci] ([`a952958`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/a9529588a005f12f521c965a3be1466302f99820)) by 
+- fix: run the release job on Node 22 so npm can be upgraded for OIDC ([`cb42b19`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/cb42b19247ffa7c52b67f37d533de7e6a825d7c0)) by 
+- chore: update changelog for v2.3.0 [skip ci] ([`79dc0ca`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/79dc0ca76e8004075b1b26a258395a0402e25ad4)) by 
+
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...HEAD) - 2026-07-26
 
 ## [v2.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...v2.3.0) - 2026-07-26
