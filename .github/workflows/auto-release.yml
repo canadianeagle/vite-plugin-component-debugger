@@ -176,11 +176,19 @@ jobs:
         run: |
           git push origin main
 
+      # `pnpm version` in the bump step already creates this tag, so creating it
+      # again is a fatal error. That made every bump-path release fail; v2.3.0
+      # only got through because it needed no bump, so `pnpm version` never ran.
       - name: Create and push tag
         run: |
-          git tag v${{ env.VERSION }}
-          git push origin v${{ env.VERSION }}
-          echo "Created and pushed tag v${{ env.VERSION }}"
+          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "Tag v${{ env.VERSION }} already exists locally (created by pnpm version)"
+          else
+            git tag "v${{ env.VERSION }}"
+            echo "Created tag v${{ env.VERSION }}"
+          fi
+          git push origin "v${{ env.VERSION }}"
+          echo "Pushed tag v${{ env.VERSION }}"
 
       - name: Generate changelog and update file
         run: |
