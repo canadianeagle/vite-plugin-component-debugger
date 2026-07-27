@@ -68,6 +68,27 @@ jobs:
       - name: Build package
         run: pnpm run build
 
+      # Fail before tagging, not after. Publishing is the LAST step, so a dead
+      # NPM_TOKEN used to leave a git tag and a GitHub Release pointing at a
+      # version that never reached the registry. v2.2.1 sat in that state for
+      # nine months and looked shipped.
+      - name: Preflight - verify npm credentials
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN secret is not set. Nothing would be published."
+            exit 1
+          fi
+
+          if ! WHO=$(npm whoami 2>&1); then
+            echo "::error::NPM_TOKEN is set but not accepted by the registry (npm said: ${WHO})."
+            echo "::error::npm reports an unauthenticated publish as '404 Not Found - PUT', which is misleading."
+            echo "::error::Create a new token with 'npm token create --type=automation' and update the NPM_TOKEN secret."
+            exit 1
+          fi
+          echo "Authenticated to npm as: ${WHO}"
+
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
@@ -183,6 +204,21 @@ jobs:
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Trust the registry, not the exit code.
+      - name: Verify the version is actually on npm
+        run: |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          for attempt in 1 2 3 4 5; do
+            if npm view "${PKG_NAME}@${{ env.VERSION }}" version >/dev/null 2>&1; then
+              echo "Confirmed ${PKG_NAME}@${{ env.VERSION }} is live on npm"
+              exit 0
+            fi
+            echo "Not visible yet (attempt ${attempt}/5), waiting for registry propagation..."
+            sleep 10
+          done
+          echo "::error::${PKG_NAME}@${{ env.VERSION }} is not on the registry after publishing."
+          exit 1
 
       - name: Success notification
         run: |
