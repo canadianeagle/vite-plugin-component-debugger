@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.2...HEAD) - 2026-07-27
+
+## [v2.3.2](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.1...v2.3.2) - 2026-07-27
+
+### Pull Requests
+- feat: Add support for Vite 6 and 7 in peer dependencies ([#10](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/10))
+- fix: use PAT token to allow workflows to trigger on PR merges ([#8](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/8))
+- feat: modularize plugin architecture and implement performance optimizations ([#7](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/7))
+- v2.0.0: Major Feature Release with 10+ New Capabilities ([#6](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/6))
+- feat: add includeAttributes and excludeAttributes options for filtering data attributes ([#5](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/5))
+- fix: handle multi-line JSX elements correctly when inserting attributes ([#3](https://github.com/canadianeagle/vite-plugin-component-debugger/pull/3))
+
+- chore: clear the outstanding cleanup items ([`8c08892`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8c088926d8d22e0ca99da1d66f8b8d408118bf7d)) by 
+- feat: Add project image and update documentation ([`f72fc76`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/f72fc76185e513a6a1301e91711d4fe78d280bc8)) by 
+- feat: support Vite 2 through 8 ([`9c42692`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/9c42692257d981ba314bb5eb7bdf1cc33872588f)) by 
+- docs: correct false claims in readme, drop stale release notes, cut emoji ([`414db1c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/414db1c3eb8685a4c6e89a1dc85c3a4c7ee39580)) by 
+- docs: strip decorative emoji across the repo ([`a7f4636`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/a7f46360db03939792484227bce9eb912512e3b2)) by 
+- test: add regression and adversarial suites ([`dc9d99a`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/dc9d99a5c1e97f9b240805238fae86d3f47fb364)) by 
+- docs: correct inaccurate claims and document Vite support ([`de4b59c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/de4b59ccd90b62a273cf1a5e53f23cea04a174b1)) by 
+- fix: correct 15 defects in attribute generation and file handling ([`182042c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/182042c89dced28b766e25f8a2e73ad179703fb4)) by 
+- chore: add changelog template and update changelog generation in auto-release workflow ([`7a7d575`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/7a7d575d8d5b291ad5fe53c89abbfed0e65afbbe)) by 
+- ci: make lint and typecheck real gates, add vite-compat job ([`655dbc2`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/655dbc2ef89a166175773b9fb860c8f6a1a4d16d)) by 
+- refactor: streamline auto-release workflow and improve version checking logic ([`657e5da`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/657e5da6259003605077496c4182c6d4038cd8f6)) by 
+- feat: restore automatic version bumping and enhance changelog generation ([`78abd19`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/78abd197a4b32633bd19343ffe8648b4e93cd6f0)) by 
+- fix: release v2.3.0 and repair the auto-release version check ([`9afa0d4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/9afa0d4458eea42f23eeb567f8f56b1722f54954)) by 
+- ci: fail the release before tagging when npm auth is broken ([`44bea48`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/44bea4854c08a089c0d5a61f8fd8c832082fefe7)) by 
+- ci: publish via npm trusted publishing (OIDC) with token fallback ([`8d1bf86`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8d1bf86dacfffbf170ba934d099cfb6f6092ff17)) by 
+- docs: repair changelog commit links after the history rewrite ([`ab1cae8`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/ab1cae8bc1751b8ce78c0f156c3652806d52b275)) by 
+- chore: update changelog for v2.2.0 [skip ci] ([`8cee125`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8cee125f8da4a8e7db942e21e7fb01c6344c2105)) by 
+- chore: update changelog for v2.1.0 [skip ci] ([`3093426`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/309342609e343b400f84e6258e73ba965a5bce5b)) by 
+- fix: stop the release failing when pnpm version already created the tag ([`36c8795`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/36c8795ba7022cf2f06da432962e47ef0a7d56f1)) by 
+- chore: update changelog for v2.2.1 [skip ci] ([`8daa3f2`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8daa3f21bb70b72d7232356256a5b04f55336734)) by 
+- chore: update changelog for v2.3.0 [skip ci] ([`d21df89`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d21df892b577ee1adb07818a35f309b8b8b5139f)) by 
+- chore: update changelog for v2.3.1 [skip ci] ([`e94b878`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/e94b878bd9616dadebaba9a94b2bba8214ecc3e6)) by 
+- fix: run the release job on Node 22 so npm can be upgraded for OIDC ([`d86c4d4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/d86c4d47dc74263d596d8d83211a242be29ad808)) by 
+- chore: update changelog for v2.3.0 [skip ci] ([`04c8d22`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/04c8d22edca1eff8840cbbbc28d91ccb27b70305)) by 
+- Update readme.md ([`f78e4e4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/f78e4e40220696413633afa62d728cfb3eb43b23)) by 
+- chore: release v2.2.1 [skip ci] ([`259ec42`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/259ec42278728ccd92cfa632ab47c94aa02299ae)) by 
+- chore: release v2.2.0 [skip ci] ([`fb351d8`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/fb351d8eaf0b72edb223efd88ab225495c2a4d8e)) by 
+- chore: release v2.1.0 [skip ci] ([`055b7ea`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/055b7ea5540d13b02b40aab6be1a689b598db6c6)) by 
+- chore: release v1.4.0 [skip ci] ([`8209b32`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/8209b32092466db926ba14372a073fc7462366bd)) by 
+- chore: release v1.3.1 [skip ci] ([`5bc59f4`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/5bc59f4ca47131c72c4c05684697ac8ee66ab020)) by 
+- fix: bundle estree-walker so the CommonJS entry works ([`11af721`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/11af721ac0362c0c0e4920a4abb82d9569c84eed)) by 
+- chore: release v2.3.2 [skip ci] ([`180c654`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/180c6549b9d0de8e3a6f9b982e1e1b722a4ad8fb)) by 
+- chore: release v2.3.1 [skip ci] ([`cacc9cc`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/cacc9cc1dd042fce18532feffcfe5685a3cc7268)) by 
+
+- feat: add includeAttributes and excludeAttributes options for filtering data attributes (#5) ([`1c97646`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/1c97646b88fb181d0e9203f07b9ee64a0977cf42))
+
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.1...HEAD) - 2026-07-27
 
 ## [v2.3.1](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...v2.3.1) - 2026-07-27
