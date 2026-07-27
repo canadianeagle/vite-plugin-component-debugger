@@ -62,6 +62,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'src/components/Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Check that path attribute was transformed
         expect(result.code).toContain('data-dev-path="Button.tsx"');
@@ -84,6 +88,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const idMatch = result.code.match(/data-dev-id="([^"]+)"/);
         expect(idMatch).toBeTruthy();
@@ -101,6 +109,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-name="BUTTON"');
       }
@@ -115,6 +127,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toMatch(/data-dev-line="L\d+"/);
       }
@@ -140,6 +156,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(code, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-name="CustomComponent"');
         expect(result.code).not.toContain('data-dev-name="div"');
@@ -177,6 +197,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-custom="test-value"');
         expect(result.code).toContain('data-dev-timestamp="12345"');
@@ -214,6 +238,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(codeWithProps, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-metadata="%7B%22className%22');
       }
@@ -227,6 +255,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(codeWithProps, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const metadataMatch = result.code.match(/data-dev-metadata="([^"]+)"/);
         expect(metadataMatch).toBeTruthy();
@@ -249,6 +281,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(codeWithProps, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const metadataMatch = result.code.match(/data-dev-metadata="([^"]+)"/);
         expect(metadataMatch).toBeTruthy();
@@ -284,6 +320,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(nestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should only tag <div> (root)
         const divMatches = result.code.match(/data-dev-name="div"/g);
@@ -301,6 +341,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(nestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should NOT tag <div> (depth 1)
         // Should tag <section> and deeper (depth 2+)
@@ -316,6 +360,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(nestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should tag <div> and <section> (depth 1-2)
         // Should NOT tag <article> and <p> (depth 3-4)
@@ -333,6 +381,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(nestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should ONLY tag depth 2-3 (section, article)
         expect(result.code).not.toContain('data-dev-name="div"'); // depth 1
@@ -419,6 +471,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should only include id
         expect(result.code).toContain('data-dev-id');
@@ -435,6 +491,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should include id, name, component
         expect(result.code).toContain('data-dev-id');
@@ -459,6 +519,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(codeWithProps, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should include all attributes
         expect(result.code).toContain('data-dev-id');
@@ -474,6 +538,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'src/components/Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should only include id and line
         expect(result.code).toContain('data-dev-id');
@@ -498,6 +566,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name'); // Overridden
@@ -513,6 +585,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-sourcemap="webpack://Button.tsx"');
       }
@@ -523,6 +599,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).not.toContain('data-dev-sourcemap');
       }
@@ -538,6 +618,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should have single data-dev attribute
         expect(result.code).toContain('data-dev="');
@@ -568,6 +652,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const groupedMatch = result.code.match(/data-dev="([^"]+)"/);
         expect(groupedMatch).toBeTruthy();
@@ -590,6 +678,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
@@ -610,6 +702,10 @@ describe('V2 Features', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-test-id');
         expect(result.code).toContain('data-test-name');

@@ -19,6 +19,10 @@ describe('V2 Edge Cases & Security', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should not contain unescaped script tags
         expect(result.code).not.toContain('<script>');
@@ -36,6 +40,10 @@ describe('V2 Edge Cases & Security', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Quotes should be escaped, preventing attribute breakout
         expect(result.code).toContain('&quot;');
@@ -114,6 +122,10 @@ describe('V2 Edge Cases & Security', () => {
         expect.stringContaining('Metadata size')
       );
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Metadata should be present and truncated
         const metadataMatch = result.code.match(/data-dev-metadata="([^"]+)"/);
@@ -151,6 +163,10 @@ describe('V2 Edge Cases & Security', () => {
       // Should not crash
       expect(result).toBeDefined();
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Count how many elements were tagged
         const matches = result.code.match(/data-dev-id=/g);
@@ -200,6 +216,10 @@ describe('V2 Edge Cases & Security', () => {
       // Should complete in reasonable time (< 5 seconds)
       expect(duration).toBeLessThan(5000);
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should have tagged all elements
         const matches = result.code.match(/data-dev-id=/g);
@@ -219,6 +239,10 @@ describe('V2 Edge Cases & Security', () => {
       const result = await plugin.transform?.(basicCode, longPath);
 
       expect(result).toBeDefined();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-path=');
       }
@@ -265,6 +289,10 @@ describe('V2 Edge Cases & Security', () => {
       expect(transformerCalled).toBe(true);
       expect(customAttrsCalled).toBe(true);
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Only button should be tagged (shouldTag filter)
         expect(result.code).toContain('data-dev-name="BUTTON"'); // transformer
@@ -294,6 +322,10 @@ describe('V2 Edge Cases & Security', () => {
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
       expect(result).toBeDefined();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-');
       }

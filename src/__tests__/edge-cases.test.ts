@@ -42,6 +42,10 @@ describe('Edge Cases That Could Cause Line Number Issues', () => {
 
     const result = await plugin.transform?.(code, 'complex.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== COMPLEX EXPRESSIONS TEST ===');
 
@@ -77,6 +81,10 @@ describe('Edge Cases That Could Cause Line Number Issues', () => {
 
     const result = await plugin.transform?.(code, 'template.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== TEMPLATE LITERALS TEST ===');
 
@@ -119,6 +127,10 @@ describe('Edge Cases That Could Cause Line Number Issues', () => {
 
     const result = await plugin.transform?.(code, 'nested.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== DEEPLY NESTED TEST ===');
 
@@ -157,6 +169,10 @@ function ShortFragmentTest() {
 
     const result = await plugin.transform?.(code, 'fragments.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== FRAGMENTS TEST ===');
 
@@ -210,6 +226,10 @@ function ShortFragmentTest() {
 
     const result = await plugin.transform?.(code, 'edge-cases.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== EDGE CASES TEST ===');
 
@@ -245,6 +265,10 @@ function LineNumberCheck() {
 
     const result = await plugin.transform?.(code, 'line-check.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== LINE NUMBER VERIFICATION ===');
       console.log('Original with line numbers:');

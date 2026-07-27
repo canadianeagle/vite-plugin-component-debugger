@@ -83,9 +83,9 @@ than esbuild+Rollup; the plugin works on both because it only uses the standard
 - `tsup.config.ts` - Build configuration
 - `.eslintrc.json` - ESLint config (`pnpm run lint` fails without it)
 
-**Dead code:** `src/utils/component-debugger.ts` is a browser-side helper module that
-nothing imports, exports, bundles, or tests (0% coverage). It is not part of the published
-package. Delete it or publish it as an explicit browser subpath entry.
+**Package manager:** pnpm only. `package-lock.json` is gitignored and `packageManager` pins
+the version so corepack picks the right tool. CI runs `pnpm install --frozen-lockfile`, which
+fails if `pnpm-lock.yaml` goes stale after a dependency change.
 
 ### How It Works
 1. Intercepts Vite's transform hook for `.jsx`/`.tsx` files
