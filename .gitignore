@@ -48,3 +48,5 @@ logs/
 # Reference files (keep local only)
 final-summary.md
 Makefile/
+# npm lockfile: this project uses pnpm (see CLAUDE.md and CI)
+package-lock.json

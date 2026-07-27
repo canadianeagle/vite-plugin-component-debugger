@@ -13,6 +13,10 @@ describe('Nested Component Line Number Accuracy', () => {
 
     const result = await plugin.transform?.(code, 'NestedComponents.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== NESTED COMPONENTS LINE ANALYSIS ===');
 
@@ -98,6 +102,10 @@ describe('Nested Component Line Number Accuracy', () => {
 
     const result = await plugin.transform?.(code, 'render-props.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== RENDER PROPS COMPONENT TEST ===');
 
@@ -158,6 +166,10 @@ function App() {
 
     const result = await plugin.transform?.(code, 'hoc-test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== HOC PATTERN TEST ===');
 
@@ -239,6 +251,10 @@ function App() {
 
     const result = await plugin.transform?.(code, 'conditional.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== CONDITIONAL RENDERING TEST ===');
 
@@ -288,6 +304,10 @@ function App() {
 
     const result = await plugin.transform?.(code, 'sequential.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== SEQUENTIAL LINE VERIFICATION ===');
 

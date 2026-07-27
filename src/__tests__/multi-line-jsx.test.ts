@@ -20,6 +20,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'TreeSelect.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Check that the code is valid JavaScript/JSX
       expect(() => {
@@ -62,6 +66,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'SelfClosing.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify syntax is valid
       expect(() => {
@@ -103,6 +111,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'Spread.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify syntax is valid
       expect(() => {
@@ -147,6 +159,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'Complex.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify syntax is valid
       expect(() => {
@@ -186,6 +202,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'Comments.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify syntax is valid
       expect(() => {
@@ -219,6 +239,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'Spaces.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify syntax is valid
       expect(() => {
@@ -264,6 +288,10 @@ describe('Multi-line JSX Element Handling', () => {
 
     const result = await plugin.transform?.(code, 'Newlines.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify syntax is valid
       expect(() => {

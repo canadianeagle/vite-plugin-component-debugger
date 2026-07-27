@@ -30,6 +30,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Button.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-dev-id');
       expect(result.code).toContain('data-dev-name="button"');
@@ -48,6 +52,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Component.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-dev-name="div"');
       expect(result.code).not.toContain('data-dev-name="Fragment"');
@@ -64,6 +72,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Button.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-track-id');
       expect(result.code).toContain('data-track-name');
@@ -81,6 +93,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Button.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-dev-metadata');
       // The metadata should contain encoded className
@@ -98,6 +114,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Button.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).not.toContain('data-dev-metadata');
     }
@@ -113,6 +133,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Component.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-dev-name="Motion.div"');
       expect(result.code).not.toContain('data-dev-name="React.Fragment"');
@@ -136,6 +160,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Scene.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-dev-name="div"');
       expect(result.code).not.toContain('data-dev-name="mesh"');
@@ -154,6 +182,10 @@ describe('componentDebugger', () => {
     
     const result = await plugin.transform?.(code, 'Scene.tsx');
     
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       expect(result.code).toContain('data-dev-name="mesh"');
     }

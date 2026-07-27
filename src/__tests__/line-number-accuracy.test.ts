@@ -23,6 +23,10 @@ export function TestComponent() {
 
     const result = await plugin.transform?.(code, 'test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // div should be on line 4 (1-indexed, accounting for initial newline)
       expect(result.code).toContain('data-dev-line="4"');
@@ -59,6 +63,10 @@ export function MultiLineComponent() {
 
     const result = await plugin.transform?.(code, 'test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // div opening tag starts on line 4
       expect(result.code).toMatch(/data-dev-name="div"[^>]*data-dev-line="4"/);
@@ -95,6 +103,10 @@ function NestedComponent() {
 
     const result = await plugin.transform?.(code, 'test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Verify specific line numbers
       expect(result.code).toMatch(/data-dev-name="article"[^>]*data-dev-line="4"/);
@@ -118,6 +130,10 @@ function NestedComponent() {
 
     const result = await plugin.transform?.(code, 'test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Should never have line 0
       expect(result.code).not.toContain('data-dev-line="0"');
@@ -144,6 +160,10 @@ export function ComponentWithComments() {
 
     const result = await plugin.transform?.(code, 'test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // div should be on line 9 (accounting for comments)
       expect(result.code).toMatch(/data-dev-name="div"[^>]*data-dev-line="9"/);
@@ -160,6 +180,10 @@ export function ComponentWithComments() {
 
     const result = await plugin.transform?.(code, 'SimpleComponent.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Based on SimpleComponent.tsx structure:
       // div should be on line 7
@@ -189,6 +213,10 @@ export function ColumnTest() {
 
     const result = await plugin.transform?.(code, 'test.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       // Extract column numbers
       const divMatch = result.code.match(/data-dev-name="div"[^>]*data-dev-line="4"[^>]*data-dev-id="[^:]*:[^:]*:(\d+)"/);
