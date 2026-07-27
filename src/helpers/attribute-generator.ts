@@ -1,6 +1,6 @@
 // src/helpers/attribute-generator.ts
 // Generate data attributes for JSX elements
-// 🚀 OPTIMIZATION #1: Single JSON.stringify instead of triple calls
+// OPTIMIZATION #1: Single JSON.stringify instead of triple calls
 
 import type {
   InternalComponentInfo,
@@ -24,7 +24,7 @@ function isValidAttributeName(name: string): boolean {
 
 /**
  * Generate data attributes string for a JSX element
- * 🚀 PERFORMANCE: Optimized to call JSON.stringify only once or twice (not 3 times)
+ * PERFORMANCE: Optimized to call JSON.stringify only once or twice (not 3 times)
  *
  * @param info - Component information
  * @param prefix - Attribute prefix (e.g., 'data-dev')
@@ -68,12 +68,12 @@ export function generateAttributes(
       try {
         const transformed = transformers.id(id);
         if (typeof transformed !== 'string') {
-          console.warn(`⚠️  id transformer must return string, got ${typeof transformed}, using original value`);
+          console.warn(` id transformer must return string, got ${typeof transformed}, using original value`);
         } else {
           id = transformed;
         }
       } catch (error) {
-        console.error(`⚠️  Error in id transformer:`, error);
+        console.error(` Error in id transformer:`, error);
       }
     }
     attributeValues['id'] = id;
@@ -86,12 +86,12 @@ export function generateAttributes(
       try {
         const transformed = transformers.name(name);
         if (typeof transformed !== 'string') {
-          console.warn(`⚠️  name transformer must return string, got ${typeof transformed}, using original value`);
+          console.warn(` name transformer must return string, got ${typeof transformed}, using original value`);
         } else {
           name = transformed;
         }
       } catch (error) {
-        console.error(`⚠️  Error in name transformer:`, error);
+        console.error(` Error in name transformer:`, error);
       }
     }
     attributeValues['name'] = name;
@@ -104,12 +104,12 @@ export function generateAttributes(
       try {
         const transformed = transformers.path(pathValue);
         if (typeof transformed !== 'string') {
-          console.warn(`⚠️  path transformer must return string, got ${typeof transformed}, using original value`);
+          console.warn(` path transformer must return string, got ${typeof transformed}, using original value`);
         } else {
           pathValue = transformed;
         }
       } catch (error) {
-        console.error(`⚠️  Error in path transformer:`, error);
+        console.error(` Error in path transformer:`, error);
       }
     }
     attributeValues['path'] = pathValue;
@@ -121,12 +121,12 @@ export function generateAttributes(
       try {
         const transformed = transformers.line(info.line);
         if (typeof transformed !== 'string') {
-          console.warn(`⚠️  line transformer must return string, got ${typeof transformed}, using original value`);
+          console.warn(` line transformer must return string, got ${typeof transformed}, using original value`);
         } else {
           line = transformed;
         }
       } catch (error) {
-        console.error(`⚠️  Error in line transformer:`, error);
+        console.error(` Error in line transformer:`, error);
       }
     }
     attributeValues['line'] = line;
@@ -138,12 +138,12 @@ export function generateAttributes(
       try {
         const transformed = transformers.file(file);
         if (typeof transformed !== 'string') {
-          console.warn(`⚠️  file transformer must return string, got ${typeof transformed}, using original value`);
+          console.warn(` file transformer must return string, got ${typeof transformed}, using original value`);
         } else {
           file = transformed;
         }
       } catch (error) {
-        console.error(`⚠️  Error in file transformer:`, error);
+        console.error(` Error in file transformer:`, error);
       }
     }
     attributeValues['file'] = file;
@@ -155,19 +155,19 @@ export function generateAttributes(
       try {
         const transformed = transformers.component(component);
         if (typeof transformed !== 'string') {
-          console.warn(`⚠️  component transformer must return string, got ${typeof transformed}, using original value`);
+          console.warn(` component transformer must return string, got ${typeof transformed}, using original value`);
         } else {
           component = transformed;
         }
       } catch (error) {
-        console.error(`⚠️  Error in component transformer:`, error);
+        console.error(` Error in component transformer:`, error);
       }
     }
     attributeValues['component'] = component;
   }
 
   // Props and content as JSON
-  // 🚀 OPTIMIZATION #1: Single JSON.stringify instead of triple calls
+  // OPTIMIZATION #1: Single JSON.stringify instead of triple calls
   if (shouldInclude('metadata')) {
     const metadata: any = {};
     if (info.props) {
@@ -185,7 +185,7 @@ export function generateAttributes(
       let metadataJson = JSON.stringify(metadata);
 
       if (metadataJson.length > MAX_METADATA_SIZE) {
-        console.warn(`⚠️  Metadata size (${metadataJson.length} bytes) exceeds limit (${MAX_METADATA_SIZE} bytes), truncating`);
+        console.warn(` Metadata size (${metadataJson.length} bytes) exceeds limit (${MAX_METADATA_SIZE} bytes), truncating`);
 
         // Re-stringify with _truncated flag (2nd call only if needed)
         metadataJson = JSON.stringify({ ...metadata, _truncated: true });
@@ -257,13 +257,13 @@ export function generateAttributes(
 
         // Skip dangerous keys (check both the raw and the de-prefixed form)
         if (dangerousKeys.includes(key) || dangerousKeys.includes(cleanKey)) {
-          console.warn(`⚠️  Skipping dangerous custom attribute key: ${key}`);
+          console.warn(` Skipping dangerous custom attribute key: ${key}`);
           continue;
         }
 
         // Limit number of custom attributes
         if (attrCount >= MAX_CUSTOM_ATTRS) {
-          console.warn(`⚠️  Maximum custom attributes limit (${MAX_CUSTOM_ATTRS}) reached, skipping remaining attributes`);
+          console.warn(` Maximum custom attributes limit (${MAX_CUSTOM_ATTRS}) reached, skipping remaining attributes`);
           break;
         }
 
@@ -273,14 +273,14 @@ export function generateAttributes(
           : value;
 
         if (typeof value === 'string' && value.length > MAX_ATTR_LENGTH) {
-          console.warn(`⚠️  Attribute '${key}' value truncated to ${MAX_ATTR_LENGTH} characters`);
+          console.warn(` Attribute '${key}' value truncated to ${MAX_ATTR_LENGTH} characters`);
         }
 
         attributeValues[cleanKey] = truncatedValue;
         attrCount++;
       }
     } catch (error) {
-      console.error(`⚠️  Error in customAttributes callback for ${info.name}:`, error);
+      console.error(` Error in customAttributes callback for ${info.name}:`, error);
       // Continue without custom attributes
     }
   }
@@ -309,7 +309,7 @@ export function generateAttributes(
       encoded = encodeURIComponent(grouped);
     }
     if (!isValidAttributeName(prefix)) {
-      console.warn(`⚠️  Skipping attributes: invalid attributePrefix "${prefix}"`);
+      console.warn(` Skipping attributes: invalid attributePrefix "${prefix}"`);
       return '';
     }
     return ` ${prefix}="${escapeHtml(encoded)}"`;
@@ -322,7 +322,7 @@ export function generateAttributes(
       // (from attributePrefix or a customAttributes key) would inject arbitrary
       // JSX or make the module unparseable, so reject it.
       if (!isValidAttributeName(attrName)) {
-        console.warn(`⚠️  Skipping attribute with invalid name: ${attrName}`);
+        console.warn(` Skipping attribute with invalid name: ${attrName}`);
         continue;
       }
       const escapedValue = escapeHtml(String(value));

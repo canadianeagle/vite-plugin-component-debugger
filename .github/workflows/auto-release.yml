@@ -245,6 +245,6 @@ jobs:
 
       - name: Success notification
         run: |
-          echo "🎉 Successfully released v${{ env.VERSION }}"
-          echo "📦 NPM: https://www.npmjs.com/package/vite-plugin-component-debugger"
-          echo "🏷️ GitHub: ${{ steps.create_release.outputs.html_url }}"
+          echo "Successfully released v${{ env.VERSION }}"
+          echo "NPM: https://www.npmjs.com/package/vite-plugin-component-debugger"
+          echo "GitHub: ${{ steps.create_release.outputs.html_url }}"

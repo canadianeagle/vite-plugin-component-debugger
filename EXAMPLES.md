@@ -2,9 +2,9 @@
 
 **Comprehensive real-world examples** showing you how to leverage all the powerful features in v2.0. From simple setups to advanced patterns, find the perfect configuration for your workflow.
 
-> **💡 New to the plugin?** Start with [Quick Start](#quick-start) or jump to [Presets](#presets) for instant configurations.
+> **New to the plugin?** Start with [Quick Start](#quick-start) or jump to [Presets](#presets) for instant configurations.
 >
-> **🎯 Looking for specific features?** Use the [Table of Contents](#table-of-contents) below to navigate directly to what you need.
+> **Looking for specific features?** Use the [Table of Contents](#table-of-contents) below to navigate directly to what you need.
 
 Created and maintained by **[Tonye Brown](https://www.tonyebrown.com)** - Builder, Front-end developer, and performance optimization expert.
 
@@ -344,7 +344,7 @@ componentDebugger({
 ```typescript
 componentDebugger({
   onTransform: ({ file, elementsTagged, elementNames }) => {
-    console.log(`✓ ${file}: ${elementsTagged} elements`);
+    console.log(`${file}: ${elementsTagged} elements`);
     console.log(`  Elements: ${elementNames.join(', ')}`);
   }
 })
@@ -599,18 +599,18 @@ componentDebugger({
 
 **Connect:**
 
-- 🌐 [Website](https://www.tonyebrown.com)
-- 📖 [Plugin Docs](https://www.tonyebrown.com/apps/vite-plugin-component-debugger)
-- 🐦 [Twitter](https://www.twitter.com/truevined)
-- 💼 [LinkedIn](https://www.linkedin.com/in/tonyeb/)
+- [Website](https://www.tonyebrown.com)
+- [Plugin Docs](https://www.tonyebrown.com/apps/vite-plugin-component-debugger)
+- [Twitter](https://www.twitter.com/truevined)
+- [LinkedIn](https://www.linkedin.com/in/tonyeb/)
 
 **Support This Project:**
 
-- ⭐ [Star on GitHub](https://github.com/canadianeagle/vite-plugin-component-debugger)
-- ☕ [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
-- 💝 [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
-- 🐛 [Report issues or suggest features](https://github.com/canadianeagle/vite-plugin-component-debugger/issues)
-- 🤝 Contribute via pull requests
-- 📢 Share with other developers
+- [Star on GitHub](https://github.com/canadianeagle/vite-plugin-component-debugger)
+- [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
+- [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
+- [Report issues or suggest features](https://github.com/canadianeagle/vite-plugin-component-debugger/issues)
+- Contribute via pull requests
+- Share with other developers
 
 **[← Back to README](./README.md)**

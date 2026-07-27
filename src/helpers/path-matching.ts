@@ -1,6 +1,6 @@
 // src/helpers/path-matching.ts
 // Path filtering with glob pattern support
-// 🚀 OPTIMIZATION #2: Pre-compiled regex patterns for 5-10x faster matching
+// OPTIMIZATION #2: Pre-compiled regex patterns for 5-10x faster matching
 
 import { minimatch } from 'minimatch';
 
@@ -20,7 +20,7 @@ interface CompiledPattern {
 
 /**
  * Compile glob patterns into regex for fast repeated matching
- * 🚀 PERFORMANCE: Pre-compiling patterns avoids repeated compilation
+ * PERFORMANCE: Pre-compiling patterns avoids repeated compilation
  *
  * @param patterns - Array of glob patterns
  * @returns Array of compiled regex patterns
@@ -31,14 +31,14 @@ export function compilePatterns(patterns: string[] | undefined): CompiledPattern
   return patterns.map(pattern => {
     // Validate pattern length
     if (pattern.length > MAX_PATTERN_LENGTH) {
-      console.warn(`⚠️  Glob pattern exceeds maximum length (${MAX_PATTERN_LENGTH}), skipping: ${pattern.substring(0, 50)}...`);
+      console.warn(` Glob pattern exceeds maximum length (${MAX_PATTERN_LENGTH}), skipping: ${pattern.substring(0, 50)}...`);
       return { regex: null, pattern };
     }
 
     // Validate wildcard count
     const wildcardCount = (pattern.match(/\*/g) || []).length;
     if (wildcardCount > MAX_WILDCARD_COUNT) {
-      console.warn(`⚠️  Glob pattern contains too many wildcards (${wildcardCount}), skipping: ${pattern}`);
+      console.warn(` Glob pattern contains too many wildcards (${wildcardCount}), skipping: ${pattern}`);
       return { regex: null, pattern };
     }
 
@@ -48,7 +48,7 @@ export function compilePatterns(patterns: string[] | undefined): CompiledPattern
       const regex = minimatch.makeRe(pattern, { dot: true });
       return { regex: regex === false ? null : regex, pattern };
     } catch (error) {
-      console.error(`⚠️  Error compiling glob pattern "${pattern}":`, error);
+      console.error(` Error compiling glob pattern "${pattern}":`, error);
       return { regex: null, pattern };
     }
   });
@@ -56,7 +56,7 @@ export function compilePatterns(patterns: string[] | undefined): CompiledPattern
 
 /**
  * Test if a file path matches any of the pre-compiled patterns
- * 🚀 PERFORMANCE: Uses cached regex instead of re-compiling patterns
+ * PERFORMANCE: Uses cached regex instead of re-compiling patterns
  *
  * @param filePath - File path to test
  * @param compiledPatterns - Pre-compiled patterns from compilePatterns()
@@ -89,14 +89,14 @@ export function matchesPatterns(filePath: string, patterns: string[] | undefined
   for (const pattern of patterns) {
     // Validate pattern length
     if (pattern.length > MAX_PATTERN_LENGTH) {
-      console.warn(`⚠️  Glob pattern exceeds maximum length (${MAX_PATTERN_LENGTH}), skipping: ${pattern.substring(0, 50)}...`);
+      console.warn(` Glob pattern exceeds maximum length (${MAX_PATTERN_LENGTH}), skipping: ${pattern.substring(0, 50)}...`);
       continue;
     }
 
     // Validate wildcard count
     const wildcardCount = (pattern.match(/\*/g) || []).length;
     if (wildcardCount > MAX_WILDCARD_COUNT) {
-      console.warn(`⚠️  Glob pattern contains too many wildcards (${wildcardCount}), skipping: ${pattern}`);
+      console.warn(` Glob pattern contains too many wildcards (${wildcardCount}), skipping: ${pattern}`);
       continue;
     }
 
@@ -105,7 +105,7 @@ export function matchesPatterns(filePath: string, patterns: string[] | undefined
         return true;
       }
     } catch (error) {
-      console.error(`⚠️  Error matching glob pattern "${pattern}":`, error);
+      console.error(` Error matching glob pattern "${pattern}":`, error);
       continue;
     }
   }

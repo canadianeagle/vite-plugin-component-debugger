@@ -347,7 +347,7 @@ componentDebugger({
 
 </details>
 
-> **📖 See complete TypeScript types:** `import { type TagOptions } from 'vite-plugin-component-debugger'`
+> **See complete TypeScript types:** `import { type TagOptions } from 'vite-plugin-component-debugger'`
 
 [More examples in EXAMPLES.md](./EXAMPLES.md)
 
@@ -487,7 +487,7 @@ export default defineConfig({
 ### Build Performance & Statistics
 
 ```
-📊 Component Debugger Statistics:
+Component Debugger Statistics:
    Total files scanned: 45
    Files processed: 32
    Elements tagged: 287
@@ -707,19 +707,19 @@ pnpm run check    # Full validation
 
 **Connect:**
 
-- 🌐 [Website](https://www.tonyebrown.com)
-- 📖 [Plugin Docs](https://www.tonyebrown.com/apps/vite-plugin-component-debugger)
-- 🐦 [Twitter](https://www.twitter.com/truevined)
-- 💼 [LinkedIn](https://www.linkedin.com/in/tonyeb/)
+- [Website](https://www.tonyebrown.com)
+- [Plugin Docs](https://www.tonyebrown.com/apps/vite-plugin-component-debugger)
+- [Twitter](https://www.twitter.com/truevined)
+- [LinkedIn](https://www.linkedin.com/in/tonyeb/)
 
 **Support This Project:**
 
-- ⭐ Star this repository
-- ☕ [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
-- 💝 [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
+- Star this repository
+- [Buy me a coffee](https://www.buymeacoffee.com/tonyebrown)
+- [Sponsor on GitHub](https://github.com/sponsors/canadianeagle)
 - Report issues or suggest features
-- 🤝 Contribute code via pull requests
-- 📢 Share with other developers
+- Contribute code via pull requests
+- Share with other developers
 
 ## License
 
@@ -737,7 +737,7 @@ _Inspired by [lovable-tagger](https://www.npmjs.com/package/lovable-tagger), enh
 [![Website](https://img.shields.io/badge/Website-tonyebrown.com-4285F4?style=flat&logo=google-chrome&logoColor=white)](https://www.tonyebrown.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-tonyeb-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/tonyeb/)
 
-**⭐ Star this repo if it helped you!**
+**Star this repo if it helped you!**
 
 </div>
 

@@ -13,7 +13,7 @@ export function applyPreset(options: TagOptions): TagOptions {
 
   const preset = PRESETS[options.preset];
   if (!preset) {
-    console.warn(`⚠️  Unknown preset: ${options.preset}, using default configuration`);
+    console.warn(` Unknown preset: ${options.preset}, using default configuration`);
     return options;
   }
 
@@ -41,7 +41,7 @@ export function encodeBase64(str: string): string {
 export function sanitizeExportPath(statsPath: string, projectRoot: string): string | null {
   // Security: Prevent path traversal
   if (statsPath.split(/[\\/]/).includes('..')) {
-    console.error('⚠️  exportStats path cannot contain ".." (path traversal attempt)');
+    console.error(' exportStats path cannot contain ".." (path traversal attempt)');
     return null;
   }
 
@@ -58,8 +58,8 @@ export function sanitizeExportPath(statsPath: string, projectRoot: string): stri
   if (!isInsideRoot) {
     console.error(
       path.isAbsolute(statsPath)
-        ? '⚠️  exportStats path must be relative or within project root'
-        : '⚠️  exportStats path resolved outside project root'
+        ? ' exportStats path must be relative or within project root'
+        : ' exportStats path resolved outside project root'
     );
     return null;
   }

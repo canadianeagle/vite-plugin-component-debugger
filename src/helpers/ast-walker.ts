@@ -1,6 +1,6 @@
 // src/helpers/ast-walker.ts
 // AST walking and element tagging logic
-// 🚀 OPTIMIZATION #3: Single string split for debug logging (was 2 splits)
+// OPTIMIZATION #3: Single string split for debug logging (was 2 splits)
 
 import { walk } from 'estree-walker';
 import type MagicString from 'magic-string';
@@ -75,21 +75,21 @@ function shouldExcludeElement(
 
 /**
  * Debug log file processing information
- * 🚀 OPTIMIZATION #3: Single split instead of two separate splits
+ * OPTIMIZATION #3: Single split instead of two separate splits
  */
 export function logDebugInfo(code: string, relativePath: string): void {
-  console.log(`\n🔍 PROCESSING FILE: ${relativePath}`);
-  console.log(`📄 CODE LENGTH: ${code.length} characters`);
+  console.log(`\nPROCESSING FILE: ${relativePath}`);
+  console.log(`CODE LENGTH: ${code.length} characters`);
 
   // Split once and reuse (OPTIMIZATION: was 2 splits, now 1)
   const lines = code.split('\n');
 
-  console.log(`📄 FIRST 10 LINES:`);
+  console.log(`FIRST 10 LINES:`);
   lines.slice(0, 10).forEach((line, i) => {
     console.log(`  ${i + 1}: ${line}`);
   });
 
-  console.log(`📄 LAST 5 LINES:`);
+  console.log(`LAST 5 LINES:`);
   lines.slice(-5).forEach((line, i) => {
     console.log(`  ${lines.length - 5 + i + 1}: ${line}`);
   });
@@ -301,7 +301,7 @@ export function tagElements(options: TagElementsOptions): TagElementsResult {
         if (!openingElement.loc?.start) {
           if (debug) {
             console.warn(
-              `⚠️  Missing location info for element "${elementName}" in ${relativePath}`
+              ` Missing location info for element "${elementName}" in ${relativePath}`
             );
           }
         }
@@ -309,7 +309,7 @@ export function tagElements(options: TagElementsOptions): TagElementsResult {
         // Debug logging
         if (debug) {
           console.log(
-            `🏷️  Tagging ${elementName} at line ${line}, column ${column} in ${relativePath}`
+            ` Tagging ${elementName} at line ${line}, column ${column} in ${relativePath}`
           );
         }
 
@@ -374,7 +374,7 @@ export function tagElements(options: TagElementsOptions): TagElementsResult {
             }
           } catch (error) {
             console.error(
-              `⚠️  Error in shouldTag callback for ${elementName} in ${relativePath}:`,
+              ` Error in shouldTag callback for ${elementName} in ${relativePath}:`,
               error
             );
             // Continue processing - don't skip element on error
@@ -409,7 +409,7 @@ export function tagElements(options: TagElementsOptions): TagElementsResult {
             // Fallback: this shouldn't happen with valid JSX
             if (debug) {
               console.warn(
-                `⚠️  Could not find '/>' in self-closing element "${elementName}" at ${relativePath}:${line}`
+                ` Could not find '/>' in self-closing element "${elementName}" at ${relativePath}:${line}`
               );
             }
             insertPosition = elementEnd - 2;
@@ -423,7 +423,7 @@ export function tagElements(options: TagElementsOptions): TagElementsResult {
             // Fallback: this shouldn't happen with valid JSX
             if (debug) {
               console.warn(
-                `⚠️  Could not find '>' in element "${elementName}" at ${relativePath}:${line}`
+                ` Could not find '>' in element "${elementName}" at ${relativePath}:${line}`
               );
             }
             insertPosition = elementEnd - 1;

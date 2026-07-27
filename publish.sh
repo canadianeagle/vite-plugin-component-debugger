@@ -3,7 +3,7 @@
 
 set -e  # Exit on error
 
-echo "🚀 Vite Plugin Component Debugger - Quick Publish"
+echo "Vite Plugin Component Debugger - Quick Publish"
 echo "================================================"
 echo ""
 
@@ -56,7 +56,7 @@ fi
 
 # Clean and install
 echo ""
-echo "📦 Preparing package..."
+echo "Preparing package..."
 echo "----------------------"
 
 echo "Cleaning previous builds..."
@@ -83,7 +83,7 @@ fi
 
 # Check git status
 echo ""
-echo "📋 Git Status"
+echo "Git Status"
 echo "-------------"
 if [ -d .git ]; then
     if [ -n "$(git status --porcelain)" ]; then
@@ -107,14 +107,14 @@ fi
 
 # Show what will be published
 echo ""
-echo "📄 Files to be published:"
+echo "Files to be published:"
 echo "------------------------"
-npm pack --dry-run 2>&1 | grep -A 100 "Tarball Contents" | grep -B 100 "Tarball Details" | grep "📦" || npm pack --dry-run
+npm pack --dry-run 2>&1 | grep -A 100 "Tarball Contents" | grep -B 100 "Tarball Details" | grep "" || npm pack --dry-run
 
 # Get current version
 CURRENT_VERSION=$(node -p "require('./package.json').version")
 echo ""
-echo "📌 Current version: $CURRENT_VERSION"
+echo "Current version: $CURRENT_VERSION"
 
 # Ask for version bump
 echo ""
@@ -167,7 +167,7 @@ if [[ "$PACKAGE_NAME" == @* ]]; then
     echo ""
 fi
 
-read -p "🚀 Publish now? (y/n) " -n 1 -r
+read -p "Publish now? (y/n) " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -196,7 +196,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         fi
         
         echo ""
-        echo "🎉 Congratulations! Your package is now live!"
+        echo "Congratulations! Your package is now live!"
         echo ""
         echo "Next steps:"
         echo "  - Share on social media"
