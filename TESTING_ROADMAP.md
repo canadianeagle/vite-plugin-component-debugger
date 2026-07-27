@@ -2,37 +2,42 @@
 
 ## Vite Plugin Component Debugger
 
-**Version:** 2.0.0+
-**Created:** 2025-09-30
-**Total Time Estimate:** 8-12 hours with AI assistance (1-2 days)
-**Status:** Planning Phase
+**Created:** 2025-09-30 against v2.0.0
+**Status:** Partly superseded. See the note below before using this as a plan.
 
 ---
 
-## 📊 Executive Summary
+## Executive Summary
 
 This roadmap outlines a comprehensive plan to achieve enterprise-grade security, reliability, and test coverage for the vite-plugin-component-debugger. The plan includes 51 specific tasks across 8 categories.
 
-**Current Status:**
+**Current Status (updated for v2.3.0):**
 
-- ✅ 113/113 tests passing
-- ✅ Basic security measures implemented (ReDoS protection, transformer validation, path traversal prevention)
-- ✅ Risk Level: 🟢 LOW
+- ✅ 1268 tests passing, up from the 113 recorded when this was written
+- ✅ Property-based and fuzz coverage added in `src/__tests__/adversarial.test.ts`:
+  65 hostile JSX shapes across 17 configs, plus 400 seeded random trees
+- ✅ The suite is mutation tested: 27 injected bugs, 27 caught
+- ✅ Vite 2 through 8 verified by real builds in CI (`scripts/vite-compat.mjs`)
+- ✅ Security hardening: ReDoS limits, attribute-name validation, path traversal prevention
+
+Several items below were completed during the v2.3.0 audit and are no longer open work.
+Task counts and time estimates in the rest of this document reflect the original 2025-09-30
+plan and have not been recalculated.
 
 **Target Status:**
 
-- 🎯 100% code coverage
-- 🎯 Comprehensive fuzzing tests
-- 🎯 Memory leak detection
-- 🎯 Performance regression tests
-- 🎯 Browser compatibility tests
-- 🎯 Formal threat model
-- 🎯 Penetration testing complete
-- 🎯 Risk Level: 🟢 ZERO
+- 100% code coverage
+- Comprehensive fuzzing tests
+- Memory leak detection
+- Performance regression tests
+- Browser compatibility tests
+- Formal threat model
+- Penetration testing complete
+- Risk Level: 🟢 ZERO
 
 ---
 
-## 🎯 Priority Breakdown
+## Priority Breakdown
 
 ### 🔴 HIGH Priority (4-6 hours)
 
@@ -120,7 +125,7 @@ describe("Babel Parser Fuzzing", () => {
 
   it("should handle Unicode edge cases", async () => {
     const unicodeCases = [
-      "<Component😀 />", // Emoji in name
+      "<Component/>", // Emoji in name
       "<div>مرحبا</div>", // Arabic RTL
       "<div>你好</div>", // Chinese
       "<div>\u200B\u200C\u200D</div>", // Zero-width chars
@@ -1916,7 +1921,7 @@ This roadmap should be reviewed and updated:
 
 ---
 
-## 🚀 Realistic AI-Assisted Timeline Summary
+## Realistic AI-Assisted Timeline Summary
 
 **Total Time with AI Assistance: 8-12 hours (1-2 days)**
 

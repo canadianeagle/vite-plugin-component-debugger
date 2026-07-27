@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing! This document provides guidelines and information for contributors.
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
@@ -19,7 +19,7 @@ Thank you for your interest in contributing! This document provides guidelines a
    git checkout -b feature/my-new-feature
    ```
 
-## 🛠️ Development Setup
+## Development Setup
 
 ### Prerequisites
 - Node.js 14.18.0 or higher
@@ -57,7 +57,7 @@ src/
     └── plugin.test.ts
 ```
 
-## 📝 Guidelines
+## Guidelines
 
 ### Code Style
 - Follow existing TypeScript conventions
@@ -97,7 +97,7 @@ src/
    - Address feedback promptly
    - Keep PRs focused and atomic
 
-## 🐛 Bug Reports
+## Bug Reports
 
 When reporting bugs, please include:
 - Plugin version
@@ -110,7 +110,7 @@ When reporting bugs, please include:
 
 Use the bug report template in GitHub Issues.
 
-## 💡 Feature Requests
+## Feature Requests
 
 When requesting features:
 - Describe the problem you're solving
@@ -120,7 +120,7 @@ When requesting features:
 
 Use the feature request template in GitHub Issues.
 
-## 🏗️ Architecture
+## Architecture
 
 ### Plugin Design
 The plugin works by:
@@ -142,24 +142,24 @@ The plugin works by:
 - Minimize impact on HMR
 - Skip processing for excluded elements
 
-## 📜 Code of Conduct
+## Code of Conduct
 
 - Be respectful and inclusive
 - Welcome newcomers and help them learn
 - Focus on constructive feedback
 - Assume good intentions
 
-## 🆘 Getting Help
+## Getting Help
 
 - **Questions**: Open a GitHub Discussion
 - **Bugs**: Use the bug report template
 - **Features**: Use the feature request template
 - **Contributing**: Tag maintainers in issues
 
-## 📄 License
+## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
 ---
 
-Thank you for contributing to vite-plugin-component-debugger! 🎉
+Thank you for contributing to vite-plugin-component-debugger!

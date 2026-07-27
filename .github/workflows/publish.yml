@@ -143,5 +143,5 @@ jobs:
       
       - name: Success message
         run: |
-          echo "🎉 Successfully published ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
+          echo "Successfully published ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
           echo "View on NPM: https://www.npmjs.com/package/${{ steps.package.outputs.name }}"
