@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
   packages: write
+  # Required for npm trusted publishing (OIDC). Lets the job mint a short-lived
+  # identity token so npm can verify the publish came from this repo and this
+  # workflow, with no long-lived NPM_TOKEN involved.
+  id-token: write
 
 jobs:
   test:
@@ -72,19 +76,35 @@ jobs:
       # NPM_TOKEN used to leave a git tag and a GitHub Release pointing at a
       # version that never reached the registry. v2.2.1 sat in that state for
       # nine months and looked shipped.
-      - name: Preflight - verify npm credentials
+      # npm >= 11.5.1 is required for OIDC trusted publishing. The Node 18 runner
+      # ships npm 10, so upgrade before we rely on it.
+      - name: Upgrade npm for trusted publishing
+        run: |
+          npm install -g npm@latest
+          echo "npm $(npm --version)"
+
+      - name: Preflight - verify a publish route exists
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "::error::NPM_TOKEN secret is not set. Nothing would be published."
-            exit 1
+          # Route 1: OIDC trusted publishing. Preferred, nothing to expire.
+          if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "OIDC is available; publishing via trusted publisher."
+            echo "If npm rejects it, confirm the trusted publisher on npmjs.com names"
+            echo "this repo and workflow file exactly (auto-release.yml)."
+            exit 0
           fi
 
+          # Route 2: a classic/granular token. Being deprecated by npm
+          # (bypass-2FA restricted Aug 2026, direct publishing Jan 2027).
+          echo "::warning::OIDC unavailable, falling back to NPM_TOKEN."
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::No OIDC and no NPM_TOKEN. Nothing would be published."
+            exit 1
+          fi
           if ! WHO=$(npm whoami 2>&1); then
-            echo "::error::NPM_TOKEN is set but not accepted by the registry (npm said: ${WHO})."
+            echo "::error::NPM_TOKEN is set but the registry rejected it (npm said: ${WHO})."
             echo "::error::npm reports an unauthenticated publish as '404 Not Found - PUT', which is misleading."
-            echo "::error::Create a new token with 'npm token create --type=automation' and update the NPM_TOKEN secret."
             exit 1
           fi
           echo "Authenticated to npm as: ${WHO}"
@@ -200,8 +220,11 @@ jobs:
           draft: false
           prerelease: false
 
+      # Uses npm, not pnpm: OIDC trusted publishing is implemented in the npm CLI.
+      # NODE_AUTH_TOKEN stays as a fallback for when OIDC is unavailable; npm
+      # prefers the trusted publisher when one is configured.
       - name: Publish to NPM
-        run: pnpm publish --access public --no-git-checks
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
