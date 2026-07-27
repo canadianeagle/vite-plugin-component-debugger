@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.1...HEAD) - 2026-07-27
+
+## [v2.3.1](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...v2.3.1) - 2026-07-27
+
+- chore: clear the outstanding cleanup items ([`869ea2c`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/869ea2c0233fcd01e4d786a1a96f95de068245f4)) by 
+- fix: stop the release failing when pnpm version already created the tag ([`bade493`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/bade493192b8cfbf335c4a0b3616512a5110a260)) by 
+- chore: update changelog for v2.3.0 [skip ci] ([`2607035`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/260703574651c9e08b73ca9ce489cf55e8862217)) by 
+- chore: release v2.3.1 [skip ci] ([`1007663`](https://github.com/canadianeagle/vite-plugin-component-debugger/commit/1007663fd170c9d56e372b8a40ac8c18e1178824)) by 
+
 ## [Unreleased](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.3.0...HEAD) - 2026-07-27
 
 ## [v2.3.0](https://github.com/canadianeagle/vite-plugin-component-debugger/compare/v2.2.1...v2.3.0) - 2026-07-27
