@@ -23,6 +23,10 @@ describe('V2 Error Handling', () => {
 
       // Should still process the element (not skip on error)
       expect(result).toBeTruthy();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
       }
@@ -58,6 +62,10 @@ describe('V2 Error Handling', () => {
       const result = await plugin.transform?.(code, 'App.tsx');
 
       // All elements should be tagged despite error
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-name="div"');
         expect(result.code).toContain('data-dev-name="button"');
@@ -81,6 +89,10 @@ describe('V2 Error Handling', () => {
 
       // Should still include default attributes
       expect(result).toBeTruthy();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
@@ -116,6 +128,10 @@ describe('V2 Error Handling', () => {
 
       // Verify plugin continued processing despite error
       expect(result).toBeDefined();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should still have tagged the element
         expect(result.code).toContain('data-dev-id');
@@ -268,6 +284,10 @@ describe('V2 Error Handling', () => {
         expect.stringContaining('truncated to 1000 characters')
       );
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Value should be truncated
         const match = result.code.match(/data-dev-long-attr="([^"]+)"/);
@@ -332,6 +352,10 @@ describe('V2 Error Handling', () => {
         expect(hasDangerousKeyWarning).toBe(true);
       }
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should not contain any dangerous keys
         expect(result.code).not.toContain('data-dev-__proto__');

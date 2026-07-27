@@ -25,6 +25,10 @@ export function DebugComponent() {
 
     const result = await plugin.transform?.(code, 'DebugComponent.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== ORIGINAL CODE ===');
       console.log(code.split('\n').map((line, i) => `${i + 1}: ${line}`).join('\n'));
@@ -63,6 +67,10 @@ export function DebugComponent() {
 
     const result = await plugin.transform?.(code, 'minimal.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== MINIMAL CODE TEST ===');
       console.log('Original:', code);
@@ -90,6 +98,10 @@ export function DebugComponent() {
 
     const result = await plugin.transform?.(code, 'fragment.tsx');
 
+    expect(
+      result && typeof result === 'object' && 'code' in result,
+      'transform returned no code, so the assertions below would never run'
+    ).toBe(true);
     if (result && typeof result === 'object' && 'code' in result) {
       console.log('\n=== FRAGMENT TEST ===');
       console.log('Original:', code);

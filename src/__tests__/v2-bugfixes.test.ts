@@ -28,6 +28,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(basicCode, 'src/components/deep/Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should have both preset transformers (id shortened) AND user transformer (line prefixed)
         const idMatch = result.code.match(/data-dev-id="([^"]+)"/);
@@ -52,6 +56,10 @@ describe('V2 Bug Fixes', () => {
 
       // Should not crash, should apply user transformer
       expect(result).toBeTruthy();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const idMatch = result.code.match(/data-dev-id="([^"]+)"/);
         expect(idMatch).toBeTruthy();
@@ -69,6 +77,10 @@ describe('V2 Bug Fixes', () => {
       const result = await plugin.transform?.(basicCode, 'src/components/Button.tsx');
 
       expect(result).toBeTruthy();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Preset transformers should be applied
         const idMatch = result.code.match(/data-dev-id="([^"]+)"/);
@@ -102,6 +114,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(deeplyNestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should tag depth 1-3 only
         expect(result.code).toContain('data-dev-name="div"');      // depth 1
@@ -122,6 +138,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(deeplyNestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should skip depth 1
         expect(result.code).not.toContain('data-dev-name="div"'); // depth 1
@@ -142,6 +162,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(deeplyNestedCode, 'App.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should ONLY tag depth 1 (root)
         expect(result.code).toContain('data-dev-name="div"');
@@ -166,6 +190,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Prefix should be removed, leaving just the key
         expect(result.code).toContain('data-dev-custom="value1"');
@@ -183,6 +211,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Key without dash should NOT have prefix removed (would become "ustom")
         // Instead, it should be added as-is
@@ -203,6 +235,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Keys without prefix should get prefix added
         expect(result.code).toContain('data-dev-env="production"');
@@ -229,6 +265,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(codeWithLargeProps, 'Component.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-metadata');
 
@@ -263,6 +303,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(codeWithLargeProps, 'Component.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const metadataMatch = result.code.match(/data-dev-metadata="([^"]+)"/);
         expect(metadataMatch).toBeTruthy();
@@ -294,6 +338,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(codeWithLargeProps, 'Component.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // KEY FIX: Before the fix, 'none' encoding bypassed size limits
         // Now it should be truncated
@@ -326,6 +374,10 @@ describe('V2 Bug Fixes', () => {
 
       const result = await plugin.transform?.(codeWithSmallProps, 'Component.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         const metadataMatch = result.code.match(/data-dev-metadata="([^"]+)"/);
         expect(metadataMatch).toBeTruthy();
@@ -378,6 +430,10 @@ describe('V2 Bug Fixes', () => {
 
       // Should not crash and should apply all fixes correctly
       expect(result).toBeTruthy();
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Transformer merging works (name should be uppercase)
         expect(result.code).toContain('data-dev-name="DIV"');

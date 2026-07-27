@@ -17,6 +17,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should include
         expect(result.code).toContain('data-dev-id');
@@ -38,6 +42,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).not.toContain('data-dev-name');
@@ -53,6 +61,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-line');
         expect(result.code).toContain('data-dev-file');
@@ -76,6 +88,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(codeWithProps, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-metadata');
@@ -98,6 +114,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(codeWithProps, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
@@ -114,6 +134,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Should include
         expect(result.code).toContain('data-dev-id');
@@ -135,6 +159,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).not.toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
@@ -150,6 +178,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).not.toContain('data-dev-name');
@@ -168,6 +200,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name'); // Should be included due to allowlist
@@ -181,6 +217,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
@@ -199,6 +239,10 @@ describe('Attribute Filtering', () => {
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
       // Should still transform but with no attributes
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).not.toContain('data-dev-id');
         expect(result.code).not.toContain('data-dev-name');
@@ -214,6 +258,10 @@ describe('Attribute Filtering', () => {
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
       // Should include all attributes (empty disallowlist excludes nothing)
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
@@ -231,6 +279,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(basicCode, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-test-id');
         expect(result.code).toContain('data-test-name');
@@ -256,6 +308,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(multiElementCode, 'Form.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         // Each element should have only id and line
         const idMatches = result.code.match(/data-dev-id/g);
@@ -283,6 +339,10 @@ describe('Attribute Filtering', () => {
 
       const result = await plugin.transform?.(codeWithPropsAndContent, 'Button.tsx');
 
+      expect(
+        result && typeof result === 'object' && 'code' in result,
+        'transform returned no code, so the assertions below would never run'
+      ).toBe(true);
       if (result && typeof result === 'object' && 'code' in result) {
         expect(result.code).toContain('data-dev-id');
         expect(result.code).toContain('data-dev-name');
